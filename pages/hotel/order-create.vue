@@ -1,0 +1,444 @@
+<template>
+  <view class="page">
+    <scroll-view scroll-y class="content">
+      <!-- 顶部房型摘要 -->
+      <view class="top-card">
+        <view class="hotel-name">{{ hotelInfo.hotelName || '酒店名称' }}</view>
+        <view class="room-brief">
+          <text>{{ roomInfo.roomName || '大床房' }}</text>
+          <text v-if="roomInfo.bedInfo" class="dot">·</text>
+          <text v-if="roomInfo.bedInfo">{{ roomInfo.bedInfo }}</text>
+          <text class="dot">·</text>
+          <text>{{ hasBreakfast(roomInfo) ? '有早餐' : '不含早' }}</text>
+        </view>
+        <view class="date-brief">
+          <text>{{ checkInDate }}</text>
+          <text class="night-badge">{{ nightNum }}晚</text>
+          <text>{{ checkOutDate }}</text>
+        </view>
+        <view class="cancel-brief">{{ roomInfo.cancelPolicy || '入住当天18:00前可免费取消' }}</view>
+      </view>
+
+      <!-- 订单信息（入住人） -->
+      <view class="section-card">
+        <view class="section-title">订单信息</view>
+        <view class="form-item">
+          <text class="label">住客姓名*</text>
+          <input
+            class="input"
+            v-model="guestName"
+            placeholder="请输入住客姓名"
+          />
+        </view>
+        <view class="form-item">
+          <text class="label">联系电话*</text>
+          <input
+            class="input"
+            v-model="mobile"
+            type="number"
+            placeholder="请输入手机号码"
+          />
+        </view>
+        <view class="form-item">
+          <text class="label">房间数量</text>
+          <view class="stepper">
+            <text class="step-btn" @click="changeRoomNum(-1)">-</text>
+            <text class="step-value">{{ roomNum }}</text>
+            <text class="step-btn" @click="changeRoomNum(1)">+</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 房费明细 -->
+      <view class="section-card">
+        <view class="section-title">房费明细</view>
+        <view class="price-row">
+          <text class="label">房费1晚</text>
+          <text class="value">¥{{ formatPrice(displayPrice) }}</text>
+        </view>
+        <view class="price-row">
+          <text class="label sub">本单您需支付</text>
+          <text class="value highlight">¥{{ totalAmount }}</text>
+        </view>
+      </view>
+
+      <!-- 取消政策 -->
+      <view class="section-card">
+        <view class="section-title">取消政策</view>
+        <view class="section-text">
+          {{ roomInfo.cancelPolicy || '该房型可于入住当天12:00前免费取消' }}
+        </view>
+      </view>
+
+      <!-- 入住提示 -->
+      <view class="section-card">
+        <view class="section-title">入住提示</view>
+        <view class="section-text">
+          房客信息真实、可使用任意有效证件办理入住。请在预订后按酒店要求时间办理入住。
+        </view>
+      </view>
+
+      <!-- 入住协议 -->
+      <view class="section-card">
+        <view class="section-title">入住协议</view>
+        <view class="section-text">
+          预订即视为同意酒店相关入住协议及服务条款。
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 底部价格栏 -->
+    <view class="bottom-bar">
+      <view class="bottom-prices">
+        <view class="price-line">
+          <text class="price-label">挂牌价</text>
+          <text class="price-value">¥{{ formatPrice(prices.list_price) }}</text>
+        </view>
+        <view class="price-line">
+          <text class="price-label vip">尊享价</text>
+          <text class="price-value vip">¥{{ formatPrice(prices.vip_price) }}</text>
+        </view>
+        <view class="price-line">
+          <text class="price-label share">股东价</text>
+          <text class="price-value share">¥{{ formatPrice(prices.share_price) }}</text>
+        </view>
+      </view>
+      <button class="submit-btn" :disabled="submitting" @click="submitOrder">
+        立即预订
+      </button>
+    </view>
+  </view>
+</template>
+
+<script>
+import { hotelDetail, createOrder } from '@/api/hotel.js'
+
+export default {
+  data() {
+    return {
+      hotelCode: '',
+      roomCode: '',
+      checkInDate: '',
+      checkOutDate: '',
+      nightNum: 1,
+      hotelInfo: {},
+      roomInfo: {},
+      prices: { list_price: 0, vip_price: 0, share_price: 0 },
+      guestName: '',
+      mobile: '',
+      roomNum: 1,
+      submitting: false
+    }
+  },
+  computed: {
+    // 显示用的单晚价格（这里采用尊享价优先）
+    displayPrice() {
+      return this.prices.vip_price || this.prices.list_price || 0
+    },
+    // 总价 = 单价 * 晚数 * 房间数
+    totalAmount() {
+      const amount = this.displayPrice * this.nightNum * this.roomNum
+      return this.formatPrice(amount)
+    }
+  },
+  onLoad(options) {
+    this.hotelCode = options.hotelCode || ''
+    this.roomCode = options.roomCode || ''
+    this.checkInDate = options.checkInDate || ''
+    this.checkOutDate = options.checkOutDate || ''
+
+    if (this.checkInDate && this.checkOutDate) {
+      const checkIn = new Date(this.checkInDate)
+      const checkOut = new Date(this.checkOutDate)
+      this.nightNum = Math.max(1, Math.ceil((checkOut - checkIn) / 86400000))
+    }
+
+    this.loadHotelDetail()
+  },
+  methods: {
+    formatPrice(price) {
+      if (!price && price !== 0) return '0.00'
+      const num = typeof price === 'number' ? price : parseFloat(price)
+      return num.toFixed(2)
+    },
+    hasBreakfast(room) {
+      const desc = (room.roomDesc || room.description || '').toLowerCase()
+      const name = (room.roomName || '').toLowerCase()
+      return desc.includes('早餐') || desc.includes('breakfast') || name.includes('含早')
+    },
+    changeRoomNum(delta) {
+      const next = this.roomNum + delta
+      if (next < 1) return
+      this.roomNum = next
+    },
+    async loadHotelDetail() {
+      try {
+        const res = await hotelDetail({
+          hotel_code: this.hotelCode,
+          check_in_date: this.checkInDate,
+          check_out_date: this.checkOutDate
+        })
+        if (res.code === 1) {
+          this.hotelInfo = res.data || {}
+          const rooms = this.hotelInfo.rooms || []
+          const room = rooms.find(r => r.roomCode === this.roomCode) || rooms[0]
+          if (room) {
+            this.roomInfo = room
+            const basePrice = room.amountPrice ? room.amountPrice / 100 : 0
+            this.prices = {
+              list_price: room.list_price || basePrice,
+              vip_price: room.vip_price || basePrice,
+              share_price: room.share_price || basePrice
+            }
+          }
+        }
+      } catch (e) {
+        uni.showToast({ title: e.msg || '加载失败', icon: 'none' })
+      }
+    },
+    async submitOrder() {
+      if (this.submitting) return
+
+      if (!this.hotelCode || !this.roomCode) {
+        uni.showToast({ title: '参数错误', icon: 'none' })
+        return
+      }
+      if (!this.guestName) {
+        uni.showToast({ title: '请输入住客姓名', icon: 'none' })
+        return
+      }
+      if (!this.mobile) {
+        uni.showToast({ title: '请输入联系电话', icon: 'none' })
+        return
+      }
+
+      this.submitting = true
+      try {
+        const res = await createOrder({
+          hotel_code: this.hotelCode,
+          room_code: this.roomCode,
+          check_in_date: this.checkInDate,
+          check_out_date: this.checkOutDate,
+          adult_count: this.roomNum, // 简化：按房间数估算人数
+          child_count: 0,
+          guest_name: this.guestName,
+          mobile: this.mobile,
+          room_num: this.roomNum
+        })
+
+        if (res.code === 1) {
+          // 跳转到统一支付页面（复用原有支付流程）
+          uni.redirectTo({
+            url: `/pages/payment/payment?from=hotel&order_id=${res.data.order_id}`
+          })
+        }
+      } catch (e) {
+        uni.showToast({ title: e.msg || '创建订单失败', icon: 'none' })
+      } finally {
+        this.submitting = false
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.page {
+  min-height: 100vh;
+  background: #0a1929;
+  color: #fff;
+  padding-bottom: 140rpx;
+}
+
+.content {
+  height: calc(100vh - 140rpx);
+}
+
+.top-card {
+  padding: 40rpx 30rpx 30rpx;
+  background: #0a1929;
+  border-bottom: 1px solid #1a3a5a;
+}
+
+.hotel-name {
+  font-size: 34rpx;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+}
+
+.room-brief {
+  font-size: 26rpx;
+  color: #ddd;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6rpx;
+  margin-bottom: 10rpx;
+}
+
+.room-brief .dot {
+  color: #666;
+}
+
+.date-brief {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
+  color: #ddd;
+  margin-bottom: 10rpx;
+}
+
+.night-badge {
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  background: #1a3a5a;
+  color: #ff9500;
+  font-size: 22rpx;
+}
+
+.cancel-brief {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.section-card {
+  margin: 20rpx 20rpx 0;
+  padding: 24rpx 26rpx;
+  background: #16213e;
+  border-radius: 16rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 1px solid #1f2b48;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 26rpx;
+  color: #ddd;
+}
+
+.input {
+  flex: 1;
+  text-align: right;
+  font-size: 26rpx;
+  color: #fff;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.step-btn {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 24rpx;
+  border: 1px solid #555;
+  text-align: center;
+  line-height: 48rpx;
+  font-size: 32rpx;
+}
+
+.step-value {
+  min-width: 40rpx;
+  text-align: center;
+  font-size: 26rpx;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10rpx 0;
+}
+
+.price-row .sub {
+  color: #999;
+}
+
+.price-row .highlight {
+  color: #ff9500;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.section-text {
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #ccc;
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16rpx 20rpx 26rpx;
+  background: #0a1929;
+  border-top: 1px solid #1a3a5a;
+  display: flex;
+  align-items: center;
+}
+
+.bottom-prices {
+  flex: 1;
+}
+
+.price-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22rpx;
+  margin-bottom: 4rpx;
+}
+
+.price-label {
+  color: #999;
+}
+
+.price-label.vip,
+.price-value.vip {
+  color: #ff9500;
+}
+
+.price-label.share,
+.price-value.share {
+  color: #ffdf70;
+}
+
+.price-value {
+  color: #fff;
+}
+
+.submit-btn {
+  width: 220rpx;
+  height: 80rpx;
+  background: #ffb84d;
+  border-radius: 40rpx;
+  border: none;
+  color: #1a1a2e;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+.submit-btn[disabled] {
+  opacity: 0.6;
+}
+</style>
+
+
