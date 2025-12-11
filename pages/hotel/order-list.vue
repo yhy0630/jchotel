@@ -5,12 +5,9 @@
       <view class="navbar-left" @click="goBack">
         <text class="icon-back">‹</text>
       </view>
-      <view class="navbar-title">全部订单</view>
-      <view class="navbar-right">
-        <view class="filter-btn" @click="toggleTypePicker(true)">
-          <text>{{ typeLabel }}</text>
-          <text class="icon-down">▼</text>
-        </view>
+      <view class="navbar-title" @click="toggleTypePicker(true)">
+        <text>{{ typeLabel }}</text>
+        <text class="icon-down">▼</text>
       </view>
     </view>
 
@@ -83,7 +80,7 @@ export default {
       status: '',
       activeType: '', // 订单类型：''-全部, '1'-定制房, '2'-尊享房
       typeOptions: [
-        { label: '全部', value: '' },
+        { label: '全部订单', value: '' },
         { label: '尊享房', value: '2' },
         { label: '定制房', value: '1' }
       ],
@@ -235,8 +232,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 88rpx;
-  padding: 0 30rpx;
+  padding: 120rpx 30rpx 30rpx;
   background: #16213e;
   position: relative;
 }
@@ -250,30 +246,18 @@ export default {
 }
 
 .icon-back {
-  font-size: 48rpx;
+  font-size: 55rpx;
   color: #ffffff;
   line-height: 1;
 }
 
 .navbar-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 36rpx;
-  font-weight: 500;
-  color: #ffffff;
-}
-
-.navbar-right {
-  display: flex;
-  align-items: center;
-}
-
-.filter-btn {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 10rpx;
-  font-size: 28rpx;
+  font-size: 36rpx;
+  font-weight: 500;
   color: #ffffff;
 }
 
@@ -442,7 +426,7 @@ export default {
 
 .type-picker-panel {
   width: 100%;
-  background: #16213e;
+  background: #1F2034;
   border-radius: 24rpx 24rpx 0 0;
   padding: 40rpx 30rpx;
   padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
@@ -452,15 +436,17 @@ export default {
 
 .panel-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 40rpx;
+  position: relative;
 }
 
 .panel-title {
   font-size: 36rpx;
   font-weight: 500;
   color: #ffffff;
+  text-align: center;
 }
 
 .panel-close {
@@ -471,6 +457,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .panel-tags {
@@ -494,9 +484,9 @@ export default {
 }
 
 .panel-tag.active {
-  background: rgba(255, 149, 0, 0.2);
-  border-color: #ff9500;
-  color: #ff9500;
+  background: #4E474C;
+  border-color: #FFE3BB;
+  color: #FFE3BB;
 }
 
 .panel-tag.disabled {

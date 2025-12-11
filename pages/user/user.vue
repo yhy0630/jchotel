@@ -154,7 +154,7 @@
 				</view>
 			</view>
 			<view class="nav row wrap">
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/user_order/user_order?scene=hotel')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">酒店订单</view>
 				</view>

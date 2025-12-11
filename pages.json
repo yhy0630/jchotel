@@ -255,7 +255,7 @@
 		{
 			"path": "pages/hotel/order-list",
 			"style": {
-				"navigationBarTitleText": "酒店订单"
+				"navigationStyle": "custom" 
 			}
 		},
 		{
