@@ -1,15 +1,7 @@
 <template>
 	<view class="index">
 		<!-- 顶部导航栏 -->
-		<u-navbar :border-bottom="false" :is-fixed="true" :background="{ background: '#1A4A8F' }" :is-back="false">
-			<view class="navbar-content">
-				<text class="navbar-title">锦程汇</text>
-				<view class="navbar-right">
-					<text class="icon-more">⋯</text>
-					<view class="icon-circle"></view>
-				</view>
-				</view>
-			</u-navbar>
+		
 
 		<!-- 轮播图 -->
 		<view class="banner-section">

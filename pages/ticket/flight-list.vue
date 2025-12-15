@@ -2,12 +2,13 @@
   <view class="page">
     <!-- 顶部路线信息 -->
     <view class="header">
-      <text class="route">{{ departureCityName }}-{{ arrivalCityName }}</text>
+      <text class="route">{{ departureCityName }} - {{ arrivalCityName }}</text>
+      <text class="date-label">{{ departureDate }}</text>
     </view>
 
     <!-- 日期选择 -->
     <view class="date-bar">
-      <scroll-view scroll-x class="date-scroll">
+      <scroll-view scroll-x class="date-scroll" scroll-with-animation>
         <view 
           v-for="(date, index) in dateList" 
           :key="index"
@@ -91,45 +92,43 @@
     <!-- 航班列表 -->
     <scroll-view scroll-y class="list" @scrolltolower="loadMore">
       <view v-for="(item, index) in list" :key="index" class="flight-item" @click="goDetail(item)">
-        <view class="time-info">
-          <view class="departure">
-            <text class="time">{{ item.departureTime }}</text>
-            <text class="airport">{{ item.departureAirport }}{{ item.departureTerminal }}</text>
-          </view>
-          <view class="duration">
-            <text class="duration-text">{{ item.duration }}</text>
-            <view class="line">
-              <text class="dot"></text>
-              <text class="line-dash"></text>
-              <text class="plane">✈</text>
+        <view class="row-top">
+          <view class="col-left">
+            <view class="time airport-line">
+              <text class="time-text">{{ item.departureTime }}</text>
+              <text class="airport">{{ item.departureAirport }}</text>
+            </view>
+            <view class="duration">
+              <text class="duration-text">{{ item.duration || '—' }}</text>
+              <text class="arrow">→</text>
+            </view>
+            <view class="time airport-line">
+              <text class="time-text">{{ item.arrivalTime }}</text>
+              <text class="airport">{{ item.arrivalAirport }}</text>
             </view>
           </view>
-          <view class="arrival">
-            <text class="time">{{ item.arrivalTime }}</text>
-            <text class="airport">{{ item.arrivalAirport }}{{ item.arrivalTerminal }}</text>
+          <view class="col-right">
+            <view class="price-row">
+              <text class="price">¥{{ formatPrice(item.display_price || item.price) }}</text>
+              <text class="unit">起</text>
+            </view>
+            <text v-if="item.original_price && item.original_price !== item.display_price" class="original-price">
+              ¥{{ formatPrice(item.original_price) }}
+            </text>
+            <button class="book-btn" @click.stop="goBook(item)">订</button>
           </view>
         </view>
-        
-        <view class="flight-info">
-          <text class="airline">{{ item.airlineName }}{{ item.flightNo }}</text>
-          <text v-if="item.aircraftType" class="aircraft">{{ item.aircraftType }}</text>
-          <text v-if="item.hasMeal" class="meal">有餐食</text>
-        </view>
-        
-        <view class="price-info">
-          <view class="price-row">
-            <text class="price-label">{{ item.price_type_text || '尊享价' }}</text>
-            <text class="price">¥{{ formatPrice(item.display_price || item.price) }}</text>
-            <text class="price-unit">起</text>
+
+        <view class="row-bottom">
+          <text class="airline">{{ item.airlineName }} {{ item.flightNo }}</text>
+          <view class="tags">
+            <text v-if="item.aircraftType" class="tag">{{ item.aircraftType }}</text>
+            <text v-if="item.hasMeal" class="tag">有餐食</text>
+            <text class="tag type">{{ item.price_type_text || '尊享价' }}</text>
           </view>
-          <text v-if="item.original_price && item.original_price !== item.display_price" class="original-price">
-            原价 ¥{{ formatPrice(item.original_price) }}
-          </text>
         </view>
-        
-        <button class="book-btn" @click.stop="goBook(item)">订</button>
       </view>
-      
+
       <view v-if="loading" class="loading">加载中...</view>
       <view v-if="noMore" class="no-more">没有更多了</view>
     </scroll-view>
@@ -196,7 +195,16 @@ export default {
     
     this.initDateList()
     this.initAirlines()
-    this.loadList()
+    this.loadList(true)
+  },
+  onPullDownRefresh() {
+    // 下拉刷新重置分页
+    this.page = 1
+    this.noMore = false
+    this.list = []
+    this.loadList(true).finally(() => {
+      uni.stopPullDownRefresh()
+    })
   },
   methods: {
     initAirlines() {
@@ -313,8 +321,9 @@ export default {
       this.loadList()
     },
     
-    async loadList() {
-      if (this.loading || this.noMore) return
+    async loadList(force = false) {
+      if (this.loading) return
+      if (!force && this.noMore) return
       this.loading = true
       
       try {
@@ -484,10 +493,9 @@ export default {
     },
     
     loadMore() {
-      if (!this.noMore) {
-        this.page++
-        this.loadList()
-      }
+      if (this.loading || this.noMore) return
+      this.page++
+      this.loadList()
     },
     
     formatPrice(price) {
@@ -497,14 +505,64 @@ export default {
     },
     
     goDetail(item) {
-      uni.navigateTo({
-        url: `/pages/ticket/flight-detail?flight_no=${item.flightNo}&departure_date=${this.departureDate}`
-      })
+      // 优先使用routeId（新接口参数）
+      if (item.routeId) {
+        uni.navigateTo({
+          url: `/pages/ticket/flight-detail?route_id=${encodeURIComponent(item.routeId)}&route_type=OW`
+        })
+      } else {
+        // 使用旧接口参数
+        const params = {
+          flight_no: item.flightNo || '',
+          departure_date: this.departureDate || '',
+          dep_airport: item.depAirportCode || '',
+          arr_airport: item.arrAirportCode || ''
+        }
+        const queryString = Object.keys(params)
+          .map(key => `${key}=${encodeURIComponent(params[key])}`)
+          .join('&')
+        uni.navigateTo({
+          url: `/pages/ticket/flight-detail?${queryString}`
+        })
+      }
     },
     
     goBook(item) {
+      if (!item || !item.flightNo) {
+        uni.showToast({ title: '航班信息不完整', icon: 'none' })
+        return
+      }
+      
+      // 不要在这里预先编码，统一在构建 queryString 时编码
+      const params = {
+        type: 'flight',
+        flight_no: item.flightNo || '',
+        departure_date: this.departureDate || '',
+        price: item.display_price || item.price || 0,
+        price_type: item.price_type || 2,
+        price_type_text: item.price_type_text || '尊享价',
+        original_price: item.original_price || item.price || 0,
+        dep_city: item.departureCityName || item.departureCity || '',
+        arr_city: item.arrivalCityName || item.arrivalCity || '',
+        // 使用机场三字码传递，避免名称过长写入数据库
+        dep_airport: item.depAirportCode || item.departureAirport || item.depAirport || '',
+        arr_airport: item.arrAirportCode || item.arrivalAirport || item.arrAirport || '',
+        airline_name: item.airlineName || '',
+        dep_time: item.departureTime || '',
+        arr_time: item.arrivalTime || ''
+      }
+      
+      // 统一在这里编码一次
+      const queryString = Object.keys(params)
+        .map(key => `${key}=${encodeURIComponent(params[key])}`)
+        .join('&')
+      
       uni.navigateTo({
-        url: `/pages/ticket/passenger-info?type=flight&flight_no=${item.flightNo}&departure_date=${this.departureDate}&price=${item.display_price || item.price}&price_type=${item.price_type || 2}&price_type_text=${item.price_type_text || '尊享价'}&original_price=${item.original_price || item.price}`
+        url: `/pages/ticket/passenger-info?${queryString}`,
+        fail: (err) => {
+          console.error('跳转失败:', err)
+          uni.showToast({ title: '页面跳转失败，请重试', icon: 'none' })
+        }
       })
     }
   }
@@ -519,13 +577,20 @@ export default {
 
 .header {
   background: #fff;
-  padding: 30rpx;
-  text-align: center;
+  padding: 30rpx 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   
   .route {
-    font-size: 36rpx;
+    font-size: 34rpx;
     font-weight: bold;
     color: #333;
+  }
+
+  .date-label {
+    font-size: 26rpx;
+    color: #666;
   }
 }
 
@@ -535,14 +600,15 @@ export default {
   
   .date-scroll {
     white-space: nowrap;
-    padding: 20rpx 0;
+    padding: 20rpx 20rpx;
     
     .date-item {
       display: inline-block;
-      padding: 20rpx 30rpx;
-      margin: 0 10rpx;
+      padding: 18rpx 26rpx;
+      margin: 0 8rpx;
       text-align: center;
       border-radius: 8rpx;
+      border: 1px solid #f0f0f0;
       
       .date-text {
         display: block;
@@ -558,8 +624,9 @@ export default {
       }
       
       &.active {
-        background: #F8D07C;
-        
+        background: #FDF3DB;
+        border-color: #F8D07C;
+
         .date-text, .week-text {
           color: #1A4A8F;
         }
@@ -577,19 +644,22 @@ export default {
 .filter-bar {
   display: flex;
   background: #fff;
-  padding: 20rpx 30rpx;
+  padding: 16rpx 24rpx;
   border-bottom: 1px solid #e0e0e0;
+  align-items: center;
   
   .filter-item {
-    margin-right: 30rpx;
-    padding: 10rpx 20rpx;
+    margin-right: 20rpx;
+    padding: 10rpx 18rpx;
     font-size: 26rpx;
     color: #666;
-    border-radius: 8rpx;
+    border-radius: 32rpx;
+    border: 1px solid #f0f0f0;
     
     &.active {
-      background: #F8D07C;
+      background: #FDF3DB;
       color: #1A4A8F;
+      border-color: #F8D07C;
     }
   }
 }
@@ -710,141 +780,144 @@ export default {
 }
 
 .list {
-  height: calc(100vh - 300rpx);
-  padding: 20rpx;
+  height: calc(100vh - 320rpx);
+  padding: 20rpx 24rpx 40rpx;
 }
 
 .flight-item {
   background: #fff;
   border-radius: 16rpx;
-  padding: 30rpx;
+  padding: 28rpx 24rpx;
   margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 18rpx;
   
-  .time-info {
-    flex: 1;
+  .row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20rpx;
+
+    .col-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8rpx;
+
+      .airport-line {
+        display: flex;
+        align-items: baseline;
+        gap: 12rpx;
+
+        .time-text {
+          font-size: 34rpx;
+          font-weight: 600;
+          color: #1A1A1A;
+        }
+
+        .airport {
+          font-size: 24rpx;
+          color: #888;
+          max-width: 360rpx;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+
+      .duration {
+        display: flex;
+        align-items: center;
+        gap: 8rpx;
+        font-size: 24rpx;
+        color: #999;
+
+        .arrow {
+          color: #ccc;
+        }
+      }
+    }
+
+    .col-right {
+      width: 220rpx;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6rpx;
+
+      .price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 6rpx;
+
+        .price {
+          font-size: 40rpx;
+          font-weight: 700;
+          color: #FF7A00;
+        }
+        .unit {
+          font-size: 22rpx;
+          color: #999;
+        }
+      }
+
+      .original-price {
+        font-size: 22rpx;
+        color: #999;
+        text-decoration: line-through;
+      }
+
+      .book-btn {
+        background: linear-gradient(90deg, #FFC966, #F8D07C);
+        color: #1A4A8F;
+        font-size: 26rpx;
+        font-weight: 600;
+        padding: 12rpx 28rpx;
+        border-radius: 30rpx;
+        border: none;
+        min-width: 120rpx;
+        text-align: center;
+      }
+    }
+  }
+
+  .row-bottom {
     display: flex;
     align-items: center;
-    
-    .departure, .arrival {
-      text-align: center;
-      
-      .time {
-        display: block;
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333;
-      }
-      
-      .airport {
-        display: block;
-        font-size: 24rpx;
-        color: #999;
-        margin-top: 5rpx;
-      }
-    }
-    
-    .duration {
-      flex: 1;
-      text-align: center;
-      margin: 0 20rpx;
-      
-      .duration-text {
-        font-size: 24rpx;
-        color: #999;
-      }
-      
-      .line {
-        position: relative;
-        margin: 10rpx 0;
-        height: 2rpx;
-        background: #e0e0e0;
-        
-        .dot {
-          position: absolute;
-          left: 0;
-          top: -4rpx;
-          width: 10rpx;
-          height: 10rpx;
-          background: #999;
-          border-radius: 50%;
-        }
-        
-        .plane {
-          position: absolute;
-          right: -10rpx;
-          top: -10rpx;
-          font-size: 24rpx;
-        }
-      }
-    }
-  }
-  
-  .flight-info {
-    flex: 1;
-    margin-left: 20rpx;
-    
+    justify-content: space-between;
+    gap: 10rpx;
+
     .airline {
-      display: block;
-      font-size: 26rpx;
-      color: #333;
-      margin-bottom: 5rpx;
+      font-size: 24rpx;
+      color: #666;
+      max-width: 420rpx;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    
-    .aircraft, .meal {
-      display: inline-block;
-      font-size: 22rpx;
-      color: #999;
-      margin-right: 10rpx;
-    }
-  }
-  
-  .price-info {
-    text-align: right;
-    margin-right: 20rpx;
-    
-    .price-row {
+
+    .tags {
       display: flex;
-      align-items: baseline;
+      gap: 10rpx;
+      flex-wrap: wrap;
       justify-content: flex-end;
-      
-      .price-label {
+
+      .tag {
+        padding: 6rpx 12rpx;
+        border-radius: 16rpx;
         font-size: 22rpx;
-        color: #999;
-        margin-right: 5rpx;
-      }
-      
-      .price {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #F8D07C;
-      }
-      
-      .price-unit {
-        font-size: 22rpx;
-        color: #999;
-        margin-left: 5rpx;
+        color: #666;
+        background: #f7f7f7;
+
+        &.type {
+          color: #1A4A8F;
+          background: #FDF3DB;
+          border: 1px solid #F8D07C;
+        }
       }
     }
-    
-    .original-price {
-      display: block;
-      font-size: 22rpx;
-      color: #999;
-      text-decoration: line-through;
-      margin-top: 5rpx;
-    }
-  }
-  
-  .book-btn {
-    background: #F8D07C;
-    color: #1A4A8F;
-    font-size: 28rpx;
-    font-weight: bold;
-    padding: 15rpx 30rpx;
-    border-radius: 8rpx;
-    border: none;
   }
 }
 

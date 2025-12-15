@@ -83,6 +83,12 @@
 			// 根据订单来源设置查看订单的跳转地址
 			if (this.from === 'hotel') {
 				this.orderUrl = '/pages/hotel/order-list?status=1';
+			} else if (this.from === 'flight') {
+				// 飞机票订单跳转到统一订单列表页面
+				this.orderUrl = '/pages/hotel/order-list?order_type=flight&status=1';
+			} else if (this.from === 'train') {
+				// 火车票订单跳转到统一订单列表页面
+				this.orderUrl = '/pages/hotel/order-list?order_type=train&status=1';
 			}
 			this.getOrderResultFun();
 		},
@@ -111,6 +117,13 @@
 							pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
 						}
 					});
+				} else if (this.from === 'flight' || this.from === 'train') {
+					// 飞机票/火车票订单 - 使用统一的订单API
+					// 这里可以调用统一的订单详情接口
+					this.payInfo = {
+						pay_way_text: '余额支付',
+						pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
+					}
 				} else {
 					// 普通订单
 					getOrderDetail(this.id).then(res => {

@@ -180,7 +180,7 @@ export default {
         arrivalStationName: '青岛',
         departureDate: '',
         returnDate: '',
-        seatType: 'second', // first-一等座, second-二等座, no_seat-站票
+        seatType: 'second', // first-一等座, second-二等座, hard_seat-硬座, no_seat-站票
         trainTypes: ['G'] // 默认选择高铁
       },
       
@@ -194,6 +194,7 @@ export default {
       seatTypes: [
         { label: '一等座', value: 'first' },
         { label: '二等座', value: 'second' },
+        { label: '硬座', value: 'hard_seat' },
         { label: '站票', value: 'no_seat' }
       ],
       
@@ -245,15 +246,26 @@ export default {
     },
     
     formatDate(date) {
-      const y = date.getFullYear()
-      const m = String(date.getMonth() + 1).padStart(2, '0')
-      const d = String(date.getDate()).padStart(2, '0')
+      if (!date) return ''
+      // 支持字符串/时间戳/{year,month,day}/Date
+      let dObj = date
+      if (typeof date === 'string') dObj = new Date(date.replace(/-/g, '/'))
+      else if (typeof date === 'number') dObj = new Date(date)
+      else if (typeof date === 'object' && date.year && date.month && date.day) {
+        dObj = new Date(date.year, date.month - 1, date.day)
+      }
+      if (!(dObj instanceof Date) || isNaN(dObj.getTime())) return ''
+      const y = dObj.getFullYear()
+      const m = String(dObj.getMonth() + 1).padStart(2, '0')
+      const d = String(dObj.getDate()).padStart(2, '0')
       return `${y}-${m}-${d}`
     },
     
     formatDisplayDate(dateStr) {
-      if (!dateStr) return ''
-      const date = new Date(dateStr)
+      const normalized = this.normalizeDate(dateStr)
+      if (!normalized) return ''
+      const date = new Date(normalized.replace(/-/g, '/'))
+      if (isNaN(date.getTime())) return ''
       const month = date.getMonth() + 1
       const day = date.getDate()
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -444,10 +456,10 @@ export default {
     // 规范化日期，避免出现 [object Object]
     normalizeDate(val) {
       if (!val) return ''
-      if (typeof val === 'string') return val
-      if (Array.isArray(val)) return val[0] ? this.formatDate(new Date(val[0])) : ''
+      if (typeof val === 'string') return this.formatDate(val)
+      if (Array.isArray(val)) return val[0] ? this.formatDate(val[0]) : ''
       if (typeof val === 'object') return this.formatDate(val)
-      return String(val)
+      return this.formatDate(val)
     }
   },
   onShow() {
@@ -757,222 +769,3 @@ export default {
 }
 </style>
 
-    
-    &.active {
-      color: #F8D07C;
-      font-weight: bold;
-      
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60rpx;
-        height: 4rpx;
-        background-color: #F8D07C;
-      }
-    }
-  }
-}
-
-.search-form {
-  padding: 30rpx;
-  
-  .banner {
-    position: relative;
-    margin-bottom: 30rpx;
-    border-radius: 16rpx;
-    overflow: hidden;
-    
-    .banner-img {
-      width: 100%;
-      height: 300rpx;
-    }
-    
-    .banner-text {
-      position: absolute;
-      bottom: 20rpx;
-      left: 20rpx;
-      right: 20rpx;
-      color: #fff;
-      font-size: 28rpx;
-      text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
-    }
-  }
-  
-  .trip-type {
-    display: flex;
-    margin-bottom: 30rpx;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 16rpx;
-    padding: 10rpx;
-    
-    .trip-btn {
-      flex: 1;
-      text-align: center;
-      padding: 20rpx 0;
-      font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.7);
-      border-radius: 12rpx;
-      
-      &.active {
-        background: #F8D07C;
-        color: #1A4A8F;
-        font-weight: bold;
-      }
-    }
-  }
-  
-  .route-section {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 16rpx;
-    padding: 30rpx;
-    margin-bottom: 20rpx;
-    
-    .route-item {
-      flex: 1;
-      text-align: center;
-      
-      .route-value {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #fff;
-      }
-    }
-    
-    .route-swap {
-      width: 80rpx;
-      height: 80rpx;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      
-      .swap-icon {
-        width: 60rpx;
-        height: 60rpx;
-      }
-    }
-  }
-  
-  .form-item {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 30rpx;
-    margin-bottom: 20rpx;
-    border-radius: 16rpx;
-    
-    .label {
-      width: 160rpx;
-      font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.8);
-    }
-    
-    .value {
-      flex: 1;
-      font-size: 28rpx;
-      color: #fff;
-    }
-    
-    .arrow {
-      font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    &.date-item {
-      .date-value {
-        flex: 1;
-        font-size: 32rpx;
-        color: #fff;
-        font-weight: 500;
-      }
-    }
-  }
-  
-  .cabin-class-section {
-    display: flex;
-    gap: 20rpx;
-    margin-bottom: 20rpx;
-    
-    .cabin-class-btn {
-      flex: 1;
-      padding: 20rpx 0;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12rpx;
-      font-size: 26rpx;
-      color: rgba(255, 255, 255, 0.7);
-      
-      &.active {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-weight: bold;
-      }
-    }
-  }
-  
-  .seat-type-section {
-    display: flex;
-    gap: 20rpx;
-    margin-bottom: 20rpx;
-    
-    .seat-type-btn {
-      flex: 1;
-      padding: 20rpx 0;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12rpx;
-      font-size: 26rpx;
-      color: rgba(255, 255, 255, 0.7);
-      
-      &.active {
-        background: #F8D07C;
-        color: #1A4A8F;
-        font-weight: bold;
-      }
-    }
-  }
-  
-  .train-type-section {
-    display: flex;
-    gap: 20rpx;
-    margin-bottom: 20rpx;
-    
-    .train-type-btn {
-      flex: 1;
-      padding: 20rpx 0;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12rpx;
-      font-size: 26rpx;
-      color: rgba(255, 255, 255, 0.7);
-      
-      &.active {
-        background: #F8D07C;
-        color: #1A4A8F;
-        font-weight: bold;
-      }
-    }
-  }
-  
-  
-  .search-btn {
-    width: 100%;
-    margin-top: 40rpx;
-    background: linear-gradient(135deg, #F8D07C 0%, #E6B85C 100%);
-    color: #1A4A8F;
-    font-size: 32rpx;
-    font-weight: bold;
-    border-radius: 16rpx;
-    padding: 30rpx 0;
-    border: none;
-    
-    &::after {
-      border: none;
-    }
-  }
-}
-</style>

@@ -34,22 +34,24 @@ export default {
   },
   methods: {
     formatDate(date) {
-      if (typeof date === 'string') {
-        return date
+      if (!date) return ''
+      if (typeof date === 'string') return date
+      if (typeof date === 'object' && date.year && date.month && date.day) {
+        const m = String(date.month).padStart(2, '0')
+        const d = String(date.day).padStart(2, '0')
+        return `${date.year}-${m}-${d}`
       }
-      const d = new Date(date)
-      const y = d.getFullYear()
-      const m = String(d.getMonth() + 1).padStart(2, '0')
-      const day = String(d.getDate()).padStart(2, '0')
+      const dObj = new Date(date)
+      if (isNaN(dObj.getTime())) return ''
+      const y = dObj.getFullYear()
+      const m = String(dObj.getMonth() + 1).padStart(2, '0')
+      const day = String(dObj.getDate()).padStart(2, '0')
       return `${y}-${m}-${day}`
     },
     onDateChange(e) {
-      // u-calendar 返回单选字符串，或范围数组，或对象 {year,month,day}
+      // u-calendar 返回：字符串 / 范围数组 / 对象 {year,month,day}
       let selectedDate = Array.isArray(e) ? (e[0] || '') : e
-      if (selectedDate && typeof selectedDate === 'object') {
-        // 兼容对象格式
-        selectedDate = this.formatDate(selectedDate)
-      }
+      selectedDate = this.formatDate(selectedDate)
       const pages = getCurrentPages()
       const prevPage = pages[pages.length - 2]
       if (prevPage && prevPage.$vm) {

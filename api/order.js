@@ -24,11 +24,16 @@ export function getOrderList(data) {
 	})
 }
 //订单详情
-export function getOrderDetail(id) {
+export function getOrderDetail(data) {
 	return request.get('order/detail', {
-		params: {
-			id
-		}
+		params: data
+	})
+}
+
+// 火车票订单列表
+export function getTrainOrderList(data) {
+	return request.get('order/trainOrderList', {
+		params: data
 	})
 }
 

@@ -290,9 +290,21 @@
 			}
 		},
 		{
+			"path": "pages/ticket/flight-detail",
+			"style": {
+				"navigationBarTitleText": "航班详情"
+			}
+		},
+		{
 			"path": "pages/ticket/train-list",
 			"style": {
 				"navigationBarTitleText": "车次列表"
+			}
+		},
+		{
+			"path": "pages/ticket/train-detail",
+			"style": {
+				"navigationBarTitleText": "车次详情"
 			}
 		},
 		{
@@ -312,6 +324,30 @@
 			"style": {
 				"navigationBarTitleText": "选择日期",
 				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/ticket/passenger-info",
+			"style": {
+				"navigationBarTitleText": "填写乘客信息"
+			}
+		},
+		{
+			"path": "pages/ticket/order-confirm",
+			"style": {
+				"navigationBarTitleText": "确认订单"
+			}
+		},
+		{
+			"path": "pages/ticket/train-order-detail",
+			"style": {
+				"navigationBarTitleText": "火车票订单详情"
+			}
+		},
+		{
+			"path": "pages/ticket/flight-order-detail",
+			"style": {
+				"navigationBarTitleText": "飞机票订单详情"
 			}
 		},
 		{

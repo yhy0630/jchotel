@@ -98,9 +98,19 @@
 					from: this.from,
 					order_id: this.order_id,
 				}).then(res => {
+					// 如果订单已支付（code === 10000），直接跳转到支付成功页面
+					if (res.code === 10000) {
+						this.loadingSkeleton = false
+						uni.showToast({ title: '订单已支付，无需重复支付', icon: 'none' })
+						setTimeout(() => {
+							this.handPayResult('success')
+						}, 1500)
+						return
+					}
 					if (res.code != 1) throw new Error(res.msg)
 					return res.data
 				}).then(data => {
+					if (!data) return
 					this.loadingSkeleton = false
 					this.amount = data.order_amount
 					this.paywayList = data.pay
@@ -110,7 +120,12 @@
 					const endTimestamp = data.cancel_time * 1
 					this.timeout = endTimestamp - startTimestamp
 				}).catch(err => {
-					throw new Error(err)
+					console.error('获取支付信息失败:', err)
+					this.loadingSkeleton = false
+					uni.showToast({ title: err.message || '获取支付信息失败', icon: 'none' })
+					setTimeout(() => {
+						uni.navigateBack()
+					}, 1500)
 				})
 			},
 

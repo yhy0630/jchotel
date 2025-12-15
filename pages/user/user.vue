@@ -154,9 +154,17 @@
 				</view>
 			</view>
 			<view class="nav row wrap">
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=hotel')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">酒店订单</view>
+				</view>
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=flight')" style="width: 25%;">
+					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
+					<view class="sm mt10">飞机票订单</view>
+				</view>
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=train')" style="width: 25%;">
+					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
+					<view class="sm mt10">火车票订单</view>
 				</view>
 				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/custom-my')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_custom_my.png"></image>
