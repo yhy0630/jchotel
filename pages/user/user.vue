@@ -159,52 +159,52 @@
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="goPage('/pages/user_points/user_points')">
-				<u-icon name="star" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/Ticket Star@2x.png"></image>
 				<text class="menu-text">我的积分</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="goPage('/pages/user_coupon/user_coupon')">
-				<u-icon name="gift" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/money-recive.png"></image>
 				<text class="menu-text">代金券</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="goPage('/bundle/pages/license/license')">
-				<u-icon name="home" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/buildings.png"></image>
 				<text class="menu-text">关于我们</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="goPage('/bundle/pages/invite_fans/invite_fans')">
-				<u-icon name="account" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/2 User.png"></image>
 				<text class="menu-text">邀请好友</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" v-if="isMerchant" @tap="goPage('/pages/hotel/merchant-list')">
-				<u-icon name="bag" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/Work.png"></image>
 				<text class="menu-text">商家接单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="goPage('/pages/hotel/order-list')">
-				<u-icon name="file-text" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/jiudian-3 1.png"></image>
 				<text class="menu-text">酒店订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="handleMenuClick('flight')">
-				<u-icon name="plane" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/feiji_line 1.png"></image>
 				<text class="menu-text">机票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="handleMenuClick('train')">
-				<u-icon name="car" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/huochepiao-2 1.png"></image>
 				<text class="menu-text">车票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="handleMenuClick('rental')">
-				<u-icon name="car" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/qiche-5 1.png"></image>
 				<text class="menu-text">租车订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 			<view class="menu-item" @tap="handleMenuClick('taxi')">
-				<u-icon name="car" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/dache_taxi 1.png"></image>
 				<text class="menu-text">打车订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
@@ -849,6 +849,12 @@
     
     .menu-item:last-child {
         border-bottom: none;
+    }
+    
+    .menu-icon {
+        width: 40rpx;
+        height: 40rpx;
+        flex-shrink: 0;
     }
     
     .menu-text {
