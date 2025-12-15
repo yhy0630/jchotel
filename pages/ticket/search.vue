@@ -245,15 +245,26 @@ export default {
     },
     
     formatDate(date) {
-      const y = date.getFullYear()
-      const m = String(date.getMonth() + 1).padStart(2, '0')
-      const d = String(date.getDate()).padStart(2, '0')
+      if (!date) return ''
+      // 支持字符串/时间戳/{year,month,day}/Date
+      let dObj = date
+      if (typeof date === 'string') dObj = new Date(date.replace(/-/g, '/'))
+      else if (typeof date === 'number') dObj = new Date(date)
+      else if (typeof date === 'object' && date.year && date.month && date.day) {
+        dObj = new Date(date.year, date.month - 1, date.day)
+      }
+      if (!(dObj instanceof Date) || isNaN(dObj.getTime())) return ''
+      const y = dObj.getFullYear()
+      const m = String(dObj.getMonth() + 1).padStart(2, '0')
+      const d = String(dObj.getDate()).padStart(2, '0')
       return `${y}-${m}-${d}`
     },
     
     formatDisplayDate(dateStr) {
-      if (!dateStr) return ''
-      const date = new Date(dateStr)
+      const normalized = this.normalizeDate(dateStr)
+      if (!normalized) return ''
+      const date = new Date(normalized.replace(/-/g, '/'))
+      if (isNaN(date.getTime())) return ''
       const month = date.getMonth() + 1
       const day = date.getDate()
       const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -444,10 +455,10 @@ export default {
     // 规范化日期，避免出现 [object Object]
     normalizeDate(val) {
       if (!val) return ''
-      if (typeof val === 'string') return val
-      if (Array.isArray(val)) return val[0] ? this.formatDate(new Date(val[0])) : ''
+      if (typeof val === 'string') return this.formatDate(val)
+      if (Array.isArray(val)) return val[0] ? this.formatDate(val[0]) : ''
       if (typeof val === 'object') return this.formatDate(val)
-      return String(val)
+      return this.formatDate(val)
     }
   },
   onShow() {

@@ -26,3 +26,8 @@ export function flightDetail(data) {
     return request.post('flight/flightDetail', data)
 }
 
+// 创建机票订单
+export function createOrder(data) {
+    return request.post('flight/createOrder', data)
+}
+
