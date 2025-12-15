@@ -20,7 +20,7 @@
 					<view class="white" v-else @tap="goLogin">
 						<view style="font-size: 42rpx">点击登录</view>
 						<view class="sm">登录体验更多功能</view>
-					</view>
+					</view>   
 				</view>
                 <view class="row" style="align-self: flex-start;">
                     <view class="user-opt" style="margin-right: 30rpx;" @tap="goPage('/bundle/pages/message_center/message_center')" >
@@ -48,7 +48,7 @@
         <view class="member-identity-card" v-if="isLogin">
             <view class="identity-row">
                 <text class="identity-label">会员类别</text>
-                <text class="identity-value">{{ currentMemberCategory }}</text>
+                <text class="identity-value">{{ currentMemberCategory }}</text> 
             </view>
             <view class="identity-row">
                 <text class="identity-label">会员等级</text>
@@ -73,7 +73,7 @@
             </view>
         </view>
 
-		<view class="my-assets bg-white">
+		<!-- <view class="my-assets bg-white">
 			<view class="title row lg">我的资产</view>
 			<view class="nav row">
 				<view class="column-center mb20 assets-item" @tap="goPage('/bundle/pages/user_wallet/user_wallet')">
@@ -89,8 +89,8 @@
 					<view class="sm">优惠券</view>
 				</view>
 			</view>
-		</view>
-		<view class="order-nav bg-white">
+		</view> -->
+		<!-- <view class="order-nav bg-white">
 			<view class="title row-between" @tap="goPage('/pages/user_order/user_order')">
 				<view class="lg">我的订单</view>
 				<view class="muted sm row">
@@ -144,6 +144,69 @@
 					</view>
 					<view class="sm mt10">退款/售后</view>
 				</view>
+			</view>
+		</view> -->
+		<!-- 菜单列表 -->
+		<view class="menu-list">
+			<view class="menu-item" @tap="goPage('/bundle/pages/user_profile/user_profile')">
+				<u-icon name="file-text" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">基本信息</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="handleMenuClick('share')">
+				<u-icon name="share" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">平台分享</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="goPage('/pages/user_points/user_points')">
+				<u-icon name="star" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">我的积分</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="goPage('/pages/user_coupon/user_coupon')">
+				<u-icon name="gift" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">代金券</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="goPage('/bundle/pages/license/license')">
+				<u-icon name="home" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">关于我们</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="goPage('/bundle/pages/invite_fans/invite_fans')">
+				<u-icon name="account" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">邀请好友</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" v-if="isMerchant" @tap="goPage('/pages/hotel/merchant-list')">
+				<u-icon name="bag" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">商家接单</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="goPage('/pages/hotel/order-list')">
+				<u-icon name="file-text" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">酒店订单</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="handleMenuClick('flight')">
+				<u-icon name="plane" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">机票订单</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="handleMenuClick('train')">
+				<u-icon name="car" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">车票订单</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="handleMenuClick('rental')">
+				<u-icon name="car" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">租车订单</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" @tap="handleMenuClick('taxi')">
+				<u-icon name="car" color="#ffffff" size="40"></u-icon>
+				<text class="menu-text">打车订单</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
 		</view>
 		<!-- 酒店相关功能 -->
@@ -516,14 +579,44 @@
                 const tab = this.memberTabs.find(tab => tab.key === key);
                 return tab ? tab.label : '会员';
             },
-            openApplyRecords() {
-                if (!this.isLogin) {
-                    return toLogin();
-                }
-                uni.navigateTo({
-                    url: '/pages/user/member-apply-record'
-                });
-            }
+			openApplyRecords() {
+				if (!this.isLogin) {
+					return toLogin();
+				}
+				uni.navigateTo({
+					url: '/pages/user/member-apply-record'
+				});
+			},
+			handleMenuClick(type) {
+				if (!this.isLogin) {
+					return toLogin();
+				}
+				// 根据不同菜单类型处理跳转
+				switch(type) {
+					case 'share':
+						// 平台分享逻辑
+						uni.showToast({ title: '功能开发中', icon: 'none' });
+						break;
+					case 'flight':
+						// 机票订单
+						uni.navigateTo({ url: '/pages/ticket/search?type=flight' });
+						break;
+					case 'train':
+						// 车票订单
+						uni.navigateTo({ url: '/pages/ticket/search?type=train' });
+						break;
+					case 'rental':
+						// 租车订单
+						uni.showToast({ title: '功能开发中', icon: 'none' });
+						break;
+					case 'taxi':
+						// 打车订单
+						uni.showToast({ title: '功能开发中', icon: 'none' });
+						break;
+					default:
+						break;
+				}
+			}
 
 		},
 		computed: {
@@ -737,5 +830,31 @@
     // 修复：按钮点击反馈
     .switch-btn:active {
         background-color: rgba(255, 210, 122, 0.1);
+    }
+    
+    /* 菜单列表样式 */
+    .menu-list {
+        margin: 20rpx;
+        background: #1E1F34;
+        border-radius: 16rpx;
+        overflow: hidden;
+    }
+    
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 32rpx 30rpx;
+        border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .menu-item:last-child {
+        border-bottom: none;
+    }
+    
+    .menu-text {
+        flex: 1;
+        margin-left: 24rpx;
+        font-size: 30rpx;
+        color: #ffffff;
     }
 </style>
