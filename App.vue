@@ -71,14 +71,15 @@
 				});
 			},
 			async getShareInfo() {
-				const {
-					code,
-					data
-				} = await userShare()
-				if (code == 1) {
-					Cache.set('shareInfo', data)
+				try {
+					const { code, data } = await userShare()
+					if (code == 1) {
+						Cache.set('shareInfo', data)
+					}
+				} catch (e) {
+					// 分享配置非关键路径，接口异常时仅记录，避免阻塞启动
+					console.warn('getShareInfo failed', e)
 				}
-
 			},
 			async getConfigFun() {
 				try{
