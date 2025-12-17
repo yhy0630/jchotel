@@ -838,7 +838,8 @@ export default {
 
 .list {
   height: calc(100vh - 320rpx);
-  padding: 10rpx;
+  padding: 10rpx 16rpx;
+  box-sizing: border-box;
 }
 
 .flight-item {
@@ -846,6 +847,7 @@ export default {
   border-radius: 18rpx;
   padding: 18rpx 18rpx;
   margin-bottom: 14rpx;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 10rpx;
@@ -855,6 +857,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 6rpx;
+    width: 100%;
   }
 
   .flight-left {
@@ -871,6 +874,7 @@ export default {
 
   .flight-center {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 6rpx;
@@ -956,7 +960,6 @@ export default {
   color: #999;
 }
 </style>
-
 
 
 
