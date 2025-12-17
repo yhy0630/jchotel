@@ -119,4 +119,9 @@
 	@import 'styles/base.scss';
 	/*每个页面公共css */
 	@import "components/uview-ui/index.scss";
+	/* 全局页面背景色 */
+	page {
+	background-color: #0D1038;
+	// min-height: 100vh;
+	}
 </style>

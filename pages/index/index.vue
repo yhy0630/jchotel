@@ -17,7 +17,7 @@
 			<view 
 				v-for="(tab, index) in tabs" 
 				:key="index"
-				:class="['tab-item', { active: currentTab === index }]"
+				:class="['tab-item', { active: hasTabClicked && currentTab === index }]"
 				@click="switchTab(index)"
 			>
 				{{ tab.label }}
@@ -29,17 +29,19 @@
 			<view class="location-left" @click="selectLocation">
 				<text class="location-text">{{ currentLocation || '北京' }}</text>
 				<text class="location-arrow">▼</text>
-					</view>
+			</view>
+			<view class="location-divider"></view>
 			<view class="location-right" @click="getCurrentLocation">
-				<text class="location-icon">📍</text>
 				<text class="location-label">当前位置</text>
-				</view>
-								</view>
+				<image class="location-img" src="/static/images/dingwei 1.png" mode="widthFix"></image>
 
-		<!-- 时间选择区域（根据选项卡改变） -->
-		<view class="date-section">
+			</view>
+		</view>
+
+		<!-- 时间选择区域（不依赖选项卡，首页固定展示） + 价格/星级 -->
+		<view class="date-section with-filter">
 			<!-- 酒店/名宿 -->
-			<view v-if="currentTab === 0" class="date-row">
+			<view class="date-row">
 				<view class="date-item" @click="selectCheckInDate">
 					<text class="date-label">入住日期</text>
 					<text class="date-value">{{ formatDateDisplay(checkInDate) || formatDate(new Date()) }}</text>
@@ -53,37 +55,11 @@
 					</view>
 				</view>
 
-			<!-- 机票/火车票 -->
-			<view v-if="currentTab === 1" class="date-row">
-				<view class="date-item" @click="selectDepartureDate">
-					<text class="date-label">出发日期</text>
-					<text class="date-value">{{ departureDate || formatDate(new Date()) }}</text>
-								</view>
-				<view v-if="tripType === 'RT'" class="date-item" @click="selectReturnDate">
-					<text class="date-label">返程日期</text>
-					<text class="date-value">{{ returnDate || formatDate(getTomorrow()) }}</text>
-							</view>
-							</view>
-
-			<!-- 租车/用车 -->
-			<view v-if="currentTab === 2" class="date-row">
-				<view class="date-item" @click="selectRentStartDate">
-					<text class="date-label">取车日期</text>
-					<text class="date-value">{{ rentStartDate || formatDate(new Date()) }}</text>
-				</view>
-				<view class="date-item" @click="selectRentEndDate">
-					<text class="date-label">还车日期</text>
-					<text class="date-value">{{ rentEndDate || formatDate(getTomorrow()) }}</text>
-							</view>
-							</view>
-				</view>
-
-		<!-- 价格/星级选择（仅酒店显示） -->
-		<view v-if="currentTab === 0" class="filter-section">
-			<view class="filter-item" @click="showPriceFilter">
+			<!-- 价格/星级（仅酒店） -->
+			<view class="filter-inline" @click="showPriceFilter">
 				<text class="filter-text">价格/星级</text>
 				<text class="filter-value">{{ priceFilterText || '不限' }}</text>
-				<text class="filter-arrow">▼</text>
+				<!-- <text class="filter-arrow">▼</text> -->
 							</view>
 				</view>
 
@@ -92,27 +68,26 @@
 			<button class="search-btn" @click="handleSearch">{{ searchButtonText }}</button>
 			</view>
 
-		<!-- 列表区域（根据选项卡改变） -->
+		<!-- 列表区域（主页始终显示酒店列表，不依赖选项卡） -->
 		<view class="list-section">
-			<!-- 酒店列表 -->
-			<view v-if="currentTab === 0" class="hotel-list">
+			<view class="hotel-list">
 				<view 
 					v-for="(item, index) in hotelList" 
 					:key="index" 
 					class="hotel-item"
 					@click="goHotelDetail(item)"
 				>
-					<image :src="item.image || '/static/images/default-hotel.png'" mode="aspectFill" class="hotel-image"></image>
+					<image :src="item.image || '/static/images/Rectangle 30184.png'" mode="aspectFill" class="hotel-image"></image>
 					<view class="hotel-info">
-						<view class="hotel-name">{{ item.hotelName || '酒店名称' }}</view>
+						<view class="hotel-name">{{ item.hotelName }}</view>
 						<view class="hotel-rating">
-							<text class="rating-score">{{ item.rating || '4.9' }} 超棒</text>
-							<text class="rating-reviews">{{ item.reviews || '5877' }}条点评</text>
+							<text class="rating-score">{{ item.rating  }} 超棒</text>
+							<text class="rating-reviews">{{ item.reviews  }}条点评</text>
 					</view>
 						<view class="hotel-location">
-							距您直线距离{{ item.distance || '1.2' }}公里 近{{ item.area || '天安门广场' }}
+							距您直线距离{{ item.distance  }}公里 近{{ item.area  }}
 				</view>
-						<view class="hotel-desc">{{ item.desc || '酒店介绍:占位文字占位文字占位文字位文字占位文字占位文字.......' }}</view>
+						<view class="hotel-desc">{{ item.desc }}</view>
 						<view class="hotel-price">
 							<text class="price-item">挂牌价¥{{ formatPrice(item.listPrice || 133.2) }}起</text>
 							<text class="price-item vip">尊享价¥{{ formatPrice(item.vipPrice || 133.2) }}起</text>
@@ -123,62 +98,6 @@
 				<view v-if="hotelLoading" class="loading">加载中...</view>
 				<view v-if="hotelNoMore" class="no-more">没有更多了</view>
 		</view>
-
-			<!-- 机票/火车票列表 -->
-			<view v-if="currentTab === 1" class="ticket-list">
-				<view 
-					v-for="(item, index) in ticketList" 
-					:key="index" 
-					class="ticket-item"
-					@click="goTicketDetail(item)"
-				>
-					<view class="ticket-info">
-						<view class="ticket-route">
-							<text class="route-from">{{ item.departureCityName || '北京' }}</text>
-							<text class="route-arrow">→</text>
-							<text class="route-to">{{ item.arrivalCityName || '上海' }}</text>
-							</view>
-						<view class="ticket-time">
-							<text class="time-departure">{{ item.departureTime || '08:00' }}</text>
-							<text class="time-arrival">{{ item.arrivalTime || '10:30' }}</text>
-							</view>
-						<view class="ticket-detail">
-							<text class="detail-text">{{ item.flightNo || item.trainNo || 'G123' }}</text>
-							<text class="detail-text">{{ item.airlineName || item.trainType || '中国国航' }}</text>
-						</view>
-					</view>
-					<view class="ticket-price">
-						<text class="price-label">{{ item.priceTypeText || '尊享价' }}</text>
-						<text class="price-value">¥{{ formatPrice(item.displayPrice || item.price || 580) }}</text>
-						<text class="price-unit">起</text>
-			</view>
-				</view>
-				<view v-if="ticketLoading" class="loading">加载中...</view>
-				<view v-if="ticketNoMore" class="no-more">没有更多了</view>
-			</view>
-
-			<!-- 租车/用车列表 -->
-			<view v-if="currentTab === 2" class="car-list">
-				<view 
-					v-for="(item, index) in carList" 
-					:key="index" 
-					class="car-item"
-					@click="goCarDetail(item)"
-				>
-					<image :src="item.image || '/static/images/default-car.png'" mode="aspectFill" class="car-image"></image>
-					<view class="car-info">
-						<view class="car-name">{{ item.carName || '车型名称' }}</view>
-						<view class="car-desc">{{ item.desc || '车辆描述信息' }}</view>
-						<view class="car-price">
-							<text class="price-label">日租</text>
-							<text class="price-value">¥{{ formatPrice(item.price || 200) }}</text>
-							<text class="price-unit">/天</text>
-						</view>
-					</view>
-				</view>
-				<view v-if="carLoading" class="loading">加载中...</view>
-				<view v-if="carNoMore" class="no-more">没有更多了</view>
-			</view>
 		</view>
 	</view>
 </template>
@@ -193,11 +112,12 @@ import { trainList } from '@/api/train.js'
 			return {
 			// 选项卡
 			tabs: [
-				{ label: '酒店/名宿', value: 'hotel' },
+				{ label: '酒店/民宿', value: 'hotel' },
 				{ label: '机票/火车票', value: 'ticket' },
 				{ label: '租车/用车', value: 'car' }
 			],
 			currentTab: 0, // 当前选中的选项卡索引
+			hasTabClicked: false, // 是否点击过选项卡，用于控制默认无激活样式
 			
 			// 轮播图
 			bannerList: [
@@ -336,30 +256,25 @@ import { trainList } from '@/api/train.js'
 			}
 		},
 		
-		// 切换选项卡
+		// 切换选项卡（点击后高亮当前项，机票跳转到搜索页）
 		switchTab(index) {
-			if (this.currentTab === index) return
+			this.hasTabClicked = true
 			
-			// 如果点击的是机票/火车票选项卡，直接跳转到搜索页面
-			if (index === 1) {
-				uni.navigateTo({
-					url: '/pages/ticket/search',
-					success: () => {
-						// 跳转成功后，不更新currentTab，保持当前选项卡状态
-					},
-					fail: (err) => {
-						console.error('跳转失败:', err)
-						uni.showToast({
-							title: '跳转失败',
-							icon: 'none'
-						})
-					}
-				})
-				return
+			// 先更新当前选中，用于触发 .active 样式
+			if (this.currentTab !== index) {
+				this.currentTab = index
+				// 只有酒店/民宿需要刷新列表，其他 Tab 只是视觉效果或跳转
+				if (index === 0) {
+					this.refresh()
+				}
 			}
 			
-			this.currentTab = index
-			this.refresh()
+			// 点击机票/火车票，跳转到票务搜索页
+			if (index === 1) {
+				uni.navigateTo({
+					url: '/pages/ticket/search'
+						})
+					}
 		},
 		
 		// 选择位置
@@ -475,15 +390,9 @@ import { trainList } from '@/api/train.js'
 			// 暂时使用默认数据
 		},
 		
-		// 加载列表
+		// 加载列表（首页始终加载酒店列表）
 		loadList() {
-			if (this.currentTab === 0) {
 				this.loadHotelList()
-			} else if (this.currentTab === 1) {
-				this.loadTicketList()
-			} else if (this.currentTab === 2) {
-				this.loadCarList()
-			}
 		},
 		
 		// 加载酒店列表
@@ -646,22 +555,16 @@ import { trainList } from '@/api/train.js'
 			}
 		},
 		
-		// 加载更多
+		// 加载更多（仅酒店）
 		loadMore() {
-			this.loadList()
+			this.loadHotelList()
 		},
 		
-		// 刷新
+		// 刷新（仅酒店）
 		refresh() {
 			this.hotelList = []
-			this.ticketList = []
-			this.carList = []
 			this.hotelPage = 1
-			this.ticketPage = 1
-			this.carPage = 1
 			this.hotelNoMore = false
-			this.ticketNoMore = false
-			this.carNoMore = false
 			this.loadList()
 			uni.stopPullDownRefresh()
 		},
@@ -699,7 +602,9 @@ import { trainList } from '@/api/train.js'
 <style lang="scss" scoped>
 .index {
 	min-height: 100vh;
-	background-color: #f5f5f5;
+	background-color: #0c0d21;
+	padding: 20rpx 20rpx 40rpx;
+	box-sizing: border-box;
 }
 
 .navbar-content {
@@ -751,417 +656,44 @@ import { trainList } from '@/api/train.js'
 
 .tabs-section {
 	display: flex;
-	background-color: #1A4A8F;
-				padding: 0 20rpx;
+	gap: 12rpx;
+	padding: 0 6rpx;
+	margin-top: 10rpx;
+	margin-bottom: 20rpx;
+	background-color: #353548;
+	color: #ffffff;
+	border-radius: 48rpx;
 
 	.tab-item {
 		flex: 1;
 		text-align: center;
-		padding: 30rpx 0;
-		font-size: 32rpx;
-		color: rgba(255, 255, 255, 0.6);
-					position: relative;
+		padding: 20rpx 0;
+		font-size: 30rpx;
+		color: #ffffff;
+		position: relative;
+		background-color: #353548;
+		border-radius: 48rpx;
+		transition: all .2s;
+		border: 1rpx solid transparent;
 		
 		&.active {
-			color: #F8D07C;
-			font-weight: bold;
-			
-			&::after {
-				content: '';
-						position: absolute;
-				bottom: 0;
-						left: 50%;
-						transform: translateX(-50%);
-				width: 60rpx;
-				height: 4rpx;
-				background-color: #F8D07C;
-			}
+			color: #1b1f35;
+			font-weight: 700;
+			background: linear-gradient(90deg, #F3BC62 0%, #FEE6B6 50.34%, #F3BD64 100%)
+		
 		}
 	}
 }
 
 .location-section {
-						display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 30rpx 40rpx;
-	background-color: #fff;
-	
-	.location-left {
-		display: flex;
-		align-items: center;
-		gap: 10rpx;
-		
-		.location-text {
-			font-size: 32rpx;
-			color: #333;
-		}
-		
-		.location-arrow {
-			font-size: 24rpx;
-			color: #999;
-		}
-	}
-	
-	.location-right {
-		display: flex;
-		align-items: center;
-		gap: 10rpx;
-		padding: 10rpx 20rpx;
-		background-color: #f5f5f5;
-		border-radius: 40rpx;
-		
-		.location-icon {
-			font-size: 28rpx;
-		}
-		
-		.location-label {
-			font-size: 28rpx;
-			color: #666;
-		}
-	}
-}
-
-.date-section {
-	padding: 30rpx 40rpx;
-	background-color: #fff;
-	margin-top: 20rpx;
-	
-	.date-row {
-		display: flex;
-		align-items: center;
-		gap: 20rpx;
-		
-		.date-item {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			gap: 10rpx;
-			
-			.date-label {
-				font-size: 24rpx;
-				color: #999;
-			}
-			
-			.date-value {
-				font-size: 32rpx;
-				color: #333;
-			}
-		}
-		
-		.date-middle {
-			.date-night {
-				font-size: 28rpx;
-				color: #666;
-			}
-		}
-	}
-}
-
-.filter-section {
-	padding: 20rpx 40rpx;
-	background-color: #fff;
-	margin-top: 20rpx;
-	
-	.filter-item {
-		display: flex;
-		align-items: center;
-		gap: 10rpx;
-		
-		.filter-text {
-			font-size: 28rpx;
-			color: #666;
-		}
-		
-		.filter-value {
-			font-size: 28rpx;
-			color: #333;
-		}
-		
-		.filter-arrow {
-			font-size: 24rpx;
-			color: #999;
-		}
-	}
-}
-
-.search-section {
-	padding: 30rpx 40rpx;
-	background-color: #fff;
-	margin-top: 20rpx;
-	
-	.search-btn {
-		width: 100%;
-		height: 88rpx;
-		background: linear-gradient(135deg, #F8D07C 0%, #E6B85C 100%);
-		border-radius: 44rpx;
-		font-size: 32rpx;
-		color: #fff;
-		font-weight: bold;
-		border: none;
-		
-		&::after {
-			border: none;
-		}
-	}
-}
-
-.list-section {
-	padding: 20rpx;
-	
-	.hotel-list, .ticket-list, .car-list {
-		.hotel-item, .ticket-item, .car-item {
-			background-color: #fff;
-			border-radius: 20rpx;
-			margin-bottom: 20rpx;
-			overflow: hidden;
-			display: flex;
-			padding: 20rpx;
-			gap: 20rpx;
-			
-			.hotel-image, .car-image {
-				width: 200rpx;
-				height: 200rpx;
-				border-radius: 10rpx;
-			}
-			
-			.hotel-info, .ticket-info, .car-info {
-				flex: 1;
-				display: flex;
-				flex-direction: column;
-				gap: 10rpx;
-				
-				.hotel-name, .car-name {
-					font-size: 32rpx;
-					font-weight: bold;
-					color: #333;
-				}
-				
-				.hotel-rating {
-					display: flex;
-					align-items: center;
-					gap: 10rpx;
-					
-					.rating-score {
-						font-size: 28rpx;
-						color: #F8D07C;
-					}
-					
-					.rating-reviews {
-						font-size: 24rpx;
-						color: #999;
-					}
-				}
-				
-				.hotel-location {
-					font-size: 24rpx;
-					color: #666;
-				}
-				
-				.hotel-desc {
-					font-size: 24rpx;
-					color: #999;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
-				}
-				
-				.hotel-price {
-					display: flex;
-					gap: 20rpx;
-					
-					.price-item {
-						font-size: 24rpx;
-						color: #666;
-						
-						&.vip {
-							color: #F8D07C;
-						}
-						
-						&.share {
-							color: #1A4A8F;
-						}
-					}
-				}
-				
-				.ticket-route {
-					display: flex;
-					align-items: center;
-					gap: 10rpx;
-					
-					.route-from, .route-to {
-						font-size: 32rpx;
-						font-weight: bold;
-						color: #333;
-					}
-					
-					.route-arrow {
-						font-size: 28rpx;
-						color: #999;
-					}
-				}
-				
-				.ticket-time {
-					display: flex;
-					gap: 20rpx;
-					
-					.time-departure, .time-arrival {
-						font-size: 28rpx;
-						color: #666;
-					}
-				}
-				
-				.ticket-detail {
-					display: flex;
-					gap: 20rpx;
-					
-					.detail-text {
-						font-size: 24rpx;
-						color: #999;
-					}
-				}
-				
-				.car-desc {
-					font-size: 24rpx;
-					color: #666;
-				}
-				
-				.car-price {
-					display: flex;
-					align-items: baseline;
-					gap: 10rpx;
-					
-					.price-label {
-						font-size: 24rpx;
-						color: #999;
-					}
-					
-					.price-value {
-						font-size: 36rpx;
-						font-weight: bold;
-						color: #F8D07C;
-					}
-					
-					.price-unit {
-						font-size: 24rpx;
-						color: #999;
-					}
-				}
-			}
-			
-			.ticket-price {
-				display: flex;
-				flex-direction: column;
-				align-items: flex-end;
-				justify-content: center;
-				gap: 10rpx;
-				
-				.price-label {
-					font-size: 24rpx;
-					color: #999;
-				}
-				
-				.price-value {
-					font-size: 40rpx;
-					font-weight: bold;
-					color: #F8D07C;
-				}
-				
-				.price-unit {
-					font-size: 24rpx;
-					color: #999;
-				}
-			}
-		}
-		
-		.loading, .no-more {
-			text-align: center;
-			padding: 40rpx 0;
-			font-size: 28rpx;
-			color: #999;
-			}
-		}
-	}
-</style>
-
-	
-	.navbar-title {
-		font-size: 36rpx;
-		font-weight: bold;
-		color: #fff;
-	}
-	
-	.navbar-right {
-		display: flex;
-		align-items: center;
-		gap: 20rpx;
-		
-		.icon-more {
-			font-size: 40rpx;
-			color: #fff;
-		}
-		
-		.icon-circle {
-			width: 60rpx;
-			height: 60rpx;
-			border-radius: 50%;
-			background-color: #fff;
-		}
-	}
-}
-
-.banner-section {
-	width: 100%;
-	height: 400rpx;
-	
-	.banner-swiper {
-		width: 100%;
-		height: 100%;
-		
-		.banner-image {
-			width: 100%;
-			height: 100%;
-		}
-	}
-}
-
-.tabs-section {
 	display: flex;
-	background-color: #1A4A8F;
-				padding: 0 20rpx;
-
-	.tab-item {
-		flex: 1;
-		text-align: center;
-		padding: 30rpx 0;
-		font-size: 32rpx;
-		color: rgba(255, 255, 255, 0.6);
-					position: relative;
-		
-		&.active {
-			color: #F8D07C;
-			font-weight: bold;
-			
-			&::after {
-				content: '';
-						position: absolute;
-				bottom: 0;
-						left: 50%;
-						transform: translateX(-50%);
-				width: 60rpx;
-				height: 4rpx;
-				background-color: #F8D07C;
-			}
-		}
-	}
-}
-
-.location-section {
-						display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 30rpx 40rpx;
-	background-color: #fff;
+	padding: 24rpx 30rpx;
+	background-color: #1b1f35;
+	border-radius: 18rpx;
+	border: 1rpx solid rgba(255,255,255,0.08);
+	color: #f5f5f7;
 	
 	.location-left {
 		display: flex;
@@ -1170,74 +702,132 @@ import { trainList } from '@/api/train.js'
 		
 		.location-text {
 			font-size: 32rpx;
-			color: #333;
+			color: #f5f5f7;
+			font-weight: 600;
 		}
 		
 		.location-arrow {
-			font-size: 24rpx;
-			color: #999;
+			font-size: 22rpx;
+			color: #c8cbd9;
 		}
+	}
+	
+	.location-divider {
+		width: 1rpx;
+		height: 40rpx;
+		background-color: #C3C3C3;
+		margin-left: 300rpx;
 	}
 	
 	.location-right {
 		display: flex;
 		align-items: center;
 		gap: 10rpx;
-		padding: 10rpx 20rpx;
-		background-color: #f5f5f5;
+		padding: 10rpx 18rpx;
 		border-radius: 40rpx;
 		
-		.location-icon {
-			font-size: 28rpx;
+		.location-img {
+			width: 32rpx;
+			height: 32rpx;
 		}
 		
 		.location-label {
-			font-size: 28rpx;
-			color: #666;
+			font-size: 26rpx;
+			color: #EDD7BC;
+			font-weight: 600;
 		}
 	}
 }
 
 .date-section {
-	padding: 30rpx 40rpx;
-	background-color: #fff;
-	margin-top: 20rpx;
+	padding: 24rpx 30rpx;
+	background-color: #1b1f35;
+	margin-top: 18rpx;
+	border-radius: 18rpx;
+	border: 1rpx solid rgba(255,255,255,0.08);
+	color: #f5f5f7;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20rpx;
+	
+	&.with-filter {
+		.filter-inline {
+			display: flex;
+		}
+	}
 	
 	.date-row {
 		display: flex;
 		align-items: center;
+		justify-content: flex-start;
 		gap: 20rpx;
 		
 		.date-item {
-			flex: 1;
+			flex: 0;
+			flex-shrink: 0;
 			display: flex;
 			flex-direction: column;
-			gap: 10rpx;
+			gap: 8rpx;
+			text-align: center;
+			white-space: nowrap;
 			
 			.date-label {
 				font-size: 24rpx;
-				color: #999;
+				color: #FFE3BB;
 			}
 			
 			.date-value {
-				font-size: 32rpx;
-				color: #333;
+				font-size: 34rpx;
+				color: #FFE3BB;
+				font-weight: 700;
 			}
 		}
 		
 		.date-middle {
+			margin: 0 12rpx;
 			.date-night {
-				font-size: 28rpx;
-				color: #666;
+				font-size: 26rpx;
+				color: #021742;
+				padding: 10rpx 25rpx;
+                background: linear-gradient(90deg, #F3BD63 -18.87%, #FDE3B1 48.55%, #F3BD63 122.64%);
+				border-radius: 42rpx;
 			}
+		}
+	}
+	
+	.filter-inline {
+		display: none;
+		flex-direction: column;
+		gap: 8rpx;
+		padding-left: 24rpx;
+		border-left: 1px solid #E6E6E6;
+		white-space: nowrap;
+		
+		.filter-text {
+			font-size: 23rpx;
+			color: #D2BCA0;
+		}
+		
+		.filter-value {
+			font-size: 28rpx;
+			color: #FFE3BB;
+			font-weight: 700;
+		}
+		
+		.filter-arrow {
+			font-size: 22rpx;
+			color: #c8cbd9;
 		}
 	}
 }
 
 .filter-section {
-	padding: 20rpx 40rpx;
-	background-color: #fff;
-	margin-top: 20rpx;
+	padding: 20rpx 30rpx;
+	background-color: #1b1f35;
+	margin-top: 16rpx;
+	border-radius: 14rpx;
+	border: 1rpx solid rgba(255,255,255,0.08);
 	
 	.filter-item {
 		display: flex;
@@ -1245,36 +835,38 @@ import { trainList } from '@/api/train.js'
 		gap: 10rpx;
 		
 		.filter-text {
-			font-size: 28rpx;
-			color: #666;
+			font-size: 26rpx;
+			color: #c8cbd9;
 		}
 		
 		.filter-value {
 			font-size: 28rpx;
-			color: #333;
+			color: #f5f5f7;
+			font-weight: 700;
 		}
 		
 		.filter-arrow {
-			font-size: 24rpx;
-			color: #999;
+			font-size: 22rpx;
+			color: #c8cbd9;
 		}
 	}
 }
 
 .search-section {
-	padding: 30rpx 40rpx;
-	background-color: #fff;
-	margin-top: 20rpx;
+	padding: 26rpx 0;
+	margin-top: 10rpx;
 	
 	.search-btn {
 		width: 100%;
-		height: 88rpx;
-		background: linear-gradient(135deg, #F8D07C 0%, #E6B85C 100%);
-		border-radius: 44rpx;
+		height: 96rpx;
+		background: linear-gradient(90deg, #F4BD63 0%, #FFE3BB 50.4%, #F3BD64 100%);
+		border-radius: 20rpx;
 		font-size: 32rpx;
-		color: #fff;
-		font-weight: bold;
+		color: #380C00;
+		text-align: center;
+		font-weight: 800;
 		border: none;
+		box-shadow: 0 8rpx 20rpx rgba(240,190,99,0.35);
 		
 		&::after {
 			border: none;
@@ -1283,79 +875,93 @@ import { trainList } from '@/api/train.js'
 }
 
 .list-section {
-	padding: 20rpx;
+	padding: 10rpx 0 0;
 	
 	.hotel-list, .ticket-list, .car-list {
 		.hotel-item, .ticket-item, .car-item {
-			background-color: #fff;
+			background-color: #1b1f35;
 			border-radius: 20rpx;
 			margin-bottom: 20rpx;
 			overflow: hidden;
 			display: flex;
-			padding: 20rpx;
-			gap: 20rpx;
+			padding: 22rpx;
+			gap: 24rpx;
+			border: 1rpx solid rgba(255,255,255,0.08);
+			color: #f5f5f7;
 			
 			.hotel-image, .car-image {
-				width: 200rpx;
-				height: 200rpx;
-				border-radius: 10rpx;
+				width: 260rpx;
+				height: 380rpx;
+				border-radius: 16rpx;
 			}
 			
 			.hotel-info, .ticket-info, .car-info {
 				flex: 1;
 				display: flex;
 				flex-direction: column;
-				gap: 10rpx;
+				gap: 12rpx;
 				
 				.hotel-name, .car-name {
-					font-size: 32rpx;
-					font-weight: bold;
-					color: #333;
+					font-size: 33rpx;
+					font-weight: 700;
+					color: #f5f5f7;
 				}
 				
 				.hotel-rating {
 					display: flex;
 					align-items: center;
-					gap: 10rpx;
+					gap: 14rpx;
 					
 					.rating-score {
-						font-size: 28rpx;
-						color: #F8D07C;
+						font-size: 23rpx;
+						color: #380C00;
+						background: linear-gradient(90deg, #F4BD63 0%, #FFE3BB 50.4%, #F3BD64 100%);
+						padding: 6rpx 16rpx;
+						border-radius: 20rpx;
+						font-weight: 600;
 					}
 					
 					.rating-reviews {
-						font-size: 24rpx;
-						color: #999;
+						font-size: 26rpx;
+						color: #c8cbd9;
 					}
 				}
 				
 				.hotel-location {
-					font-size: 24rpx;
-					color: #666;
+					font-size: 26rpx;
+					color: #c8cbd9;
 				}
 				
 				.hotel-desc {
-					font-size: 24rpx;
-					color: #999;
+					font-size: 30rpx;
+					color: #f5f5f7;
+					line-height: 1.5;
+					display: -webkit-box;
+					-webkit-line-clamp: 2;
+					-webkit-box-orient: vertical;
 					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
 				}
 				
 				.hotel-price {
 					display: flex;
-					gap: 20rpx;
+					flex-direction: column;
+					align-items: flex-start;
+					gap: 8rpx;
 					
 					.price-item {
-						font-size: 24rpx;
-						color: #666;
+						font-size: 30rpx;
+						color: #c8cbd9;
+						font-weight: 700;
 						
 						&.vip {
-							color: #F8D07C;
+							background: linear-gradient(90deg, #F3BC63 0%, #FDE3B1 100%);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							background-clip: text;
 						}
 						
 						&.share {
-							color: #1A4A8F;
+							color: #c8cbd9;
 						}
 					}
 				}
@@ -1368,12 +974,12 @@ import { trainList } from '@/api/train.js'
 					.route-from, .route-to {
 						font-size: 32rpx;
 						font-weight: bold;
-						color: #333;
+						color: #f5f5f7;
 					}
 					
 					.route-arrow {
 						font-size: 28rpx;
-						color: #999;
+						color: #c8cbd9;
 					}
 				}
 				
@@ -1383,7 +989,7 @@ import { trainList } from '@/api/train.js'
 					
 					.time-departure, .time-arrival {
 						font-size: 28rpx;
-						color: #666;
+						color: #c8cbd9;
 					}
 				}
 				
@@ -1393,13 +999,13 @@ import { trainList } from '@/api/train.js'
 					
 					.detail-text {
 						font-size: 24rpx;
-						color: #999;
+						color: #c8cbd9;
 					}
 				}
 				
 				.car-desc {
 					font-size: 24rpx;
-					color: #666;
+					color: #c8cbd9;
 				}
 				
 				.car-price {
@@ -1409,18 +1015,18 @@ import { trainList } from '@/api/train.js'
 					
 					.price-label {
 						font-size: 24rpx;
-						color: #999;
+						color: #c8cbd9;
 					}
 					
 					.price-value {
 						font-size: 36rpx;
 						font-weight: bold;
-						color: #F8D07C;
+						color: #f7d390;
 					}
 					
 					.price-unit {
 						font-size: 24rpx;
-						color: #999;
+						color: #c8cbd9;
 					}
 				}
 			}
@@ -1434,18 +1040,18 @@ import { trainList } from '@/api/train.js'
 				
 				.price-label {
 					font-size: 24rpx;
-					color: #999;
+					color: #c8cbd9;
 				}
 				
 				.price-value {
 					font-size: 40rpx;
 					font-weight: bold;
-					color: #F8D07C;
+					color: #f7d390;
 				}
 				
 				.price-unit {
 					font-size: 24rpx;
-					color: #999;
+					color: #c8cbd9;
 				}
 			}
 		}
@@ -1454,7 +1060,7 @@ import { trainList } from '@/api/train.js'
 			text-align: center;
 			padding: 40rpx 0;
 			font-size: 28rpx;
-			color: #999;
+			color: #c8cbd9;
 			}
 		}
 	}

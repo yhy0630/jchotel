@@ -8,20 +8,23 @@
 
     <!-- 日期选择 -->
     <view class="date-bar">
-      <scroll-view scroll-x class="date-scroll" scroll-with-animation>
-        <view 
-          v-for="(date, index) in dateList" 
-          :key="index"
-          :class="['date-item', { active: selectedDateIndex === index }]"
-          @click="selectDate(index)"
-        >
-          <text class="date-text">{{ date.dateText }}</text>
-          <text class="week-text">{{ date.weekText }}</text>
+      <view class="date-wrapper">
+        <scroll-view scroll-x class="date-scroll" scroll-with-animation>
+          <view 
+            v-for="(date, index) in dateList" 
+            :key="index"
+            :class="['date-item', { active: selectedDateIndex === index }]"
+            @click="selectDate(index)"
+          >
+            <text class="date-text">{{ date.dateText }}</text>
+            <text class="week-text">{{ date.weekText }}</text>
+          </view>
+        </scroll-view>
+        <view class="date-calendar" @click="showCalendar">
+          <image class="calendar-icon" src="/static/images/日历.png" mode="widthFix"></image>
+          <text class="calendar-text">日历</text>
         </view>
-        <view class="date-item calendar" @click="showCalendar">
-          <text class="calendar-icon">📅</text>
-        </view>
-      </scroll-view>
+      </view>
     </view>
 
     <!-- 筛选栏 -->
@@ -92,39 +95,44 @@
     <!-- 航班列表 -->
     <scroll-view scroll-y class="list" @scrolltolower="loadMore">
       <view v-for="(item, index) in list" :key="index" class="flight-item" @click="goDetail(item)">
-        <view class="row-top">
-          <view class="col-left">
-            <view class="time airport-line">
-              <text class="time-text">{{ item.departureTime }}</text>
-              <text class="airport">{{ item.departureAirport }}</text>
+        <view class="flight-main">
+          <view class="flight-left">
+            <image class="plane-icon" src="/static/images/飞机2.png" mode="widthFix"></image>
+          </view>
+          <view class="flight-center">
+            <view class="time-row">
+              <view class="time-block">
+                <text class="time-text">{{ item.departureTime }}</text>
+                <text class="airport">{{ item.departureAirport }}</text>
+              </view>
+              <image class="time-arrow" src="/static/images/箭头2.png" mode="widthFix"></image>
+              <view class="time-block">
+                <text class="time-text">{{ item.arrivalTime }}</text>
+                <text class="airport">{{ item.arrivalAirport }}</text>
+              </view>
             </view>
-            <view class="duration">
-              <text class="duration-text">{{ item.duration || '—' }}</text>
-              <text class="arrow">→</text>
-            </view>
-            <view class="time airport-line">
-              <text class="time-text">{{ item.arrivalTime }}</text>
-              <text class="airport">{{ item.arrivalAirport }}</text>
+            <view class="airline-row">
+              <text class="airline-text">
+                {{ item.airlineName }}{{ item.flightNo ? ' ' + item.flightNo : '' }}{{ item.aircraftType ? '|' + item.aircraftType : '' }}{{ item.hasMeal ? '有餐食' : '' }}
+              </text>
             </view>
           </view>
-          <view class="col-right">
-            <view class="price-row">
-              <text class="price">¥{{ formatPrice(item.display_price || item.price) }}</text>
-              <text class="unit">起</text>
+          <view class="flight-prices">
+            <view class="price-line">
+              <text class="price-label">挂牌价</text>
+              <text class="price-value">¥{{ formatPrice(item.list_price || item.price || item.display_price) }}</text>
+              <text class="price-unit">起</text>
             </view>
-            <text v-if="item.original_price && item.original_price !== item.display_price" class="original-price">
-              ¥{{ formatPrice(item.original_price) }}
-            </text>
-            <button class="book-btn" @click.stop="goBook(item)">订</button>
-          </view>
-        </view>
-
-        <view class="row-bottom">
-          <text class="airline">{{ item.airlineName }} {{ item.flightNo }}</text>
-          <view class="tags">
-            <text v-if="item.aircraftType" class="tag">{{ item.aircraftType }}</text>
-            <text v-if="item.hasMeal" class="tag">有餐食</text>
-            <text class="tag type">{{ item.price_type_text || '尊享价' }}</text>
+            <view class="price-line vip">
+              <text class="price-label">尊享价</text>
+              <text class="price-value">¥{{ formatPrice(item.display_price || item.price) }}</text>
+              <text class="price-unit">起</text>
+            </view>
+            <view class="price-line share">
+              <text class="price-label">股东价</text>
+              <text class="price-value">¥{{ formatPrice(item.share_price || item.display_price || item.price) }}</text>
+              <text class="price-unit">起</text>
+            </view>
           </view>
         </view>
       </view>
@@ -278,39 +286,48 @@ export default {
     },
     
     showCalendar() {
+      const fallbackModal = () => {
+        uni.showModal({
+          title: '选择日期',
+          editable: true,
+          placeholderText: '请输入日期 YYYY-MM-DD',
+          success: (res) => {
+            if (res.confirm && res.content) {
+              this.departureDate = res.content
+              this.initDateList()
+              this.selectedDateIndex = 0
+              this.page = 1
+              this.noMore = false
+              this.loadList()
+            }
+          }
+        })
+      }
+
       // #ifdef MP-WEIXIN
-      const that = this
-      wx.showDatePicker({
-        current: this.departureDate || new Date().toISOString().split('T')[0],
-        startDate: this.formatDate(new Date()),
-        success: (res) => {
-          const selectedDate = res.date
-          that.departureDate = selectedDate
-          that.initDateList()
-          that.selectedDateIndex = 0
-          that.page = 1
-          that.noMore = false
-          that.loadList()
-        }
-      })
-      // #endif
-      
-      // #ifndef MP-WEIXIN
-      uni.showModal({
-        title: '选择日期',
-        editable: true,
-        placeholderText: '请输入日期 YYYY-MM-DD',
-        success: (res) => {
-          if (res.confirm && res.content) {
-            this.departureDate = res.content
+      const api = wx && typeof wx.showDatePicker === 'function' ? wx.showDatePicker : null
+      if (api) {
+        api({
+          current: this.departureDate || new Date().toISOString().split('T')[0],
+          startDate: this.formatDate(new Date()),
+          success: (res) => {
+            const selectedDate = res.date
+            this.departureDate = selectedDate
             this.initDateList()
             this.selectedDateIndex = 0
             this.page = 1
             this.noMore = false
             this.loadList()
-          }
-        }
-      })
+          },
+          fail: () => fallbackModal()
+        })
+      } else {
+        fallbackModal()
+      }
+      // #endif
+
+      // #ifndef MP-WEIXIN
+      fallbackModal()
       // #endif
     },
     
@@ -572,7 +589,7 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #0D1038;
 }
 
 .header {
@@ -595,12 +612,18 @@ export default {
 }
 
 .date-bar {
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  background: #012158;
   
+  .date-wrapper{
+    display: flex;
+    align-items: stretch;
+  }
+
   .date-scroll {
     white-space: nowrap;
     padding: 20rpx 20rpx;
+    flex: 1 1 auto;
+    min-width: 0;
     
     .date-item {
       display: inline-block;
@@ -608,58 +631,91 @@ export default {
       margin: 0 8rpx;
       text-align: center;
       border-radius: 8rpx;
-      border: 1px solid #f0f0f0;
+      border: 1rpx solid transparent;
       
       .date-text {
         display: block;
         font-size: 28rpx;
-        color: #666;
+        color: #ffffff;
       }
       
       .week-text {
         display: block;
         font-size: 24rpx;
-        color: #999;
+        color: #ffffff;
         margin-top: 5rpx;
       }
       
       &.active {
-        background: #FDF3DB;
-        border-color: #F8D07C;
+        background: #4E474C;
+        border-color: #FCDDA6;
 
         .date-text, .week-text {
-          color: #1A4A8F;
-        }
-      }
-      
-      &.calendar {
-        .calendar-icon {
-          font-size: 40rpx;
+          color: #FCDDA6;
         }
       }
     }
+  }
+
+  .date-calendar{
+    flex: 0 0 150rpx;
+    width: 150rpx;
+    padding: 20rpx 12rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10rpx;
+    border-left: 1rpx solid rgba(255,255,255,0.2);
+  }
+
+  .calendar-icon{
+    width: 48rpx;
+    height: 48rpx;
+  }
+
+  .calendar-text{
+    font-size: 24rpx;
+    color: #e0e3ea;
   }
 }
 
 .filter-bar {
   display: flex;
-  background: #fff;
-  padding: 16rpx 24rpx;
-  border-bottom: 1px solid #e0e0e0;
   align-items: center;
-  
+  gap: 26rpx;
+  background: #1E1F34;
+  padding: 24rpx 28rpx;
+  border-radius: 8rpx;
+  margin: 20rpx 16rpx 12rpx;
+
   .filter-item {
-    margin-right: 20rpx;
-    padding: 10rpx 18rpx;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 76rpx;
+    border-radius: 12rpx;
+    background: #353548;
+    color: #f0f0f0;
     font-size: 26rpx;
-    color: #666;
-    border-radius: 32rpx;
-    border: 1px solid #f0f0f0;
-    
+    font-weight: 600;
+    border: none;
+    padding: 0 10rpx;
+
+    &.filter-btn {
+      gap: 12rpx;
+
+      .filter-icon {
+        width: 28rpx;
+        height: 28rpx;
+      }
+    }
+
     &.active {
-      background: #FDF3DB;
-      color: #1A4A8F;
-      border-color: #F8D07C;
+      background: #58585e;
+      color: #ffffff;
+      font-weight: 700;
     }
   }
 }
@@ -668,6 +724,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #1E1F34;
   
   .filter-header {
     display: flex;
@@ -679,7 +736,7 @@ export default {
     .filter-title {
       font-size: 32rpx;
       font-weight: bold;
-      color: #333;
+      color: #ffffff;
     }
     
     .filter-close {
@@ -781,472 +838,114 @@ export default {
 
 .list {
   height: calc(100vh - 320rpx);
-  padding: 20rpx 24rpx 40rpx;
+  padding: 10rpx;
 }
 
 .flight-item {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 28rpx 24rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
+  background: #1E1F34;
+  border-radius: 18rpx;
+  padding: 18rpx 18rpx;
+  margin-bottom: 14rpx;
   display: flex;
   flex-direction: column;
-  gap: 18rpx;
-  
-  .row-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20rpx;
+  gap: 10rpx;
+  color: #f5f5f7;
 
-    .col-left {
-      flex: 1;
+  .flight-main {
+    display: flex;
+    align-items: center;
+    gap: 6rpx;
+  }
+
+  .flight-left {
+    width: 70rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .plane-icon {
+      width: 50rpx;
+      height: 50rpx;
+    }
+  }
+
+  .flight-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6rpx;
+
+    .time-row {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 8rpx;
 
-      .airport-line {
+      .time-block {
         display: flex;
-        align-items: baseline;
-        gap: 12rpx;
+        flex-direction: column;
+        min-width: 0;
 
         .time-text {
-          font-size: 34rpx;
-          font-weight: 600;
-          color: #1A1A1A;
+          font-size: 40rpx;
+          font-weight: 700;
+          color: #f5f5f7;
         }
 
         .airport {
-          font-size: 24rpx;
-          color: #888;
-          max-width: 360rpx;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-      }
-
-      .duration {
-        display: flex;
-        align-items: center;
-        gap: 8rpx;
-        font-size: 24rpx;
-        color: #999;
-
-        .arrow {
-          color: #ccc;
-        }
-      }
-    }
-
-    .col-right {
-      width: 220rpx;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6rpx;
-
-      .price-row {
-        display: flex;
-        align-items: baseline;
-        gap: 6rpx;
-
-        .price {
-          font-size: 40rpx;
-          font-weight: 700;
-          color: #FF7A00;
-        }
-        .unit {
+          margin-top: -2rpx;
           font-size: 22rpx;
-          color: #999;
+          color: #d3d6e0;
         }
       }
 
-      .original-price {
-        font-size: 22rpx;
-        color: #999;
-        text-decoration: line-through;
+      .time-arrow {
+        width: 76rpx;
+        height: 16rpx;
+        margin: 0 4rpx;
       }
+    }
 
-      .book-btn {
-        background: linear-gradient(90deg, #FFC966, #F8D07C);
-        color: #1A4A8F;
-        font-size: 26rpx;
-        font-weight: 600;
-        padding: 12rpx 28rpx;
-        border-radius: 30rpx;
-        border: none;
-        min-width: 120rpx;
-        text-align: center;
+    .airline-row {
+      .airline-text {
+        font-size: 22rpx;
+        color: #d3d6e0;
       }
     }
   }
 
-  .row-bottom {
+  .flight-prices {
+    width: 150rpx;
+    flex: 0 0 165rpx;
+    margin-left: -20rpx;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10rpx;
-
-    .airline {
-      font-size: 24rpx;
-      color: #666;
-      max-width: 420rpx;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .tags {
-      display: flex;
-      gap: 10rpx;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-
-      .tag {
-        padding: 6rpx 12rpx;
-        border-radius: 16rpx;
-        font-size: 22rpx;
-        color: #666;
-        background: #f7f7f7;
-
-        &.type {
-          color: #1A4A8F;
-          background: #FDF3DB;
-          border: 1px solid #F8D07C;
-        }
-      }
-    }
-  }
-}
-
-.loading, .no-more {
-  text-align: center;
-  padding: 30rpx;
-  font-size: 26rpx;
-  color: #999;
-}
-</style>
-
-
-
-.date-bar {
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
-  
-  .date-scroll {
+    flex-direction: column;
+    gap: 6rpx;
     white-space: nowrap;
-    padding: 20rpx 0;
-    
-    .date-item {
-      display: inline-block;
-      padding: 20rpx 30rpx;
-      margin: 0 10rpx;
-      text-align: center;
-      border-radius: 8rpx;
-      
-      .date-text {
-        display: block;
-        font-size: 28rpx;
-        color: #666;
-      }
-      
-      .week-text {
-        display: block;
-        font-size: 24rpx;
-        color: #999;
-        margin-top: 5rpx;
-      }
-      
-      &.active {
-        background: #F8D07C;
-        
-        .date-text, .week-text {
-          color: #1A4A8F;
-        }
-      }
-      
-      &.calendar {
-        .calendar-icon {
-          font-size: 40rpx;
-        }
-      }
-    }
-  }
-}
-
-.filter-bar {
-  display: flex;
-  background: #fff;
-  padding: 20rpx 30rpx;
-  border-bottom: 1px solid #e0e0e0;
-  
-  .filter-item {
-    margin-right: 30rpx;
-    padding: 10rpx 20rpx;
-    font-size: 26rpx;
-    color: #666;
-    border-radius: 8rpx;
-    
-    &.active {
-      background: #F8D07C;
-      color: #1A4A8F;
-    }
-  }
-}
-
-.filter-popup {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  
-  .filter-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 30rpx;
-    border-bottom: 1px solid #e0e0e0;
-    
-    .filter-title {
-      font-size: 32rpx;
-      font-weight: bold;
-      color: #333;
-    }
-    
-    .filter-close {
-      font-size: 50rpx;
-      color: #999;
-      line-height: 1;
-    }
-  }
-  
-  .filter-content {
-    flex: 1;
-    padding: 30rpx;
-    overflow-y: auto;
-    
-    .filter-group {
-      margin-bottom: 40rpx;
-      
-      .group-title {
-        display: block;
-        font-size: 28rpx;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20rpx;
-      }
-      
-      .price-range {
-        display: flex;
-        align-items: center;
-        gap: 20rpx;
-        
-        .price-input {
-          flex: 1;
-          padding: 20rpx;
-          border: 1px solid #e0e0e0;
-          border-radius: 8rpx;
-          font-size: 28rpx;
-        }
-        
-        .price-separator {
-          font-size: 28rpx;
-          color: #999;
-        }
-      }
-      
-      .time-options, .airline-options {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20rpx;
-        
-        .time-option, .airline-option {
-          padding: 15rpx 30rpx;
-          border: 2rpx solid #e0e0e0;
-          border-radius: 8rpx;
-          font-size: 28rpx;
-          color: #666;
-          
-          &.active {
-            border-color: #F8D07C;
-            background: #F8D07C;
-            color: #1A4A8F;
-          }
-        }
-      }
-    }
-  }
-  
-  .filter-footer {
-    display: flex;
-    padding: 30rpx;
-    border-top: 1px solid #e0e0e0;
-    gap: 20rpx;
-    
-    .reset-btn, .confirm-btn {
-      flex: 1;
-      height: 80rpx;
-      line-height: 80rpx;
-      text-align: center;
-      border-radius: 8rpx;
-      font-size: 32rpx;
-      border: none;
-      
-      &::after {
-        border: none;
-      }
-    }
-    
-    .reset-btn {
-      background: #f5f5f5;
-      color: #666;
-    }
-    
-    .confirm-btn {
-      background: #F8D07C;
-      color: #1A4A8F;
-      font-weight: bold;
-    }
-  }
-}
-
-.list {
-  height: calc(100vh - 300rpx);
-  padding: 20rpx;
-}
-
-.flight-item {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  display: flex;
-  align-items: center;
-  
-  .time-info {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    
-    .departure, .arrival {
-      text-align: center;
-      
-      .time {
-        display: block;
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333;
-      }
-      
-      .airport {
-        display: block;
-        font-size: 24rpx;
-        color: #999;
-        margin-top: 5rpx;
-      }
-    }
-    
-    .duration {
-      flex: 1;
-      text-align: center;
-      margin: 0 20rpx;
-      
-      .duration-text {
-        font-size: 24rpx;
-        color: #999;
-      }
-      
-      .line {
-        position: relative;
-        margin: 10rpx 0;
-        height: 2rpx;
-        background: #e0e0e0;
-        
-        .dot {
-          position: absolute;
-          left: 0;
-          top: -4rpx;
-          width: 10rpx;
-          height: 10rpx;
-          background: #999;
-          border-radius: 50%;
-        }
-        
-        .plane {
-          position: absolute;
-          right: -10rpx;
-          top: -10rpx;
-          font-size: 24rpx;
-        }
-      }
-    }
-  }
-  
-  .flight-info {
-    flex: 1;
-    margin-left: 20rpx;
-    
-    .airline {
-      display: block;
-      font-size: 26rpx;
-      color: #333;
-      margin-bottom: 5rpx;
-    }
-    
-    .aircraft, .meal {
-      display: inline-block;
-      font-size: 22rpx;
-      color: #999;
-      margin-right: 10rpx;
-    }
-  }
-  
-  .price-info {
     text-align: right;
-    margin-right: 20rpx;
-    
-    .price-row {
+
+    .price-line {
       display: flex;
       align-items: baseline;
       justify-content: flex-end;
-      
+      gap: 4rpx;
+      font-size: 14rpx;
+      color: #d3d6e0;
+
       .price-label {
+        font-size: 20rpx;
+      }
+      .price-value {
         font-size: 22rpx;
-        color: #999;
-        margin-right: 5rpx;
+        font-weight: 700;
       }
-      
-      .price {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #F8D07C;
-      }
-      
       .price-unit {
-        font-size: 22rpx;
-        color: #999;
-        margin-left: 5rpx;
+        font-size: 16rpx;
+      }
+
+      &.vip {
+        color: #e3af53;
       }
     }
-    
-    .original-price {
-      display: block;
-      font-size: 22rpx;
-      color: #999;
-      text-decoration: line-through;
-      margin-top: 5rpx;
-    }
-  }
-  
-  .book-btn {
-    background: #F8D07C;
-    color: #1A4A8F;
-    font-size: 28rpx;
-    font-weight: bold;
-    padding: 15rpx 30rpx;
-    border-radius: 8rpx;
-    border: none;
   }
 }
 
@@ -1257,4 +956,7 @@ export default {
   color: #999;
 }
 </style>
+
+
+
 

@@ -11,10 +11,17 @@
 				<view class="info row">
 					<image class="avatar mr20 flexnone" @tap="goLogin" :src="isLogin ? userInfo.avatar : '/static/images/my_portrait_empty.png'"></image>
 					<view class="white" v-if="isLogin">
-						<view class="name xxl line1">{{userInfo.nickname}}</view>
-						<view class="user-id row-between" v-if="userInfo.sn">
+						<view class="name-row">
+							<view class="name xxl line1">{{userInfo.nickname}}</view>
+							<view class="identity-chip" v-if="currentIdentityLabel">{{ currentIdentityLabel }}</view>
+						</view>
+						<!-- <view class="user-id row-between" v-if="userInfo.sn">
 							<view class="xs white ml20 mr20">会员ID: {{userInfo.sn || ''}}</view>
 							<view class="xs normal copy-btn row-center ml5" @tap.stop="onCopy">复制</view>
+						</view> -->
+						<view class="member-identity-pills" v-if="isLogin">
+							<!-- <view class="identity-pill">会员类别</view> -->
+							<view class="identity-pill">会员等级</view>
 						</view>
 					</view>
 					<view class="white" v-else @tap="goLogin">
@@ -25,14 +32,14 @@
                 <view class="row" style="align-self: flex-start;">
                     <view class="user-opt" style="margin-right: 30rpx;" @tap="goPage('/bundle/pages/message_center/message_center')" >
                         <view class="dot row-center" v-if="userInfo.notice_num"></view>
-                        <image style="width:58rpx;height: 58rpx;" src="/static/images/icon_my_news.png"></image>
+                        <image style="width:50rpx;height: 58rpx;margin-top:23rpx;" src="/static/images/铃铛.png"></image>
                     </view>
-                    <view class="user-opt" @tap="goPage('/bundle/pages/user_profile/user_profile')">
-                        <image style="width:58rpx;height: 58rpx;" src="/static/images/icon_my_setting.png"></image>
-                    </view>
+                    <!-- <view class="user-opt" @tap="goPage('/bundle/pages/user_profile/user_profile')">
+                        <image style="width:50rpx;height: 50rpx;margin-top:6rpx;" src="/static/images/icon_my_setting.png"></image>
+                    </view> -->
                 </view>
 			</view>
-			<view class="member column-end" @tap="goPage('/pages/user_vip/user_vip')">
+			<!-- <view class="member column-end" @tap="goPage('/pages/user_vip/user_vip')">
 				<view class="member-entery row-between">
 					<view class="row">
 						<image class="icon-md" src="/static/images/icon_member.png"></image>
@@ -43,9 +50,23 @@
 						<u-icon name="arrow-right"></u-icon>
 					</view>
 				</view>
-			</view>
+			</view> -->
 		</view>
-        <view class="member-identity-card" v-if="isLogin">
+        <view class="user-stats" v-if="isLogin">
+            <view class="stat-item">
+                <text class="stat-label">在网时长：</text>
+                <text class="stat-value">333天</text>
+            </view>
+            <view class="stat-item">
+                <text class="stat-label">能量分：</text>
+                <text class="stat-value">500</text>
+            </view>
+            <view class="stat-item">
+                <text class="stat-label">消费积分：</text>
+                <text class="stat-value">69898</text>
+            </view>
+        </view>
+        <!-- <view class="member-identity-card" v-if="isLogin">
             <view class="identity-row">
                 <text class="identity-label">会员类别</text>
                 <text class="identity-value">{{ currentMemberCategory }}</text> 
@@ -54,10 +75,10 @@
                 <text class="identity-label">会员等级</text>
                 <text class="identity-value">{{ currentMemberGrade }}</text>
             </view>
-        </view>
+        </view> -->
         <!-- 会员身份选项卡与个人中心 -->
-        <view class="member-tabs-box bg-white">
-            <view class="member-tabs row-between">
+        <view class="member-tabs-box">
+            <view class="member-tabs">
                 <!-- 修复：始终显示所有会员类型，允许自由切换 -->
                 <view
                     v-for="tab in memberTabs"
@@ -67,9 +88,11 @@
                 >
                     {{ tab.label }}
                 </view>
-                <view class="switch-btn" @tap="openMemberCenter">个人中心</view>
-                <view class="switch-btn" @tap="switchIdentity">切换身份</view>
-                <view class="switch-btn" @tap="openApplyRecords">申请记录</view>
+            </view>
+            <view class="member-actions">
+                <view class="action-btn action-upgrade" @tap="goPage('/pages/user/member-upgrade')">升级会员</view>
+                <view class="action-btn action-center" @tap="openMemberCenter">个人中心</view>
+                <view class="action-btn action-switch" @tap="switchIdentity">切换身份</view>
             </view>
         </view>
 
@@ -149,12 +172,12 @@
 		<!-- 菜单列表 -->
 		<view class="menu-list">
 			<view class="menu-item" @tap="goPage('/bundle/pages/user_profile/user_profile')">
-				<u-icon name="file-text" color="#ffffff" size="40"></u-icon>
+				<image class="menu-icon" src="/static/images/ISM-jichuxinxi 1.png"></image>
 				<text class="menu-text">基本信息</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="handleMenuClick('share')">
-				<u-icon name="share" color="#ffffff" size="40"></u-icon>
+			<view class="menu-item" @tap="goPage('/bundle/pages/invite_fans/invite_fans')">
+				<image class="menu-icon" src="/static/images/Upload.png"></image>
 				<text class="menu-text">平台分享</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
@@ -173,7 +196,7 @@
 				<text class="menu-text">关于我们</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/bundle/pages/invite_fans/invite_fans')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/user_spread/user_spread')">
 				<image class="menu-icon" src="/static/images/2 User.png"></image>
 				<text class="menu-text">邀请好友</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
@@ -183,17 +206,17 @@
 				<text class="menu-text">商家接单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/order-list')">
+			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=hotel')">
 				<image class="menu-icon" src="/static/images/jiudian-3 1.png"></image>
 				<text class="menu-text">酒店订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="handleMenuClick('flight')">
+			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=flight')">
 				<image class="menu-icon" src="/static/images/feiji_line 1.png"></image>
 				<text class="menu-text">机票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="handleMenuClick('train')">
+			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=train')">
 				<image class="menu-icon" src="/static/images/huochepiao-2 1.png"></image>
 				<text class="menu-text">车票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
@@ -603,7 +626,7 @@
 				switch(type) {
 					case 'share':
 						// 平台分享逻辑
-						uni.showToast({ title: '功能开发中', icon: 'none' });
+						uni.navigateTo({ url: '/bundle/pages/invite_fans/invite_fans' });
 						break;
 					case 'flight':
 						// 机票订单
@@ -629,28 +652,36 @@
 		},
 		computed: {
 			...mapGetters(["cartNum", "userInfo", "inviteCode", "appConfig", "isLogin"]),
-			background() {
-				const {
-					center_setting
-				} = this.appConfig
-				return center_setting.top_bg_image ? {
-					'background-image': `url(${center_setting.top_bg_image})`
-				} : {}
-			},
+		background() {
+			const {
+				center_setting
+			} = this.appConfig
+			const bgImage = center_setting?.top_bg_image || '/static/images/蒙版.png'
+			return {
+				'background-image': `url(${bgImage})`,
+				'background-size': '100% 420rpx',
+				'background-repeat': 'no-repeat'
+			}
+		},
             currentMemberCategory() {
                 return this.memberIdentity.categoryName || this.userInfo.member_category_name || '未设置';
             },
             currentMemberGrade() {
                 return this.memberIdentity.gradeName || this.userInfo.member_grade_name || '未设置';
+            },
+            currentIdentityLabel() {
+                if (!this.isLogin) return '';
+                const key = this.activeMemberType || this.userInfo.member_category_code || '';
+                const tab = this.memberTabs.find(tab => tab.key === key);
+                return tab ? tab.label : '当前身份';
             }
 		}
 	};
 </script>
 <style lang="scss">
 	.user {
-		background-image: url(../../static/images/my_topbg.png);
-		background-size: 100% 420rpx;
-		background-repeat: no-repeat;
+		background-color: #0D1038;
+		min-height: 210vh;
 		.header {
 			display: flex;
 			flex-direction: column;
@@ -670,6 +701,22 @@
 					text-align: left;
 					margin-bottom: 5rpx;
 					max-width: 400rpx;
+					color: #FFE3BB;
+				}
+				.name-row {
+					display: flex;
+					align-items: center;
+					flex-wrap: wrap;
+					gap: 12rpx;
+				}
+				.identity-chip {
+					padding: 8rpx 18rpx;
+					border-radius: 999rpx;
+					border: 2rpx solid #FDE3B1;
+					color: #FDE3B1;
+					font-size: 22rpx;
+					font-weight: 600;
+					line-height: 1;
 				}
 
 				.user-id {
@@ -721,6 +768,30 @@
 			}
 
 		}
+
+        .user-stats {
+            margin: -60rpx 30rpx 0;
+            padding: 30rpx 40rpx;
+            border-radius: 20rpx;
+            background: linear-gradient(90deg, #FDE3B1 0%, #F2BC62 100%);
+            color: #380C00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            font-size: 26rpx;
+            font-weight: 600;
+        }
+        .stat-label {
+            margin-right: 6rpx;
+            opacity: 0.8;
+        }
 
 		.order-nav {
 			.icon-contain {
@@ -779,71 +850,87 @@
 
     .member-tabs-box {
         margin: 20rpx;
-        border-radius: 16rpx;
-        overflow: hidden;
+        padding: 20rpx;
+        border-radius: 20rpx;
+        background: #151b3a;
+        box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.25);
     }
-           .member-identity-card {
-               margin: 20rpx;
-               padding: 20rpx 30rpx;
-               border-radius: 16rpx;
-               background: #1f2750;
-               color: #fff;
-           }
-           .identity-row {
-               display: flex;
-               align-items: center;
-               justify-content: space-between;
-               font-size: 26rpx;
-               margin-top: 8rpx;
-           }
-           .identity-row:first-child {
-               margin-top: 0;
-           }
-           .identity-label {
-               color: rgba(255,255,255,0.7);
-           }
-           .identity-value {
-               font-weight: 600;
-           }
-    .member-tabs {
-        padding: 20rpx 20rpx 10rpx;
-        align-items: center;
-        // 修复：增加flex-wrap避免按钮换行遮挡
+    .member-identity-pills {
+        display: flex;
         flex-wrap: wrap;
-        gap: 10rpx;
+        gap: 16rpx;
+        margin-top: 12rpx;
+    }
+    .identity-pill {
+        padding: 5rpx 26rpx;
+        border-radius: 999rpx;
+        background: linear-gradient(90deg, #F3BD63 0%, #FDE3B1 49.74%, #F2BC62 100%);
+        color: #380C00;
+        font-size: 23rpx;
+        font-weight: 500;
+        box-shadow: 0 6rpx 12rpx rgba(56, 12, 0, 0.08);
+    }
+    .member-tabs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16rpx;
+        margin-bottom: 16rpx;
     }
     .member-tab {
-        flex: 1;
         text-align: center;
         font-size: 26rpx;
-        color: #999;
-        padding: 10rpx 0;
-        // 修复：确保选项卡不被挤压
-        min-width: 100rpx;
+        color: #d8d8d8;
+        padding: 18rpx 0;
+        border-radius: 14rpx;
+        background: #3c4156;
+        font-weight: 500;
+        position: relative;
+        border: 2rpx solid transparent;
     }
     .member-tab.active {
-        color: #ffd27a;
-        font-weight: 600;
+		background-color:#4E474C ;       
+		color: #FFE3BB;
+        font-weight: 700;
+        border-color: #FFE3BB;
+        box-shadow: 0 6rpx 14rpx rgba(56, 12, 0, 0.12);
+
     }
-    .switch-btn {
-        padding: 8rpx 20rpx;
-        border-radius: 40rpx;
-        border: 1rpx solid #ffd27a;
-        font-size: 22rpx;
-        color: #ffd27a;
-        // 修复：增加点击区域，确保可触发
-        touch-action: manipulation;
-        cursor: pointer;
+    .member-tab.active::after {
+        content: "";
+        position: absolute;
+        right: -2rpx;
+        bottom: -2rpx;
+        width: 28rpx;
+        height: 28rpx;
+        background: url('/static/images/勾.png') no-repeat center / contain;
+		
     }
-    // 修复：按钮点击反馈
-    .switch-btn:active {
-        background-color: rgba(255, 210, 122, 0.1);
+    .member-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16rpx;
+        margin-top: 8rpx;
+    }
+    .action-btn {
+        text-align: center;
+        border-radius: 14rpx;
+        padding: 22rpx 0;
+        font-size: 28rpx;
+        font-weight: 700;
+        color: #d8d8d8;
+        background: #3c4156;
+        border: 2rpx solid transparent;
+    }
+    .action-btn:active {
+        background: linear-gradient(90deg, #F3BD64 0%, #FDE3B0 50.4%, #F2BD64 100%);
+        color: #3b1c00;
+        box-shadow: 0 8rpx 16rpx rgba(56, 12, 0, 0.12);
     }
     
     /* 菜单列表样式 */
     .menu-list {
         margin: 20rpx;
-        background: #1E1F34;
+        background: #1F2034;
         border-radius: 16rpx;
         overflow: hidden;
     }
@@ -860,8 +947,8 @@
     }
     
     .menu-icon {
-        width: 40rpx;
-        height: 40rpx;
+        width: 48rpx;
+        height: 48rpx;
         flex-shrink: 0;
     }
     
@@ -869,6 +956,16 @@
         flex: 1;
         margin-left: 24rpx;
         font-size: 30rpx;
-        color: #ffffff;
+        color: #E4E3E3;
+    }
+    
+    /* 底部推荐区域背景色 */
+    /deep/ .recommend {
+        background-color: #0D1038;
+    }
+    
+    /* 确保页面底部背景色一致 */
+    /deep/ .goods-list {
+        background-color: #0D1038;
     }
 </style>
