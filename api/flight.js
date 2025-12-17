@@ -31,8 +31,8 @@ export function createOrder(data) {
     return request.post('flight/createOrder', data)
 }
 
-// 获取机票订单列表
-export function getFlightOrderList(data) {
-    return request.get('order/flightOrderList', { params: data })
+// 机票验价
+export function verifyPrice(data) {
+    return request.post('flight/verifyPrice', data)
 }
 

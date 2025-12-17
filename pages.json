@@ -1,5 +1,5 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -307,6 +307,18 @@
 				"navigationBarTitleText": "车次详情"
 			}
 		},
+        {
+            "path": "pages/ticket/train-passenger",
+            "style": {
+                "navigationBarTitleText": "填写乘客信息(火车票)"
+            }
+        },
+        {
+            "path": "pages/ticket/train-order-confirm",
+            "style": {
+                "navigationBarTitleText": "确认订单(火车票)"
+            }
+        },
 		{
 			"path": "pages/ticket/city-select",
 			"style": {
@@ -336,18 +348,6 @@
 			"path": "pages/ticket/order-confirm",
 			"style": {
 				"navigationBarTitleText": "确认订单"
-			}
-		},
-		{
-			"path": "pages/ticket/train-order-detail",
-			"style": {
-				"navigationBarTitleText": "火车票订单详情"
-			}
-		},
-		{
-			"path": "pages/ticket/flight-order-detail",
-			"style": {
-				"navigationBarTitleText": "飞机票订单详情"
 			}
 		},
 		{

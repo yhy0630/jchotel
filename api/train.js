@@ -26,3 +26,8 @@ export function trainDetail(data) {
     return request.post('train/trainDetail', data)
 }
 
+// 创建火车票订单
+export function createOrder(data) {
+    return request.post('train/createOrder', data)
+}
+

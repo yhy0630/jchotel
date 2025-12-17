@@ -62,6 +62,7 @@
 		prepay,
 		getPayway
 	} from '@/api/app'
+	import { getOrderDetail } from '@/api/order'
 	import {
 		wxpay,
 		alipay
@@ -133,10 +134,24 @@
 			handlePrepay() {
 				if (this.loadingPay) return
 				this.loadingPay = true
-				prepay({
-					from: this.from,
-					order_id: this.order_id,
-					pay_way: this.payway,
+				// 支付前再查一次订单状态，避免已支付/已失效重复发起
+				getOrderDetail({
+					id: this.order_id,
+					from: this.from
+				}).then(res => {
+					if (res.code === 1 && res.data) {
+						const data = res.data
+						if (data.pay_status == 1 || data.status != 0) {
+							uni.showToast({ title: '订单已支付或状态已变更', icon: 'none' })
+							this.handPayResult('success')
+							throw new Error('订单已支付或状态已变更')
+						}
+					}
+					return prepay({
+						from: this.from,
+						order_id: this.order_id,
+						pay_way: this.payway,
+					})
 				}).then(({
 					code,
 					data
@@ -153,7 +168,8 @@
 							break;
 					}
 				}).catch(err => {
-
+					console.error('预支付失败:', err)
+					uni.showToast({ title: err?.message || '预支付失败', icon: 'none' })
 				}).finally(() => {
 					setTimeout(() => {
 						this.loadingPay = false
