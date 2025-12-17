@@ -3,11 +3,11 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationStyle": "custom",
+				// "navigationStyle": "custom",
 				"enablePullDownRefresh": true,
-				"navigationBarTitleText": "首页",
-				"backgroundColorTop": "#FFFFFF",
-				"navigationBarTextStyle": "white"
+				"navigationBarTitleText": "首页"
+				// "backgroundColorTop": "#FFFFFF",
+				// "navigationBarTextStyle": "white"
 			}
 		},
 		{
@@ -32,6 +32,54 @@
 			"path": "pages/news_details/news_details",
 			"style": {
 				"navigationBarTitleText": "资讯详情"
+			}
+		},
+		{
+			"path": "pages/industry/industry",
+			"style": {
+				"navigationBarTitleText": "行业资讯"
+			}
+		},
+		{
+			"path": "pages/industry_list/law",
+			"style": {
+				"navigationBarTitleText": "法律援助"
+			}
+		},
+		{
+			"path": "pages/industry_list/cheer",
+			"style": {
+				"navigationBarTitleText": "加油/充电"
+			}
+		},
+		{
+			"path": "pages/industry_list/cheer_detail",
+			"style": {
+				"navigationBarTitleText": "加油"
+			}
+		},
+		{
+			"path": "pages/industry_list/power_detail",
+			"style": {
+				"navigationBarTitleText": "充电站"
+			}
+		},
+		{
+			"path": "pages/industry_list/pile_detail",
+			"style": {
+				"navigationBarTitleText": "充电桩详情"
+			}
+		},
+		{
+			"path": "pages/industry_list/private",
+			"style": {
+				"navigationBarTitleText": "私人秘书"
+			}
+		},
+		{
+			"path": "pages/industry_list/agency",
+			"style": {
+				"navigationBarTitleText": "工商代办"
 			}
 		},
 		{
@@ -96,6 +144,12 @@
 			"path": "pages/user/member-center",
 			"style": {
 				"navigationBarTitleText": "会员个人中心"
+			}
+		},
+		{
+			"path": "pages/user/member-upgrade",
+			"style": {
+				"navigationBarTitleText": "会员升级"
 			}
 		},
 		{
@@ -279,8 +333,7 @@
 		{
 			"path": "pages/ticket/search",
 			"style": {
-				"navigationBarTitleText": "机票/火车票",
-				"navigationStyle": "custom"
+				"navigationBarTitleText": "机票/火车票"
 			}
 		},
 		{
@@ -678,6 +731,12 @@
 			"text": "首页"
 		},
 			{
+				"pagePath": "pages/industry/industry",
+				"iconPath": "/static/images/Vector1.png",
+				"selectedIconPath": "/static/images/Vector.png",
+				"text": "行业资讯"
+			},
+			{
 				"pagePath": "pages/sort/sort",
 				"iconPath": "/static/images/tab_sort.png",
 				"selectedIconPath": "/static/images/tab_sort_s.png",
@@ -688,7 +747,7 @@
 				"iconPath": "/static/images/tab_cart.png",
 				"selectedIconPath": "/static/images/tab_cart_s.png",
 				"text": "购物车"
-			},
+			},  
 			{
 				"pagePath": "pages/user/user",
 				"iconPath": "/static/images/tab_user.png",

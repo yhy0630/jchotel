@@ -1,34 +1,37 @@
 <template>
-  <view class="page">
-    <!-- 顶部导航栏 -->
-    <u-navbar :border-bottom="false" :is-fixed="true" :background="{ background: '#1A4A8F' }" :is-back="true">
-      <view class="navbar-content">
-        <text class="navbar-title">{{ navbarTitle }}</text>
-        <view class="navbar-right">
-          <text class="icon-more">⋯</text>
-          <view class="icon-circle">◎</view>
-        </view>
-      </view>
-    </u-navbar>
-
-    <!-- 顶部选项卡：飞机票/火车票 -->
-    <view class="tabs">
-      <view :class="['tab', { active: activeTab === 'flight' }]" @click="switchTab('flight')">
-        飞机票
-      </view>
-      <view :class="['tab', { active: activeTab === 'train' }]" @click="switchTab('train')">
-        火车票
-      </view>
+    <view class="page">
+    <!-- 顶部轮播图 -->
+    <view class="banner-section">
+      <swiper 
+        class="banner-swiper" 
+        :indicator-dots="true" 
+        :autoplay="true" 
+        :interval="3000" 
+        :duration="500" 
+        circular
+      >
+        <swiper-item>
+          <image src="/static/images/飞机.png" mode="aspectFill" class="banner-image" />
+        </swiper-item> 
+      </swiper>
     </view>
 
-    <!-- 飞机票搜索表单 -->
-    <view v-if="activeTab === 'flight'" class="search-form">
-      <view class="banner">
-        <image src="/static/images/flight-banner.png" mode="aspectFill" class="banner-img" />
+    <!-- 选项卡 + 搜索表单整体容器 -->
+    <view class="search-box">
+      <!-- 顶部选项卡：飞机票/火车票（在轮播图下方） -->
+      <view class="tabs">
+        <view :class="['tab', { active: activeTab === 'flight' }]" @click="switchTab('flight')">
+          飞机票
+        </view>
+        <view :class="['tab', { active: activeTab === 'train' }]" @click="switchTab('train')">
+          火车票
+        </view>
       </view>
-      
-      <!-- 行程类型：单程/往返 -->
-      <view class="trip-type">
+
+      <!-- 飞机票搜索表单 -->
+      <view v-if="activeTab === 'flight'" class="search-form">
+        <!-- 行程类型：单程/往返 -->
+        <view class="trip-type">
         <view :class="['trip-btn', { active: tripType === 'OW' }]" @click="tripType = 'OW'">
           单程
         </view>
@@ -36,34 +39,33 @@
           往返
         </view>
       </view>
-
-      <!-- 出发和到达城市 -->
-      <view class="route-section">
-        <view class="route-item" @click="selectCity('departure')">
-          <text class="route-value">{{ flightForm.departureCityName || '北京' }}</text>
+        <!-- 出发和到达城市 -->
+        <view class="route-section">
+          <view class="route-item" @click="selectCity('departure')">
+            <text class="route-value">{{ flightForm.departureCityName || '北京' }}</text>
+          </view>
+          <view class="route-swap" @click="swapCities">
+            <image src="/static/images/- 101.png" class="swap-icon" mode="aspectFit"></image>
+          </view>
+          <view class="route-item" @click="selectCity('arrival')">
+            <text class="route-value">{{ flightForm.arrivalCityName || '青岛' }}</text>
+          </view>
         </view>
-        <view class="route-swap" @click="swapCities">
-          <image src="/static/images/icon-flight.png" class="swap-icon" mode="aspectFit"></image>
-        </view>
-        <view class="route-item" @click="selectCity('arrival')">
-          <text class="route-value">{{ flightForm.arrivalCityName || '青岛' }}</text>
-        </view>
-      </view>
-
+ 
       <!-- 出发日期 -->
-      <view class="form-item date-item" @click="selectDate('departure')">
-        <text class="date-value">{{ formatDisplayDate(flightForm.departureDate) || formatTodayDate() }}</text>
-        <text class="arrow">></text>
-      </view>
+        <view class="form-item date-item" @click="selectDate('departure')">
+           <text class="date-value">{{ formatDisplayDate(flightForm.departureDate) || formatTodayDate() }}</text>
+           <image class="arrow" src="/static/images/箭头.png" mode="widthFix"></image>
+        </view>
 
       <!-- 返程日期（往返时显示） -->
-      <view v-if="tripType === 'RT'" class="form-item date-item" @click="selectDate('return')">
+        <view v-if="tripType === 'RT'" class="form-item date-item" @click="selectDate('return')">
         <text class="date-value">{{ formatDisplayDate(flightForm.returnDate) || formatTomorrowDate() }}</text>
-        <text class="arrow">></text>
+        <image class="arrow" src="/static/images/箭头.png" mode="widthFix"></image>
       </view>
 
-      <!-- 舱位等级 -->
-      <view class="cabin-class-section">
+        <!-- 舱位等级 -->
+        <view class="cabin-class-section">
         <view 
           v-for="cabin in cabinClassOptions" 
           :key="cabin.value"
@@ -74,19 +76,14 @@
         </view>
       </view>
 
-      <!-- 查询按钮 -->
-      <button class="search-btn" @click="searchFlight">机票查询</button>
-    </view>
-
-    <!-- 火车票搜索表单 -->
-    <view v-if="activeTab === 'train'" class="search-form">
-      <view class="banner">
-        <image src="/static/images/train-banner.png" mode="aspectFill" class="banner-img" />
-        <view class="banner-text">余票动态实时更新, 出行规划快人一步</view>
+        <!-- 查询按钮 -->
+        <button class="search-btn" @click="searchFlight">机票查询</button>
       </view>
-      
-      <!-- 行程类型：单程/往返 -->
-      <view class="trip-type">
+
+      <!-- 火车票搜索表单 -->
+      <view v-if="activeTab === 'train'" class="search-form">
+        <!-- 行程类型：单程/往返 -->
+        <view class="trip-type">
         <view :class="['trip-btn', { active: tripType === 'OW' }]" @click="tripType = 'OW'">
           单程
         </view>
@@ -95,8 +92,8 @@
         </view>
       </view>
 
-      <!-- 出发和到达车站 -->
-      <view class="route-section">
+        <!-- 出发和到达车站 -->
+        <view class="route-section">
         <view class="route-item" @click="selectStation('departure')">
           <text class="route-value">{{ trainForm.departureStationName || '北京' }}</text>
         </view>
@@ -108,20 +105,20 @@
         </view>
       </view>
 
-      <!-- 出发日期 -->
-      <view class="form-item date-item" @click="selectDate('departure')">
+        <!-- 出发日期 -->
+        <view class="form-item date-item" @click="selectDate('departure')">
         <text class="date-value">{{ formatDisplayDate(trainForm.departureDate) || formatTodayDate() }}</text>
         <text class="arrow">></text>
       </view>
 
-      <!-- 返程日期（往返时显示） -->
-      <view v-if="tripType === 'RT'" class="form-item date-item" @click="selectDate('return')">
+        <!-- 返程日期（往返时显示） -->
+        <view v-if="tripType === 'RT'" class="form-item date-item" @click="selectDate('return')">
         <text class="date-value">{{ formatDisplayDate(trainForm.returnDate) || formatTomorrowDate() }}</text>
         <text class="arrow">></text>
       </view>
 
-      <!-- 座位类型 -->
-      <view class="seat-type-section">
+        <!-- 座位类型 -->
+        <view class="seat-type-section">
         <view 
           v-for="seat in seatTypes" 
           :key="seat.value"
@@ -132,8 +129,8 @@
         </view>
       </view>
 
-      <!-- 车次类型 -->
-      <view class="train-type-section">
+        <!-- 车次类型 -->
+        <view class="train-type-section">
         <view 
           v-for="type in trainTypes" 
           :key="type.value"
@@ -144,8 +141,9 @@
         </view>
       </view>
 
-      <!-- 查询按钮 -->
-      <button class="search-btn" @click="searchTrain">车票查询</button>
+        <!-- 查询按钮 -->
+        <button class="search-btn" @click="searchTrain">车票查询</button>
+      </view>
     </view>
 
   </view>
@@ -497,211 +495,152 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #1A4A8F;
+  background: #0D1038;
 }
 
-.navbar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.banner-section {
   width: 100%;
-  padding: 0 30rpx;
-  
-  .navbar-title {
-    font-size: 36rpx;
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  .navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 20rpx;
-    
-    .icon-more {
-      font-size: 40rpx;
-      color: #fff;
-    }
-    
-    .icon-circle {
-      width: 60rpx;
-      height: 60rpx;
-      border-radius: 50%;
-      background-color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24rpx;
-      color: #1A4A8F;
-    }
-  }
+  height: 360rpx;
+}
+
+.banner-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+}
+
+.search-box {
+  // margin-top: 10rpx;
+  background: #1E1F34;
 }
 
 .tabs {
   display: flex;
-  background: #1A4A8F;
-  padding: 0 20rpx;
+  background: #1E1F34;
+  // padding: 0 6rpx;
+  margin-top: 0;
   
   .tab {
     flex: 1;
     text-align: center;
-    padding: 30rpx 0;
-    font-size: 32rpx;
-    color: rgba(255, 255, 255, 0.6);
+    padding: 20rpx 0;
+    font-size: 30rpx;
+    color: #ffffff;
     position: relative;
+    background-color: #353548;
+    transition: all .2s;
+    border: 1rpx solid transparent;
     
     &.active {
-      color: #F8D07C;
-      font-weight: bold;
-      
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60rpx;
-        height: 4rpx;
-        background-color: #F8D07C;
-      }
+      color: #380C00;
+      font-weight: 700;
+      background: linear-gradient(90deg, #F3BC62 0%, #FEE6B6 50.34%, #F3BD64 100%);
     }
   }
 }
 
 .search-form {
-  padding: 30rpx;
-  
-  .banner {
-    position: relative;
-    margin-bottom: 30rpx;
-    border-radius: 16rpx;
-    overflow: hidden;
-    
-    .banner-img {
-      width: 100%;
-      height: 300rpx;
-    }
-    
-    .banner-text {
-      position: absolute;
-      bottom: 20rpx;
-      left: 20rpx;
-      right: 20rpx;
-      color: #fff;
-      font-size: 28rpx;
-      text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
-    }
-  }
-  
+  padding: 30rpx 30rpx 40rpx;
+
+  /* 单程 / 往返 */
   .trip-type {
     display: flex;
     margin-bottom: 30rpx;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 16rpx;
-    padding: 10rpx;
-    
+    border-radius: 48rpx;
+
     .trip-btn {
       flex: 1;
       text-align: center;
       padding: 20rpx 0;
       font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.7);
-      border-radius: 12rpx;
-      
+      color: #ffffff;
+      border-radius: 48rpx;
+
       &.active {
-        background: #F8D07C;
-        color: #1A4A8F;
+        background: linear-gradient(90deg, #F4BE65 0%, #FEE4B2 50.26%, #F3BE66 100%);
+        color: #380C00;
         font-weight: bold;
       }
     }
   }
-  
+
+  /* 出发 / 到达城市 */
   .route-section {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 16rpx;
-    padding: 30rpx;
-    margin-bottom: 20rpx;
-    
+    padding: 0 0 24rpx;
+    border-bottom: 1rpx solid rgba(255,255,255,0.2);
+
     .route-item {
       flex: 1;
       text-align: center;
-      
+
       .route-value {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #fff;
+        font-size: 40rpx;
+        font-weight: 700;
+        color: #ffffff;
       }
     }
-    
+
     .route-swap {
       width: 80rpx;
       height: 80rpx;
       display: flex;
       align-items: center;
       justify-content: center;
-      
+
       .swap-icon {
-        width: 60rpx;
-        height: 60rpx;
+        width: 48rpx;
+        height: 48rpx;
       }
     }
   }
-  
-  .form-item {
+
+  /* 出发日期行 */
+  .form-item.date-item {
+    margin-top: 24rpx;
+    padding: 20rpx 0 24rpx;
+    border-bottom: 1rpx solid rgba(255,255,255,0.2);
+    background: transparent;
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 30rpx;
-    margin-bottom: 20rpx;
-    border-radius: 16rpx;
-    
-    .label {
-      width: 160rpx;
-      font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.8);
-    }
-    
-    .value {
+
+    .date-value {
       flex: 1;
-      font-size: 28rpx;
-      color: #fff;
+      font-size: 34rpx;
+      color: #ffffff;
     }
-    
+
     .arrow {
-      font-size: 28rpx;
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    &.date-item {
-      .date-value {
-        flex: 1;
-        font-size: 32rpx;
-        color: #fff;
-        font-weight: 500;
-      }
+      width: 14rpx;
+      height: 24rpx;
     }
   }
-  
+
+  /* 舱位选择 */
   .cabin-class-section {
+    margin-top: 24rpx;
     display: flex;
-    gap: 20rpx;
-    margin-bottom: 20rpx;
-    
+    gap: 16rpx;
+
     .cabin-class-btn {
       flex: 1;
-      padding: 20rpx 0;
+      padding: 16rpx 0;
       text-align: center;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12rpx;
-      font-size: 26rpx;
-      color: rgba(255, 255, 255, 0.7);
-      
+      font-size: 24rpx;
+      border-radius: 10rpx;
+      background: #353548;
+      color: #ffffff;
+
       &.active {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-weight: bold;
+        background: #ffffff;
+        color: #2b2b2b;
+        font-weight: 600;
       }
     }
   }
@@ -754,12 +693,12 @@ export default {
   .search-btn {
     width: 100%;
     margin-top: 40rpx;
-    background: linear-gradient(135deg, #F8D07C 0%, #E6B85C 100%);
-    color: #1A4A8F;
+    background: linear-gradient(90deg, #F4BD63 0%, #FEE4B2 50.4%, #F3BD64 100%);
+    color: #380C00;
     font-size: 32rpx;
     font-weight: bold;
     border-radius: 16rpx;
-    padding: 30rpx 0;
+    padding: 20rpx 0;
     border: none;
     
     &::after {
