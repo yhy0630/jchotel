@@ -12,7 +12,7 @@
         
         <view class="route-info">
           <view class="departure">
-            <text class="time">{{ detail.fromTime || detail.departureTime || '—' }}</text>
+            <text class="time">{{ formatTimeDisplay(detail.fromTime || detail.departureTime) }}</text>
             <text class="station">{{ detail.fromStation || detail.departureStationName || '—' }}</text>
           </view>
           <view class="duration">
@@ -24,13 +24,13 @@
             </view>
           </view>
           <view class="arrival">
-            <text class="time">{{ detail.toTime || detail.arrivalTime || '—' }}</text>
+            <text class="time">{{ formatTimeDisplay(detail.toTime || detail.arrivalTime) }}</text>
             <text class="station">{{ detail.toStation || detail.arrivalStationName || '—' }}</text>
           </view>
         </view>
         
         <view class="train-meta">
-          <text v-if="detail.departureDate || detail.fromDate" class="meta-item">出发日期：{{ detail.departureDate || detail.fromDate }}</text>
+          <text v-if="detail.departureDate || detail.fromDate" class="meta-item">出发日期：{{ formatDateDisplay(detail.departureDate || detail.fromDate) }}</text>
           <text v-if="detail.isStop === '1' || detail.isStop === 1" class="meta-item warning">已停运</text>
           <text v-else-if="detail.canBook !== '0' && detail.canBook !== 0" class="meta-item warning">不可预订</text>
         </view>
@@ -153,6 +153,37 @@ export default {
     this.loadDetail()
   },
   methods: {
+    // 日期展示：YYYY-MM-DD => 7月20日 周六
+    formatDateDisplay(dateStr) {
+      if (!dateStr) return '—'
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const date = new Date(dateStr)
+        const month = date.getMonth() + 1
+        const day = date.getDate()
+        const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+        const weekDay = weekDays[date.getDay()]
+        return `${month}月${day}日 ${weekDay}`
+      }
+      return dateStr
+    },
+
+    // 时间展示：支持 HH:MM / 时间戳 / 日期时间字符串
+    formatTimeDisplay(time) {
+      if (!time) return '—'
+      if (typeof time === 'string' && /^\d{2}:\d{2}$/.test(time)) {
+        return time
+      }
+      if (typeof time === 'number' || /^\d+$/.test(time)) {
+        const date = new Date(parseInt(time))
+        const h = String(date.getHours()).padStart(2, '0')
+        const m = String(date.getMinutes()).padStart(2, '0')
+        return `${h}:${m}`
+      }
+      if (typeof time === 'string' && time.length >= 16) {
+        return time.substr(11, 5)
+      }
+      return time
+    },
     async loadDetail() {
       this.loading = true
       this.error = ''
@@ -334,7 +365,7 @@ export default {
         const seatInventory = item.seatInventory !== undefined ? parseInt(item.seatInventory) : (item.inventory !== undefined ? parseInt(item.inventory) : null)
         
         // 检查是否有嵌套的 seatInfoList（上下铺信息）
-        const seatInfoList = item.seatInfoList || []
+          const seatInfoList = item.seatInfoList || []
         
         // 判断是否有有效的子座位（如硬卧上铺、中铺、下铺等有意义的细分）
         // 如果子座位的 seatCode 是 "0" 或 "1"，或者 seatName 是"座位"，说明是无效数据，应该跳过
@@ -468,6 +499,7 @@ export default {
         train_no: this.detail.trainNo || this.trainNo || '',
         departure_date: this.detail.departureDate || this.detail.fromDate || this.departureDate,
         price: price,
+        display_price: price, // 火车票无税费，展示价即总价
         original_price: parseFloat(seat.original_price || seat.price || 0),
         price_type: this.detail.price_type || 2,
         price_type_text: this.detail.price_type_text || '尊享价',
@@ -485,7 +517,10 @@ export default {
         start_station: this.detail.startStation || '',
         end_station: this.detail.endStation || '',
         is_fxh: this.detail.isFxh || '0',
-        is_zndcz: this.detail.isZndcz || '0'
+        is_zndcz: this.detail.isZndcz || '0',
+        // 火车票无机建/燃油，强制为 0，避免后续页面显示
+        airport_tax: 0,
+        fuel_tax: 0
       }
       
       // 统一在这里编码一次
@@ -497,7 +532,7 @@ export default {
       console.log('跳转到乘客信息页:', `/pages/ticket/passenger-info?${queryString}`)
       
       uni.navigateTo({
-        url: `/pages/ticket/passenger-info?${queryString}`,
+        url: `/pages/ticket/train-passenger?${queryString}`,
         fail: (err) => {
           console.error('跳转失败:', err)
           uni.showToast({ title: '跳转失败，请重试', icon: 'none' })

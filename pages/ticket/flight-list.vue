@@ -524,7 +524,7 @@ export default {
     goDetail(item) {
       // 优先使用routeId（新接口参数）
       if (item.routeId) {
-        uni.navigateTo({
+      uni.navigateTo({
           url: `/pages/ticket/flight-detail?route_id=${encodeURIComponent(item.routeId)}&route_type=OW`
         })
       } else {
@@ -540,7 +540,7 @@ export default {
           .join('&')
         uni.navigateTo({
           url: `/pages/ticket/flight-detail?${queryString}`
-        })
+      })
       }
     },
     
@@ -550,26 +550,24 @@ export default {
         return
       }
       
-      // 不要在这里预先编码，统一在构建 queryString 时编码
       const params = {
         type: 'flight',
         flight_no: item.flightNo || '',
         departure_date: this.departureDate || '',
         price: item.display_price || item.price || 0,
         price_type: item.price_type || 2,
-        price_type_text: item.price_type_text || '尊享价',
+        price_type_text: encodeURIComponent(item.price_type_text || '尊享价'),
         original_price: item.original_price || item.price || 0,
-        dep_city: item.departureCityName || item.departureCity || '',
-        arr_city: item.arrivalCityName || item.arrivalCity || '',
+        dep_city: encodeURIComponent(item.departureCityName || item.departureCity || ''),
+        arr_city: encodeURIComponent(item.arrivalCityName || item.arrivalCity || ''),
         // 使用机场三字码传递，避免名称过长写入数据库
         dep_airport: item.depAirportCode || item.departureAirport || item.depAirport || '',
         arr_airport: item.arrAirportCode || item.arrivalAirport || item.arrAirport || '',
-        airline_name: item.airlineName || '',
+        airline_name: encodeURIComponent(item.airlineName || ''),
         dep_time: item.departureTime || '',
         arr_time: item.arrivalTime || ''
       }
       
-      // 统一在这里编码一次
       const queryString = Object.keys(params)
         .map(key => `${key}=${encodeURIComponent(params[key])}`)
         .join('&')

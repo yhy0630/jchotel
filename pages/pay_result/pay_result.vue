@@ -118,12 +118,31 @@
 						}
 					});
 				} else if (this.from === 'flight' || this.from === 'train') {
-					// 飞机票/火车票订单 - 使用统一的订单API
-					// 这里可以调用统一的订单详情接口
-					this.payInfo = {
-						pay_way_text: '余额支付',
-						pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
-					}
+					// 飞机票/火车票订单 - 使用统一的订单详情接口拉真实状态
+					getOrderDetail({
+						id: this.id,
+						from: this.from
+					}).then(res => {
+						if (res.code == 1 && res.data) {
+							this.payInfo = {
+								order_sn: res.data.order_sn || '',
+								pay_time: res.data.pay_time || new Date().toISOString().replace('T', ' ').substring(0, 19),
+								pay_way_text: res.data.pay_way_text || '余额支付',
+								order_amount: res.data.order_amount || res.data.total_price || 0
+							}
+						} else {
+							this.payInfo = {
+								pay_way_text: '余额支付',
+								pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
+							}
+						}
+					}).catch(err => {
+						console.error('获取订单详情失败', err);
+						this.payInfo = {
+							pay_way_text: '余额支付',
+							pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
+						}
+					})
 				} else {
 					// 普通订单
 					getOrderDetail(this.id).then(res => {

@@ -314,8 +314,9 @@ export default {
       }
       
       const totalPrice = this.calcTotalPrice(seat)
+      const policyId = adultPrice.policyInfo?.policyId || ''
       
-      // 跳转到乘客信息页面 - 不要预先编码，统一在构建 queryString 时编码
+      // 跳转到乘客信息页面
       const params = {
         type: 'flight',
         flight_no: this.detail.flightNo || '',
@@ -327,6 +328,7 @@ export default {
         seat_code: seat.seatCode || '',
         seat_name: seat.seatName || '',
         price_id: adultPrice.priceId || '',
+        policy_id: policyId,
         route_id: this.detail.routeId || this.routeId || '',
         dep_airport: this.detail.depAirportCode || '',
         arr_airport: this.detail.arrAirportCode || '',
@@ -337,9 +339,8 @@ export default {
         arr_time: this.formatTime(this.detail.arrTime)
       }
       
-      // 统一在这里编码一次
       const queryString = Object.keys(params)
-        .map(key => `${key}=${encodeURIComponent(String(params[key]))}`)
+        .map(key => `${key}=${encodeURIComponent(params[key])}`)
         .join('&')
       
       uni.navigateTo({
