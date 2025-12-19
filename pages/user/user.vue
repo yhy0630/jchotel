@@ -201,6 +201,11 @@
 				<text class="menu-text">邀请好友</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
+			<view class="menu-item" @tap="goPage('/pages/hotel/custom-my')">
+				<image class="menu-icon" src="/static/images/jiudian-3 1.png"></image>
+				<text class="menu-text">我的发布</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
 			<view class="menu-item" v-if="isMerchant" @tap="goPage('/pages/hotel/merchant-list')">
 				<image class="menu-icon" src="/static/images/Work.png"></image>
 				<text class="menu-text">商家接单</text>

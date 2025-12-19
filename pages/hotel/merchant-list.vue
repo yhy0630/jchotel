@@ -8,26 +8,44 @@
 
     <!-- 定制需求列表 -->
     <scroll-view v-if="currentTab === 0" scroll-y class="list">
-      <view v-for="item in requestList" :key="item.id" class="card" @click="goOffer(item)">
+      <view v-for="item in requestList" :key="item.id" class="card">
         <view class="header">
-          <text class="type">定制房需求</text>
+          <view class="header-left">
+            <image class="card-icon" src="/static/images/jiudian-2 1.png" mode="aspectFit"></image>
+            <text class="type">定制房需求</text>
+          </view>
           <button class="offer-btn" @click.stop="goOffer(item)">点击出价</button>
         </view>
-        <view class="room-name">{{ item.room_type || '豪华标间' }}</view>
-        <view class="location">{{ item.city_name }}{{ item.area }}</view>
-        <view class="price-range">{{ item.price_range }}</view>
-        <view class="rating">{{ item.hotel_level }}</view>
-        <view class="dates">{{ item.check_in_date }} 至 {{ item.check_out_date }}·{{ item.night_num }}晚1间·{{ item.room_type }}</view>
+        <view class="info-section">
+          <view class="info-line room-name">{{ item.room_type || '豪华标间' }}</view>
+          <view class="info-line">{{ item.city_name }}{{ item.area ? item.area : '' }}{{ item.landmark ? item.landmark : '' }}</view>
+          <view class="info-line">{{ item.price_range }}</view>
+          <view class="info-line">{{ item.hotel_level }}</view>
+          <view class="info-line">{{ item.check_in_date }} 至</view>
+          <view class="info-line">{{ item.check_out_date }}·{{ item.night_num }}晚1间·{{ item.room_type }}</view>
+        </view>
       </view>
     </scroll-view>
 
     <!-- 我的出价列表 -->
     <scroll-view v-if="currentTab === 1" scroll-y class="list">
       <view v-for="item in offerList" :key="item.id" class="card">
-        <view class="room-name">{{ item.room_type || '豪华标间' }}</view>
-        <view class="location">{{ item.city_name }}</view>
-        <view class="offer-amount">出价金额: ¥{{ item.offer_amount }}</view>
-        <view class="status">状态: {{ getStatusText(item.status) }}</view>
+        <view class="header">
+          <view class="header-left">
+            <image class="card-icon" src="/static/images/jiudian-2 1.png" mode="aspectFit"></image>
+            <text class="type">定制房需求</text>
+          </view>
+          <button class="offer-btn" @click.stop="goOffer(item)">点击出价</button>
+        </view>
+        <view class="info-section">
+          <view class="info-line room-name">{{ item.room_type}}</view>
+          <view class="info-line">{{ item.city_name }}</view>
+          <view class="info-line">{{ item.price_range }}</view>
+          <view class="info-line">{{ item.hotel_level }}</view>
+          <view class="info-line">{{ item.check_in_date }} 至</view>
+          <view class="info-line">{{ item.check_out_date }}·{{ item.night_num }}晚1间·{{ item.room_type }}</view>
+          <view class="info-line" style="font-size: 30rpx;">已出价：¥{{ item.offer_amount}}</view>
+        </view>
       </view>
     </scroll-view>
   </view>
@@ -92,61 +110,115 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #1a1a2e;
+  background: #0D1034;
 }
+
 .tabs {
   display: flex;
-  background: #16213e;
+  background: #012158;
   border-bottom: 2px solid #0f1624;
 }
+
 .tab {
   flex: 1;
   text-align: center;
   padding: 30rpx;
-  color: #999;
-  font-size: 28rpx;
+  color: #ffffff;
+  font-size: 32rpx;
+  position: relative;
 }
+
 .tab.active {
-  color: #ff9500;
-  border-bottom: 2px solid #ff9500;
+  color: transparent;
+  background: linear-gradient(90deg, #F3C16F 0%, #FDE1AD 51.18%, #F4C271 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-weight: bold;
 }
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, #F3C16F 0%, #FDE1AD 51.18%, #F4C271 100%);
+  border-radius: 2rpx;
+}
+
 .list {
   height: calc(100vh - 100rpx);
   padding: 20rpx;
+  background-color: #0D1034;
 }
+
 .card {
-  background: #16213e;
+  background: #1E1F34;
   padding: 30rpx;
   margin-bottom: 20rpx;
+  margin-right: 35rpx;
   border-radius: 12rpx;
+  border: 2rpx solid #FCDDA6;
 }
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20rpx;
 }
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+}
+
+.card-icon {
+  width: 48rpx;
+  height: 48rpx;
+  flex-shrink: 0;
+}
+
 .type {
-  color: #ff9500;
-  font-size: 24rpx;
-}
-.offer-btn {
-  background: #ff9500;
-  color: #fff;
-  border: none;
-  padding: 10rpx 30rpx;
-  border-radius: 8rpx;
-  font-size: 24rpx;
-}
-.room-name {
+  color: #ffffff;
   font-size: 32rpx;
   font-weight: bold;
-  color: #fff;
-  margin-bottom: 10rpx;
 }
-.location, .price-range, .rating, .dates, .offer-amount, .status {
-  color: #999;
+
+.offer-btn {
+  background: linear-gradient(90deg, #F3BF69 0%, #FDE2AF 50.29%, #F3BF68 100%);
+  color: #333333;
+  border: none;
+  padding: 0rpx 30rpx;
+  border-radius: 50rpx;
   font-size: 24rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 20rpx rgba(240, 190, 99, 0.3);
+}
+
+.offer-btn::after {
+  border: none;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.info-line {
+  color: #ffffff;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.info-line.room-name {
+  font-size: 36rpx;
+  font-weight: bold;
   margin-bottom: 5rpx;
 }
 </style>

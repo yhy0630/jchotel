@@ -34,7 +34,7 @@
         <view class="actions" @click.stop>
           <button v-if="item.status === 0 && item.pay_status !== 1" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
           <button v-if="item.status === 0 && item.pay_status !== 1" class="btn pay" @click.stop="goPay(item)">去支付</button>
-          <button v-if="item.status === 1 && (item._orderType || orderType) === 'hotel'" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
+          <button v-if="item.status === 1" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
           <button v-if="item.status === 2 && (item._orderType || orderType) === 'hotel'" class="btn invoice" @click.stop="applyInvoice(item)">申请开票</button>
         </view>
       </view>
@@ -473,8 +473,8 @@ export default {
     getOrderIcon(item) {
       const orderType = item?._orderType || this.orderType
       const iconMap = {
-        'flight': '/static/images/icon_flight_order.png',
-        'train': '/static/images/icon_train_order.png',
+        'flight': '/static/images/飞机票.png',
+        'train': '/static/images/火车票.png',
         'car_rental': '/static/images/icon_car_order.png',
         'taxi': '/static/images/icon_taxi_order.png'
       }
@@ -528,7 +528,7 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #1a1a2e;
+  background: #0D1034;
 }
 
 .navbar {
@@ -610,7 +610,7 @@ export default {
 }
 
 .card {
-  background: #16213e;
+  background: #1E1F34;
   padding: 30rpx;
   margin-bottom: 20rpx;
   margin-right: 35rpx;

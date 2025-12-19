@@ -21,16 +21,25 @@
 
       <!-- 订单信息（入住人） -->
       <view class="section-card">
-        <view class="section-title">订单信息</view>
+        <view class="section-header">
+          <text class="section-title">订单信息</text>
+          <view class="room-counter">
+            <text class="counter-btn" @click="changeRoomNum(-1)">-</text>
+            <text class="counter-value">{{ roomNum }}间</text>
+            <text class="counter-btn" @click="changeRoomNum(1)">+</text>
+          </view>
+        </view>
         <view class="form-item">
+          <image src="/static/images/keren 1.png" class="form-icon" mode="aspectFit" />
           <text class="label">住客姓名*</text>
           <input
             class="input"
             v-model="guestName"
-            placeholder="请输入住客姓名"
+            placeholder="请输入"
           />
         </view>
         <view class="form-item">
+          <image src="/static/images/dianhua 1.png" class="form-icon" mode="aspectFit" />
           <text class="label">联系电话*</text>
           <input
             class="input"
@@ -38,14 +47,6 @@
             type="number"
             placeholder="请输入手机号码"
           />
-        </view>
-        <view class="form-item">
-          <text class="label">房间数量</text>
-          <view class="stepper">
-            <text class="step-btn" @click="changeRoomNum(-1)">-</text>
-            <text class="step-value">{{ roomNum }}</text>
-            <text class="step-btn" @click="changeRoomNum(1)">+</text>
-          </view>
         </view>
       </view>
 
@@ -90,17 +91,17 @@
     <!-- 底部价格栏 -->
     <view class="bottom-bar">
       <view class="bottom-prices">
-        <view class="price-line">
+        <view class="price-item">
           <text class="price-label">挂牌价</text>
-          <text class="price-value">¥{{ formatPrice(prices.list_price) }}</text>
+          <text class="price-value">¥{{ totalListPrice }}</text>
         </view>
-        <view class="price-line">
-          <text class="price-label vip">尊享价</text>
-          <text class="price-value vip">¥{{ formatPrice(prices.vip_price) }}</text>
+        <view class="price-item vip-highlight">
+          <text class="price-label">尊享价</text>
+          <text class="price-value">¥{{ totalVipPrice }}</text>
         </view>
-        <view class="price-line">
-          <text class="price-label share">股东价</text>
-          <text class="price-value share">¥{{ formatPrice(prices.share_price) }}</text>
+        <view class="price-item">
+          <text class="price-label">股东价</text>
+          <text class="price-value">¥{{ totalSharePrice }}</text>
         </view>
       </view>
       <button class="submit-btn" :disabled="submitting" @click="submitOrder">
@@ -138,6 +139,21 @@ export default {
     // 总价 = 单价 * 晚数 * 房间数
     totalAmount() {
       const amount = this.displayPrice * this.nightNum * this.roomNum
+      return this.formatPrice(amount)
+    },
+    // 挂牌价总价
+    totalListPrice() {
+      const amount = this.prices.list_price * this.nightNum * this.roomNum
+      return this.formatPrice(amount)
+    },
+    // 尊享价总价
+    totalVipPrice() {
+      const amount = this.prices.vip_price * this.nightNum * this.roomNum
+      return this.formatPrice(amount)
+    },
+    // 股东价总价
+    totalSharePrice() {
+      const amount = this.prices.share_price * this.nightNum * this.roomNum
       return this.formatPrice(amount)
     }
   },
@@ -245,7 +261,7 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #0a1929;
+  background: #0D1034;
   color: #fff;
   padding-bottom: 140rpx;
 }
@@ -256,7 +272,7 @@ export default {
 
 .top-card {
   padding: 40rpx 30rpx 30rpx;
-  background: #0a1929;
+  background: #1E1F34;
   border-bottom: 1px solid #1a3a5a;
 }
 
@@ -290,10 +306,10 @@ export default {
 }
 
 .night-badge {
-  padding: 4rpx 16rpx;
+  padding: 4rpx 20rpx;
   border-radius: 20rpx;
-  background: #1a3a5a;
-  color: #ff9500;
+  background: #353548;
+  color: #fff;
   font-size: 22rpx;
 }
 
@@ -303,23 +319,56 @@ export default {
 }
 
 .section-card {
-  margin: 20rpx 20rpx 0;
+  margin: 20rpx 0 0;
   padding: 24rpx 26rpx;
-  background: #16213e;
+  background: #1E1F34;
   border-radius: 16rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
 }
 
 .section-title {
   font-size: 28rpx;
   font-weight: bold;
-  margin-bottom: 16rpx;
+}
+
+.room-counter {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.counter-btn {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 1rpx solid #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #fff;
+  text-align: center;
+  line-height: 44rpx;
+}
+
+.counter-value {
+  font-size: 26rpx;
+  color: #fff;
+  min-width: 60rpx;
+  text-align: center;
 }
 
 .form-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 18rpx 0;
+  gap: 16rpx;
+  padding: 20rpx 0;
   border-bottom: 1px solid #1f2b48;
 }
 
@@ -327,9 +376,16 @@ export default {
   border-bottom: none;
 }
 
+.form-icon {
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
+}
+
 .label {
   font-size: 26rpx;
   color: #ddd;
+  flex-shrink: 0;
 }
 
 .input {
@@ -373,7 +429,7 @@ export default {
 }
 
 .price-row .highlight {
-  color: #ff9500;
+  color: #fff;
   font-size: 32rpx;
   font-weight: bold;
 }
@@ -389,50 +445,61 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 16rpx 20rpx 26rpx;
-  background: #0a1929;
-  border-top: 1px solid #1a3a5a;
+  padding: 20rpx 30rpx 30rpx;
+  background: #1E1F34;
   display: flex;
   align-items: center;
+  gap: 20rpx;
 }
 
 .bottom-prices {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
 }
 
-.price-line {
+.price-item {
   display: flex;
-  justify-content: space-between;
-  font-size: 22rpx;
-  margin-bottom: 4rpx;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.price-item.vip-highlight {
+  background: linear-gradient(90deg, #F4BD65 0%, #FEE3B0 49.83%, #F3BD65 100%);
+  padding: 8rpx 20rpx;
+  border-radius: 12rpx;
+  align-self: flex-start;
 }
 
 .price-label {
+  font-size: 24rpx;
   color: #999;
 }
 
-.price-label.vip,
-.price-value.vip {
-  color: #ff9500;
-}
-
-.price-label.share,
-.price-value.share {
-  color: #ffdf70;
+.price-item.vip-highlight .price-label {
+  color: #1a1a2e;
 }
 
 .price-value {
+  font-size: 28rpx;
   color: #fff;
+  font-weight: normal;
+}
+
+.price-item.vip-highlight .price-value {
+  color: #1a1a2e;
+  font-weight: bold;
 }
 
 .submit-btn {
-  width: 220rpx;
-  height: 80rpx;
-  background: #ffb84d;
-  border-radius: 40rpx;
+  width: 360rpx;
+  height: 88rpx;
+  background: linear-gradient(90deg, #F4BD65 0%, #FEE3B0 49.83%, #F3BD65 100%);
+  border-radius: 20rpx;
   border: none;
   color: #1a1a2e;
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: bold;
 }
 

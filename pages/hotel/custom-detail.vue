@@ -3,44 +3,18 @@
     <scroll-view scroll-y class="content">
       <!-- 需求信息卡片 -->
       <view class="request-card">
-        <view class="card-title">定制房需求</view>
+        <view class="card-header">
+          <image class="card-icon" src="/static/images/jiudian-2 1.png" mode="aspectFit"></image>
+          <text class="card-title">定制房需求</text>
+        </view>
         <view class="info-section">
-          <view class="info-item">
-            <text class="label">联系电话：</text>
-            <text class="value">{{ request.mobile || '--' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">地区：</text>
-            <text class="value">{{ request.city_name || '--' }}{{ request.area ? ' ' + request.area : '' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">附近参照物：</text>
-            <text class="value">{{ request.landmark || '--' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">酒店档次：</text>
-            <text class="value">{{ request.hotel_level || '--' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">房型：</text>
-            <text class="value">{{ request.room_type || '--' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">价位：</text>
-            <text class="value">{{ request.price_range || '--' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">入住时间：</text>
-            <text class="value">{{ request.check_in_date || '--' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">离店时间：</text>
-            <text class="value">{{ request.check_out_date || '--' }}</text>
-          </view>
-          <view class="info-item">
-            <text class="label">晚数：</text>
-            <text class="value">{{ request.night_num || 0 }}晚</text>
-          </view>
+          <view class="info-line" style="font-size: 35rpx;">{{ request.room_type}}</view>
+          <view class="info-line">{{ request.city_name || '--' }}{{ request.area ? request.area : '' }}</view>
+          <view class="info-line" v-if="request.landmark">{{ request.landmark }}</view>
+          <view class="info-line">{{ request.price_range || '--' }}</view>
+          <view class="info-line">{{ request.hotel_level || '--' }}</view>
+          <view class="info-line">{{ request.check_in_date || '--' }} 至</view>
+          <view class="info-line">{{ request.check_out_date || '--' }}·{{ request.night_num || 0 }}晚{{ request.guest_num || 1 }}间·{{ request.room_type || '大床房' }}</view>
         </view>
       </view>
 
@@ -52,24 +26,23 @@
         </view>
         <view v-for="offer in offers" :key="offer.id" class="offer-card">
           <view class="offer-header">
-            <text class="merchant-label">报价商家</text>
-            <text class="merchant-name">{{ offer.merchant_name || '商家' + offer.id }}</text>
+            <text class="merchant-name">{{ offer.merchant_name || '接单商家' + offer.id }}</text>
+            <button class="select-btn" @click="selectOffer(offer)">选择付款</button>
           </view>
           <view class="offer-info">
             <view class="offer-item">
-              <text class="offer-label">用户名称：</text>
-              <text class="offer-value">{{ offer.user_name || offer.merchant_name || '--' }}</text>
+              <text class="offer-label">用户</text>
+              <text class="offer-value">{{ offer.user_name || offer.merchant_name || 'ZXC123' }}</text>
             </view>
             <view class="offer-item">
-              <text class="offer-label">出价时间：</text>
+              <text class="offer-label">出价时间</text>
               <text class="offer-value">{{ formatTime(offer.create_time) }}</text>
             </view>
             <view class="offer-item">
-              <text class="offer-label">出价金额：</text>
+              <text class="offer-label">出价金额</text>
               <text class="offer-value price">¥{{ formatPrice(offer.offer_amount) }}</text>
             </view>
           </view>
-          <button class="select-btn" @click="selectOffer(offer)">选择付款</button>
         </view>
       </view>
     </scroll-view>
@@ -155,7 +128,7 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #1a1a2e;
+  background: #0D1034;
 }
 
 .content {
@@ -163,40 +136,61 @@ export default {
   padding-bottom: 40rpx;
 }
 
-.request-card, .offer-card {
-  background: #16213e;
+.request-card {
+  background: #1E1F34;
   padding: 30rpx;
   margin-bottom: 20rpx;
+  margin-right: 35rpx;
   border-radius: 12rpx;
+  border: 2rpx solid #FCDDA6;
 }
 
-.card-title, .section-title {
-  color: #ff9500;
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-icon {
+  width: 48rpx;
+  height: 48rpx;
+  flex-shrink: 0;
+}
+
+.card-title {
+  color: #ffffff;
   font-size: 32rpx;
   font-weight: bold;
-  margin-bottom: 30rpx;
+  flex: 1;
 }
 
 .info-section {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 8rpx;
 }
 
-.info-item {
-  display: flex;
-  align-items: flex-start;
-  font-size: 28rpx;
-}
-
-.info-item .label {
-  color: #999;
-  min-width: 160rpx;
-}
-
-.info-item .value {
+.info-line {
   color: #ffffff;
-  flex: 1;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.offer-card {
+  background: #1E1F34;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  margin-right: 35rpx;
+  border-radius: 12rpx;
+  border: 2rpx solid #FCDDA6;
+}
+
+.section-title {
+  color: #FCDDA6;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
 }
 
 .offers-section {
@@ -212,64 +206,60 @@ export default {
 
 .offer-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 20rpx;
-  margin-bottom: 20rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 2rpx solid rgba(255, 255, 255, 0.1);
-}
-
-.merchant-label {
-  color: #ff9500;
-  font-size: 26rpx;
+  margin-bottom: 30rpx;
+  padding-bottom: 30rpx;
+  border-bottom: 0.5px solid #CBCBCB80;
 }
 
 .merchant-name {
   color: #ffffff;
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: bold;
 }
 
 .offer-info {
   display: flex;
   flex-direction: column;
-  gap: 15rpx;
-  margin-bottom: 30rpx;
+  gap: 20rpx;
 }
 
 .offer-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   font-size: 28rpx;
 }
 
 .offer-label {
-  color: #999;
-  min-width: 140rpx;
+  color: #ffffff;
+  font-size: 28rpx;
 }
 
 .offer-value {
   color: #ffffff;
-  flex: 1;
+  font-size: 28rpx;
+  text-align: right;
 }
 
 .offer-value.price {
-  color: #ff9500;
-  font-size: 32rpx;
+  color: #FCDDA6;
+  font-size: 36rpx;
   font-weight: bold;
 }
 
 .select-btn {
-  width: 100%;
-  height: 80rpx;
-  background: linear-gradient(270deg, #FFA500 0%, #FF8C00 100%);
-  color: #ffffff;
+  background: transparent;
+  color: #FCDDA6;
+  border: 2rpx solid #FCDDA6;
+  padding: 10rpx 30rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.select-btn::after {
   border: none;
-  border-radius: 40rpx;
-  font-size: 30rpx;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>

@@ -3,72 +3,95 @@
     <scroll-view scroll-y class="content">
       <!-- 顶部航班/车次摘要 -->
       <view class="top-card">
-        <view class="ticket-type">{{ ticketType === 'flight' ? '航班信息' : '车次信息' }}</view>
-        <view v-if="ticketType === 'flight'" class="flight-brief">
-          <text class="flight-no">{{ flightInfo.flightNo || 'CA1234' }}</text>
-          <text class="airline">{{ flightInfo.airlineName || '中国国航' }}</text>
+        <view class="card-header">
+          <view class="header-left">
+            <text class="ticket-type">{{ ticketType === 'flight' ? '直飞' : '直达' }}</text>
+            <text class="route-text">{{ flightInfo.departureCity || trainInfo.departureStation }}—{{ flightInfo.arrivalCity || trainInfo.arrivalStation }}</text>
+            <text class="date-time">{{ formatDateDisplay(departureDate) }} {{ formatTimeDisplay(flightInfo.departureTime || trainInfo.departureTime) }}</text>
+          </view>
         </view>
-        <view v-else class="train-brief">
-          <text class="train-no">{{ trainInfo.trainNo || 'G123' }}</text>
-          <text class="train-type">{{ trainInfo.trainType || '高铁' }}</text>
-        </view>
-        <view class="route-brief">
-          <text class="departure">{{ flightInfo.departureCity || trainInfo.departureStation || '北京' }}</text>
-          <text class="arrow">→</text>
-          <text class="arrival">{{ flightInfo.arrivalCity || trainInfo.arrivalStation || '上海' }}</text>
-        </view>
-		
-		{{ flightInfo.arrivalTime}}
-		
-        <view class="date-brief">
-          <text>{{ formatDateDisplay(departureDate) }}</text>
-          <text v-if="ticketType === 'flight'" class="time">{{ formatTimeDisplay(flightInfo.departureTime) }} - {{ formatTimeDisplay(flightInfo.arrivalTime) }}</text>
-          <text v-else class="time">{{ formatTimeDisplay(trainInfo.departureTime) }} - {{ formatTimeDisplay(trainInfo.arrivalTime) }}</text>
+        
+        <view class="card-content">
+          <view class="price-row">
+            <text class="price-label">成人</text>
+            <text class="price-amount">¥{{ formatPrice(displayPrice) }}</text>
+            <text class="tax-label">+ 机建燃油</text>
+            <text class="tax-amount">¥{{ formatPrice(airportTax + fuelTax) }}</text>
+          </view>
+          
+          <view class="policy-row" v-if="seatName">
+            <text class="policy-text">退改 ¥150起 | 免费托运行李额{{ seatName.includes('经济') ? '23KG' : '30KG' }}</text>
+          </view>
         </view>
       </view>
 
       <!-- 乘客信息 -->
-      <view class="section-card">
-        <view class="section-title">乘客信息</view>
-        <view class="form-item">
-          <text class="label">乘客姓名*</text>
+      <view class="section-card passenger-card card-margin">
+        <view class="section-title">乘机人信息</view>
+        
+        <view class="form-group">
+          <view class="form-label-row">
+            <text class="form-label">姓名</text>
+            <text class="form-tip">与乘机证件一致</text>
+          </view>
           <input
-            class="input"
+            class="form-input"
             v-model="passengerName"
-            placeholder="请输入乘客姓名"
+            placeholder="*中文姓名有误，请检查"
+            placeholder-class="input-placeholder"
           />
         </view>
-        <view class="form-item">
-          <text class="label">身份证号*</text>
+        
+        <view class="form-group">
+          <view class="form-label-row">
+            <text class="form-label">身份证</text>
+          </view>
           <input
-            class="input"
+            class="form-input"
             v-model="idCard"
-            placeholder="请输入身份证号"
+            placeholder="请输入证件号码"
+            placeholder-class="input-placeholder"
             maxlength="18"
           />
         </view>
-        <view class="form-item">
-          <text class="label">联系电话*</text>
+        
+        <view class="form-group">
+          <view class="form-label-row">
+            <text class="form-label">手机号码</text>
+            <text class="form-tip">用户接收航班信息</text>
+          </view>
           <input
-            class="input"
+            class="form-input"
             v-model="mobile"
             type="number"
             placeholder="请输入手机号码"
+            placeholder-class="input-placeholder"
             maxlength="11"
           />
         </view>
-        <view v-if="ticketType === 'flight'" class="form-item">
-          <text class="label">舱位等级</text>
-          <text class="readonly">{{ cabinClassText }}</text>
+        
+        <button class="complete-btn">完成</button>
+        
+        <view class="form-group contact-group">
+          <view class="form-label-row">
+            <text class="form-label">联系手机*</text>
+            <text class="form-tip">用于接收订单/航变信息</text>
+          </view>
         </view>
-        <view v-else class="form-item">
-          <text class="label">座位类型</text>
-          <text class="readonly">{{ seatTypeText }}</text>
+      </view>
+
+      <!-- 优惠专区 -->
+      <view class="section-card coupon-card card-margin">
+        <view class="section-title">优惠专区</view>
+        <view class="coupon-row">
+          <text class="coupon-label">代金券</text>
+          <text class="coupon-value">无优惠券可用</text>
+          <text class="coupon-arrow">›</text>
         </view>
       </view>
 
       <!-- 价格明细 -->
-      <view class="section-card">
+      <view class="section-card price-card card-margin">
         <view class="section-title">价格明细</view>
         <view class="price-row">
           <text class="label">票面价</text>
@@ -93,7 +116,7 @@
       </view>
 
       <!-- 退改政策 -->
-      <view class="section-card">
+      <view class="section-card policy-card card-margin">
         <view class="section-title">退改政策</view>
         <view class="section-text">
           {{ ticketType === 'flight' ? '根据航空公司规定，退改政策以实际出票时为准。' : '根据铁路部门规定，退改政策以实际出票时为准。' }}
@@ -101,7 +124,7 @@
       </view>
 
       <!-- 购票提示 -->
-      <view class="section-card">
+      <view class="section-card tips-card card-margin">
         <view class="section-title">购票提示</view>
         <view class="section-text">
           请确保乘客信息真实有效，身份证号将用于实名制购票。请在预订后及时完成支付。
@@ -109,14 +132,11 @@
       </view>
     </scroll-view>
 
-    <!-- 底部价格栏 -->
-      <view class="bottom-bar">
-      <view class="bottom-price">
-        <text class="price-label">需支付</text>
-        <text class="price-value">¥{{ formatPrice(totalAmount) }}</text>
-      </view>
-      <button class="submit-btn" :disabled="submitting || !canSubmit" @click="submitOrder">
-        {{ submitting ? '提交中...' : '立即预订' }}
+    <!-- 底部操作栏 -->
+    <view class="bottom-bar">
+      <text class="bottom-tip">请先添加乘机人</text>
+      <button class="next-btn" :disabled="submitting || !canSubmit" @click="submitOrder">
+        {{ submitting ? '提交中...' : '下一步' }}
       </button>
     </view>
   </view>
@@ -387,7 +407,7 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #0D1034;
   display: flex;
   flex-direction: column;
 }
@@ -398,61 +418,89 @@ export default {
 }
 
 .top-card {
-  background: #fff;
+  background: #4E474C;
   padding: 30rpx;
   margin-bottom: 20rpx;
   
-  .ticket-type {
-    font-size: 28rpx;
-    color: #999;
-    margin-bottom: 20rpx;
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30rpx;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15rpx;
+      flex: 1;
+      
+      .ticket-type {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .route-text {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .date-time {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10rpx;
+      
+      .detail-btn {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .arrow-icon {
+        font-size: 24rpx;
+        color: #FFE3BB;
+      }
+    }
   }
   
-  .flight-brief, .train-brief {
-    display: flex;
-    align-items: center;
-    gap: 20rpx;
-    margin-bottom: 20rpx;
-    
-    .flight-no, .train-no {
-      font-size: 36rpx;
-      font-weight: bold;
-      color: #333;
+  .card-content {
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 10rpx;
+      margin-bottom: 20rpx;
+      
+      .price-label {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .price-amount {
+        font-size: 32rpx;
+        color: #FFE3BB;
+      }
+      
+      .tax-label {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .tax-amount {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
     }
     
-    .airline, .train-type {
-      font-size: 26rpx;
-      color: #666;
-    }
-  }
-  
-  .route-brief {
-    display: flex;
-    align-items: center;
-    gap: 20rpx;
-    margin-bottom: 15rpx;
-    
-    .departure, .arrival {
-      font-size: 32rpx;
-      font-weight: 600;
-      color: #1A4A8F;
-    }
-    
-    .arrow {
-      font-size: 28rpx;
-      color: #999;
-    }
-  }
-  
-  .date-brief {
-    display: flex;
-    align-items: center;
-    gap: 20rpx;
-    font-size: 26rpx;
-    color: #666;
-    
-    .time {
-      color: #999;
+    .policy-row {
+      .policy-text {
+        font-size: 26rpx;
+        color: #FFE3BB;
+        line-height: 1.5;
+      }
     }
   }
 }
@@ -461,6 +509,11 @@ export default {
   background: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
+  
+  &.card-margin {
+    margin-left: 20rpx;
+    margin-right: 20rpx;
+  }
   
   .section-title {
     font-size: 32rpx;
@@ -496,6 +549,166 @@ export default {
       flex: 1;
       font-size: 28rpx;
       color: #666;
+    }
+  }
+  
+  &.passenger-card {
+    background: #1E1F34;
+    padding: 40rpx 30rpx;
+    
+    .section-title {
+      font-size: 36rpx;
+      color: #fff;
+      margin-bottom: 40rpx;
+    }
+    
+    .form-group {
+      margin-bottom: 40rpx;
+      
+      .form-label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20rpx;
+        
+        .form-label {
+          font-size: 28rpx;
+          color: #fff;
+        }
+        
+        .form-tip {
+          font-size: 24rpx;
+          color: #999;
+        }
+      }
+      
+      .form-input {
+        width: 100%;
+        height: 80rpx;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #4A4A5E;
+        font-size: 28rpx;
+        color: #fff;
+        padding: 0;
+        
+        &::placeholder {
+          color: #666;
+        }
+      }
+      
+      &.contact-group {
+        margin-top: 60rpx;
+        margin-bottom: 0;
+      }
+    }
+    
+    .complete-btn {
+      width: 100%;
+      height: 88rpx;
+      background: linear-gradient(90deg, #F4BD67 0%, #FEE1AD 50.09%, #F3BD66 100%);
+      border-radius: 44rpx;
+      font-size: 32rpx;
+      color: #000;
+      border: none;
+      margin: 40rpx 0;
+      
+      &::after {
+        border: none;
+      }
+    }
+  }
+  
+  &.coupon-card {
+    background: #1E1F34;
+    padding: 40rpx 30rpx;
+    
+    .section-title {
+      font-size: 36rpx;
+      color: #fff;
+      margin-bottom: 30rpx;
+    }
+    
+    .coupon-row {
+      display: flex;
+      align-items: center;
+      padding: 20rpx 0;
+      
+      .coupon-label {
+        font-size: 28rpx;
+        color: #fff;
+        margin-right: 40rpx;
+      }
+      
+      .coupon-value {
+        flex: 1;
+        font-size: 28rpx;
+        color: #999;
+      }
+      
+      .coupon-arrow {
+        font-size: 36rpx;
+        color: #fff;
+      }
+    }
+  }
+  
+  &.price-card {
+    background: #1E1F34;
+    padding: 40rpx 30rpx;
+    
+    .section-title {
+      font-size: 36rpx;
+      color: #fff;
+      margin-bottom: 30rpx;
+    }
+    
+    .price-row {
+      .label {
+        color: #fff;
+        
+        &.sub {
+          color: #fff;
+        }
+      }
+      
+      .value {
+        color: #fff;
+        
+        &.highlight {
+          background: linear-gradient(90deg, #F3BC63 0%, #FFE6B6 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 600;
+        }
+        
+        &.total {
+          background: linear-gradient(90deg, #F3BC63 0%, #FFE6B6 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+      }
+      
+      &.total {
+        border-top: 1px solid #4A4A5E;
+      }
+    }
+  }
+  
+  &.policy-card, &.tips-card {
+    background: #1E1F34;
+    padding: 40rpx 30rpx;
+    
+    .section-title {
+      font-size: 36rpx;
+      color: #fff;
+      margin-bottom: 30rpx;
+    }
+    
+    .section-text {
+      color: #999;
     }
   }
   
@@ -550,39 +763,24 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  border-top: 1px solid #e0e0e0;
+  background: #1E1F34;
+  padding: 12rpx 30rpx 30rpx;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 20rpx;
   
-  .bottom-price {
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    gap: 10rpx;
-    
-    .price-label {
-      font-size: 26rpx;
-      color: #666;
-    }
-    
-    .price-value {
-      font-size: 36rpx;
-      font-weight: bold;
-      color: #FF7A00;
-    }
+  .bottom-tip {
+    font-size: 28rpx;
+    color: #fff;
   }
   
-  .submit-btn {
-    background: linear-gradient(90deg, #FFC966, #F8D07C);
-    color: #1A4A8F;
-    font-size: 32rpx;
-    font-weight: 600;
-    padding: 20rpx 60rpx;
-    border-radius: 50rpx;
+  .next-btn {
+    background: linear-gradient(90deg, #F4BD67 0%, #FEE1AD 50.09%, #F3BD66 100%);
+    color: #000;
+    font-size: 28rpx;
+    padding: 0rpx 40rpx;
+    border-radius: 48rpx;
     border: none;
     
     &::after {

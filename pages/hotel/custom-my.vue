@@ -3,20 +3,22 @@
     <scroll-view scroll-y class="list">
       <view v-for="item in list" :key="item.id" class="card">
         <view class="header">
-          <text class="type">定制房需求</text>
-          <text class="status">{{ getStatusText(item.status) }}</text>
+          <image class="room-icon" src="/static/images/jiudian-2 1.png" mode="aspectFit"></image>
+          <text class="type">订制房需求</text>
         </view>
-        <view class="room-name">{{ item.room_type || '豪华标间' }}</view>
-        <view class="location">{{ item.city_name }}{{ item.area }}</view>
+        <view class="room-name">豪华标间</view>
+        <view class="location">{{ item.city_name }}{{ item.area ? item.area : '' }}</view>
+        <view class="location" v-if="item.landmark">{{ item.landmark }}</view>
         <view class="price-range">{{ item.price_range }}</view>
         <view class="rating">{{ item.hotel_level }}</view>
-        <view class="dates">{{ item.check_in_date }} 至 {{ item.check_out_date }}·{{ item.night_num }}晚1间·{{ item.room_type }}</view>
+        <view class="dates">{{ item.check_in_date }} 至 {{ item.check_out_date }}·2晚1间·{{ item.room_type }}</view>
         <view class="actions">
-          <button class="detail-btn" @click="goDetail(item)">详情</button>
+          <button class="detail-btn" @click="goDetail(item)">去查看</button>
         </view>
       </view>
       <view v-if="loading" class="loading">加载中...</view>
-      <view v-if="noMore" class="no-more">没有更多了</view>
+      <view v-if="noMore && list.length > 0" class="no-more">没有更多了</view>
+      <view v-if="!loading && list.length === 0" class="empty">暂无数据</view>
     </scroll-view>
   </view>
 </template>
@@ -87,64 +89,81 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #1a1a2e;
+  background: #0D1034;
 }
+
 .list {
+  height: 100vh;
   padding: 20rpx;
 }
+
 .card {
-  background: #16213e;
+  background: #1E1F34;
   padding: 30rpx;
   margin-bottom: 20rpx;
+  margin-right: 35rpx;
   border-radius: 12rpx;
+  border: 2rpx solid #FCDDA6;
 }
+
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 20rpx;
+  gap: 16rpx;
 }
+
+.header .room-icon {
+  width: 48rpx;
+  height: 48rpx;
+  flex-shrink: 0;
+}
+
 .type {
-  color: #ff9500;
-  font-size: 24rpx;
-}
-.status {
-  color: #4caf50;
-  font-size: 24rpx;
-}
-.actions {
-  margin-top: 20rpx;
-  display: flex;
-  justify-content: flex-end;
-}
-.detail-btn {
-  background: #ff9500;
-  color: #fff;
-  border: none;
-  padding: 12rpx 40rpx;
-  border-radius: 8rpx;
-  font-size: 26rpx;
-}
-.room-name {
+  color: #ffffff;
   font-size: 32rpx;
   font-weight: bold;
-  color: #fff;
+  flex: 1;
+}
+
+.room-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ffffff;
   margin-bottom: 10rpx;
 }
-.location, .price-range, .rating {
-  color: #999;
+
+.location, .price-range, .rating, .dates {
+  color: #ffffff;
   font-size: 24rpx;
   margin-bottom: 5rpx;
 }
-.dates {
-  color: #fff;
-  font-size: 24rpx;
-  margin-top: 10rpx;
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20rpx;
 }
-.loading, .no-more {
+
+.detail-btn {
+  background: transparent;
+  color: #FCDDA6;
+  border: 2rpx solid #FCDDA6;
+  padding: 15rpx 30rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.detail-btn::after {
+  border: none;
+}
+
+.loading, .no-more, .empty {
   text-align: center;
-  padding: 20rpx;
+  padding: 40rpx;
   color: #999;
+  font-size: 28rpx;
 }
 </style>
 

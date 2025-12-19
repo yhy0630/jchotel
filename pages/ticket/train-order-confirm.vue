@@ -1,64 +1,86 @@
 <template>
   <view class="page">
     <scroll-view scroll-y class="content">
-      <view class="card">
-        <view class="title">车次信息</view>
-        <view class="row">
-          <text class="train-no">{{ trainNo || '—' }}</text>
-          <text class="seat">{{ seatName || '—' }}</text>
-        </view>
-        <view class="row stations">
-          <view class="block">
-            <text class="time">{{ formatTimeDisplay(depTime) }}</text>
-            <text class="station">{{ fromStationName || fromStation || '—' }}</text>
-          </view>
-          <text class="arrow">→</text>
-          <view class="block">
-            <text class="time">{{ formatTimeDisplay(arrTime) }}</text>
-            <text class="station">{{ toStationName || toStation || '—' }}</text>
+      <!-- 顶部车次摘要 -->
+      <view class="top-card">
+        <view class="card-header">
+          <view class="header-left">
+            <text class="ticket-type">直达</text>
+            <text class="route-text">{{ fromStationName || fromStation || '—' }}—{{ toStationName || toStation || '—' }}</text>
+            <text class="date-time">{{ formatDateDisplay(departureDate) }} {{ formatTimeDisplay(depTime) }}</text>
           </view>
         </view>
-        <view class="date-row">
-          <text>{{ formatDateDisplay(departureDate) }}</text>
-          <text v-if="spanTime" class="duration">{{ spanTime }}</text>
+        
+        <view class="card-content">
+          <view class="price-row">
+            <text class="price-label">{{ seatName || '—' }}</text>
+            <text class="price-amount">¥{{ formatPrice(ticketPrice) }}</text>
+          </view>
         </view>
       </view>
 
-      <view class="card">
-        <view class="title">乘客信息</view>
-        <view class="info-row">
-          <text class="label">姓名</text>
-          <text class="value">{{ passengerName || '—' }}</text>
+      <!-- 乘客信息 -->
+      <view class="info-card">
+        <view class="card-title">乘客人信息</view>
+        <view class="info-item">
+          <text class="info-label">姓名</text>
+          <text class="info-value">{{ passengerName || '—' }}</text>
         </view>
-        <view class="info-row">
-          <text class="label">身份证号</text>
-          <text class="value">{{ idCard || '—' }}</text>
+        <view class="divider-line"></view>
+        <view class="info-item">
+          <text class="info-label">身份证</text>
+          <text class="info-value">{{ idCard || '—' }}</text>
         </view>
-        <view class="info-row">
-          <text class="label">手机号</text>
-          <text class="value">{{ mobile || '—' }}</text>
+        <view class="divider-line"></view>
+        <view class="info-item">
+          <text class="info-label">手机号码</text>
+          <text class="info-value">{{ mobile || '—' }}</text>
+        </view>
+        <view class="divider-line"></view>
+        <view class="info-item">
+          <text class="info-label">联系手机</text>
+          <text class="info-value">{{ mobile || '—' }}</text>
         </view>
       </view>
 
-      <view class="card">
-        <view class="title">价格明细</view>
-        <view class="price-row">
-          <text>票面价</text>
-          <text>¥{{ formatPrice(ticketPrice) }}</text>
-        </view>
-        <view class="price-row total">
-          <text>实付</text>
-          <text class="highlight">¥{{ formatPrice(totalAmount) }}</text>
+      <!-- 优惠专区 -->
+      <view class="info-card">
+        <view class="card-title">优惠专区</view>
+        <view class="coupon-item">
+          <text class="coupon-label">代金券</text>
+          <text class="coupon-value">无优惠券可用</text>
+          <text class="coupon-arrow">›</text>
         </view>
       </view>
     </scroll-view>
 
+    <!-- 底部价格栏 -->
     <view class="bottom-bar">
-      <view class="bottom-price">
-        <text class="label">实付</text>
-        <text class="value">¥{{ formatPrice(totalAmount) }}</text>
+      <view class="price-detail">
+        <view class="price-item">
+          <text class="price-label">尊享价</text>
+          <text class="price-dash">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</text>
+          <text class="price-amount">¥{{ formatPrice(ticketPrice) }}</text>
+        </view>
+        <view class="price-item">
+          <text class="price-label">抵扣价</text>
+          <text class="price-dash">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</text>
+          <text class="price-amount">¥{{ formatPrice(ticketPrice) }}</text>
+        </view>
+        <view class="price-item">
+          <text class="price-label">股东价</text>
+          <text class="price-dash">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</text>
+          <text class="price-amount">¥{{ formatPrice(ticketPrice) }}</text>
+        </view>
       </view>
-      <button class="submit" @click="goPay">去支付</button>
+      <view class="action-row">
+        <view class="total-price">
+          <text class="total-symbol">¥</text>
+          <text class="total-amount">{{ formatPrice(totalAmount).split('.')[0] }}</text>
+        </view>
+        <text class="detail-text">明细 ∨</text>
+        <button class="pay-btn" @click="goPay">立即预订</button>
+      </view>
     </view>
   </view>
 </template>
@@ -134,6 +156,12 @@ export default {
       }
       return dateStr
     },
+    formatWeekday(dateStr) {
+      if (!dateStr) return ''
+      const d = new Date(dateStr)
+      const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      return weekDays[d.getDay()]
+    },
     goPay() {
       const orderData = {
         train_no: this.trainNo,
@@ -191,137 +219,205 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #0D1034;
   display: flex;
   flex-direction: column;
 }
+
 .content {
   flex: 1;
-  padding-bottom: 140rpx;
+  padding: 0 0 280rpx 0;
 }
-.card {
-  background: #fff;
+
+.top-card {
+  background: #4E474C;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  border-radius: 16rpx;
-  .title {
-    font-size: 32rpx;
-    font-weight: 600;
-    margin-bottom: 20rpx;
-  }
-}
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10rpx;
-  .train-no {
-    font-size: 40rpx;
-    font-weight: 700;
-    color: #1a4a8f;
-  }
-  .seat {
-    font-size: 26rpx;
-    color: #666;
-  }
-}
-.stations {
-  align-items: center;
-  .block {
-    flex: 1;
+  
+  .card-header {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    .time {
-      font-size: 34rpx;
-      font-weight: 700;
+    margin-bottom: 30rpx;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15rpx;
+      flex: 1;
+      
+      .ticket-type {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .route-text {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .date-time {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
     }
-    .station {
-      font-size: 26rpx;
-      color: #666;
+  }
+  
+  .card-content {
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 10rpx;
+      
+      .price-label {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .price-amount {
+        font-size: 32rpx;
+        color: #FFE3BB;
+      }
     }
   }
-  .arrow {
-    width: 80rpx;
-    text-align: center;
-    color: #999;
+}
+
+.info-card {
+  background: #1E1F34;
+  margin: 20rpx;
+  padding: 40rpx 30rpx;
+  border-radius: 15rpx;
+  
+  .card-title {
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 30rpx;
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20rpx 0;
+    
+    .info-label {
+      font-size: 28rpx;
+      color: #fff;
+    }
+    
+    .info-value {
+      font-size: 28rpx;
+      color: #fff;
+    }
+  }
+  
+  .divider-line {
+    height: 1rpx;
+    background: #4A4A5E;
+  }
+  
+  .coupon-item {
+    display: flex;
+    align-items: center;
+    padding: 20rpx 0;
+    
+    .coupon-label {
+      font-size: 28rpx;
+      color: #fff;
+      margin-right: 40rpx;
+    }
+    
+    .coupon-value {
+      flex: 1;
+      font-size: 28rpx;
+      color: #999;
+    }
+    
+    .coupon-arrow {
+      font-size: 36rpx;
+      color: #fff;
+    }
   }
 }
-.date-row {
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  color: #666;
-  display: flex;
-  gap: 12rpx;
-}
-.duration {
-  color: #999;
-}
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 16rpx 0;
-  font-size: 28rpx;
-  color: #333;
-  border-bottom: 1px solid #f0f0f0;
-  &:last-child {
-    border-bottom: none;
-  }
-  .label {
-    color: #666;
-  }
-}
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 16rpx 0;
-  font-size: 28rpx;
-  color: #333;
-  &.total {
-    border-top: 1px solid #f0f0f0;
-    margin-top: 10rpx;
-    padding-top: 20rpx;
-  }
-  .highlight {
-    color: #ff7a00;
-    font-weight: 700;
-  }
-}
+
 .bottom-bar {
   position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: #fff;
-  border-top: 1px solid #e0e0e0;
-  .bottom-price {
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    gap: 10rpx;
-    .label {
-      font-size: 26rpx;
-      color: #666;
-    }
-    .value {
-      font-size: 36rpx;
-      font-weight: 700;
-      color: #ff7a00;
+  background: #1E1F34;
+  padding: 20rpx 20rpx 50rpx 20rpx;
+  
+  .price-detail {
+    margin-bottom: 20rpx;
+    
+    .price-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10rpx;
+      
+      .price-label {
+        font-size: 24rpx;
+        color: #D4B896;
+        min-width: 100rpx;
+      }
+      
+      .price-dash {
+        flex: 1;
+        font-size: 20rpx;
+        color: #4A4A5E;
+        overflow: hidden;
+        white-space: nowrap;
+        margin: 0 10rpx;
+      }
+      
+      .price-amount {
+        font-size: 24rpx;
+        color: #D4B896;
+      }
     }
   }
-  .submit {
-    background: linear-gradient(90deg, #ffc966, #f8d07c);
-    color: #1a4a8f;
-    font-size: 32rpx;
-    font-weight: 600;
-    padding: 20rpx 60rpx;
-    border-radius: 50rpx;
-    border: none;
+  
+  .action-row {
+    display: flex;
+    align-items: center;
+    gap: 20rpx;
+    
+    .total-price {
+      display: flex;
+      align-items: baseline;
+      
+      .total-symbol {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .total-amount {
+        font-size: 48rpx;
+        font-weight: bold;
+        color: #FFE3BB;
+      }
+    }
+    
+    .detail-text {
+      font-size: 28rpx;
+      color: #fff;
+      margin-right: auto;
+    }
+    
+    .pay-btn {
+      background: linear-gradient(90deg, #F4BD65 0%, #FEE3B0 49.83%, #F3BD65 100%);
+      color: #000;
+      font-size: 28rpx;
+      padding: 0rpx 50rpx;
+      border-radius: 18rpx;
+      border: none;
+      
+      &::after {
+        border: none;
+      }
+    }
   }
 }
 </style>

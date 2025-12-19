@@ -1,48 +1,39 @@
 <template>
   <view class="page">
-    <!-- 头部导航 -->
-    <view class="header">
-      <view class="nav-bar">
-        <text class="back" @click="goBack">‹</text>
-        <text class="title">{{ detail.hotelName || '酒店名称' }}</text>
-        <view class="actions">
-          <text class="icon">⋯</text>
-          <text class="icon">○</text>
-        </view>
-      </view>
+    <!-- 预订信息栏 -->
+    <view class="booking-info">
+      <text class="date">{{ formatDateShort(checkInDate) }}</text>
+      <text class="separator">—</text>
+      <text class="night-badge">共{{ nightCount }}晚</text>
+      <text class="separator">—</text>
+      <text class="date">{{ formatDateShort(checkOutDate) }}</text>
+      <text class="separator">|</text>
+      <text class="guest">{{ adultCount }}成人·{{ childCount }}儿童</text>
+    </view>
       
-      <!-- 预订信息栏 -->
-      <view class="booking-info">
-        <text class="date">{{ formatDateShort(checkInDate) }}</text>
-        <view class="night-badge">{{ nightCount }}晚</view>
-        <text class="date">{{ formatDateShort(checkOutDate) }}</text>
-        <text class="separator">|</text>
-        <text class="guest">{{ adultCount }}成人・{{ childCount }}儿童</text>
+    
+    <!-- 筛选栏 -->
+    <view class="filter-tabs">
+      <view 
+        v-for="(filter, index) in filterOptions" 
+        :key="index"
+        :class="['filter-tab', { active: activeFilters.includes(filter.value) }]"
+        @click="toggleFilter(filter.value)"
+      >
+        {{ filter.label }}
       </view>
-      
-      <!-- 筛选栏 -->
-      <view class="filter-tabs">
-        <view 
-          v-for="(filter, index) in filterOptions" 
-          :key="index"
-          :class="['filter-tab', { active: activeFilters.includes(filter.value) }]"
-          @click="toggleFilter(filter.value)"
-        >
-          {{ filter.label }}
-        </view>
-        <view class="filter-icon" @click="showAdvancedFilter">
-          <text>筛选</text>
-        </view>
+      <view class="filter-icon" @click="showAdvancedFilter">
+        <image src="/static/images/shaixuan-3 1.png" class="filter-img" mode="aspectFit"></image>
+        <text>筛选</text>
       </view>
     </view>
-
     <!-- 房间列表 -->
     <scroll-view scroll-y class="room-list" @scrolltolower="loadMore">
       <view 
         v-for="room in filteredRooms" 
         :key="room.roomCode" 
         class="room-card"
-        @click="selectRoom(room)"
+        @click="goRoomDetail(room)"
       >
         <image 
           :src="getRoomImage(room)" 
@@ -51,41 +42,36 @@
         />
         <view class="room-content">
           <view class="room-header">
-            <text
-              class="room-type"
-              @click.stop="goOrder(room.roomCode)"
-            >
-              {{ room.roomName || '大床房' }}
-            </text>
-            <view v-if="hasBreakfast(room)" class="breakfast-badge">有早餐</view>
+            <text class="room-type">{{ room.roomName}}</text>
+            <view class="breakfast-badge">{{ room.mealDesc || '无早' }}</view>
           </view>
           
           <view class="room-specs">
-            <text v-if="room.area">{{ room.area }}</text>
-            <text v-if="room.bedInfo">{{ room.bedInfo }}</text>
-            <text v-if="room.capacity">{{ room.capacity }}人</text>
+            <text>{{ room.bedType || '--' }}</text>
+            <text>{{ room.floor || '--' }}</text>
           </view>
           
-          <view v-if="room.windowInfo" class="window-info">{{ room.windowInfo }}</view>
-          
-          <view v-if="room.cancelPolicy" class="cancel-policy">{{ room.cancelPolicy }}</view>
+          <view class="window-info">窗户位于走廊或者过道</view>
+          <view class="cancel-policy">入住当天18：00前可免费取消</view>
           
           <view class="price-section">
-            <view class="price-item">
+            <view class="price-row">
               <text class="price-label">挂牌价</text>
-              <text class="price-value">¥{{ formatPrice(room.list_price || room.amountPrice) }}起</text>
+              <text class="price-value">¥ {{ formatPrice(room.list_price || room.amountPrice) }}起</text>
             </view>
-            <view class="price-item vip">
+            <view class="price-row vip">
               <text class="price-label">尊享价</text>
-              <text class="price-value">¥{{ formatPrice(room.vip_price || room.amountPrice) }}起</text>
+              <text class="price-value">¥ {{ formatPrice(room.vip_price || room.amountPrice) }}起</text>
             </view>
-            <view class="price-item share">
+            <view class="price-row share">
               <text class="price-label">股东价</text>
-              <text class="price-value">¥{{ formatPrice(room.share_price || room.amountPrice) }}起</text>
+              <text class="price-value">¥ {{ formatPrice(room.share_price || room.amountPrice) }}起</text>
             </view>
           </view>
-          
-          <button class="book-btn" @click.stop="bookRoom(room.roomCode)">订</button>
+        </view>
+        
+        <view class="book-btn" @click.stop="bookRoom(room.roomCode)">
+          <text>订</text>
         </view>
       </view>
       
@@ -210,24 +196,6 @@ export default {
         if (res.code === 1) {
           this.detail = res.data || {}
           this.rooms = this.detail.rooms || []
-          
-          // 处理房间数据，提取床型等信息
-          this.rooms = this.rooms.map(room => {
-            // 解析房间描述，提取面积、床型、人数等信息
-            const desc = room.roomDesc || room.description || ''
-            const areaMatch = desc.match(/(\d+(?:\.\d+)?)\s*m²|(\d+(?:\.\d+)?)\s*平米|(\d+(?:\.\d+)?)\s*平方米/)
-            const bedMatch = desc.match(/(\d+)\s*张\s*(\d+(?:\.\d+)?)\s*m\s*(大床|双床|单人床)/)
-            const capacityMatch = desc.match(/(\d+)\s*人/)
-            
-            return {
-              ...room,
-              area: areaMatch ? `${areaMatch[1] || areaMatch[2] || areaMatch[3]}m²` : '',
-              bedInfo: bedMatch ? `${bedMatch[1]}张${bedMatch[2]}m${bedMatch[3]}` : '',
-              capacity: capacityMatch ? capacityMatch[1] : (room.capacity || '2'),
-              windowInfo: room.windowInfo || '窗户位于走廊或过道',
-              cancelPolicy: room.cancelPolicy || '入住当天18:00前可免费取消'
-            }
-          })
         }
       } catch (e) {
         uni.showToast({ title: e.msg || '加载失败', icon: 'none' })
@@ -268,6 +236,12 @@ export default {
       // 从房型名称或“订”按钮进入下单页
       this.bookRoom(roomCode)
     },
+    goRoomDetail(room) {
+      const roomInfo = encodeURIComponent(JSON.stringify(room))
+      uni.navigateTo({
+        url: `/pages/hotel/room-detail?hotelCode=${this.hotelCode}&roomCode=${room.roomCode}&cityCode=${this.cityCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}&roomInfo=${roomInfo}`
+      })
+    },
     bookRoom(roomCode) {
       uni.navigateTo({
         url: `/pages/hotel/order-create?hotelCode=${this.hotelCode}&roomCode=${roomCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}&adultCount=${this.adultCount}&childCount=${this.childCount}`
@@ -283,224 +257,220 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #0a1929;
-  color: #fff;
-}
-
-.header {
-  background: #0a1929;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.nav-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 30rpx;
-  height: 88rpx;
-}
-
-.back {
-  font-size: 48rpx;
-  color: #fff;
-  width: 60rpx;
-  text-align: left;
-}
-
-.title {
-  flex: 1;
-  text-align: center;
-  font-size: 36rpx;
-  font-weight: bold;
-}
-
-.actions {
-  display: flex;
-  gap: 20rpx;
-  width: 60rpx;
-  justify-content: flex-end;
-}
-
-.icon {
-  font-size: 32rpx;
+  background: #0D1034;
   color: #fff;
 }
 
 .booking-info {
   display: flex;
   align-items: center;
-  padding: 20rpx 30rpx;
-  font-size: 28rpx;
-  gap: 10rpx;
-}
-
-.date {
+  padding: 24rpx 30rpx;
+  font-size: 26rpx;
+  gap: 12rpx;
+  background: #0D1034;
   color: #fff;
-}
-
-.night-badge {
-  background: #1a3a5a;
-  color: #ff9500;
-  padding: 4rpx 16rpx;
-  border-radius: 20rpx;
-  font-size: 24rpx;
-}
-
-.separator {
-  margin: 0 10rpx;
-  color: #666;
-}
-
-.guest {
-  color: #999;
+  
+  .date {
+    color: #fff;
+    font-weight: 500;
+  }
+  
+  .separator {
+    color: #666;
+    margin: 0 4rpx;
+  }
+  
+  .night-badge {
+    color: #fff;
+    font-weight: 500;
+  }
+  
+  .guest {
+    color: #fff;
+  }
 }
 
 .filter-tabs {
   display: flex;
   align-items: center;
   padding: 20rpx 30rpx;
-  gap: 20rpx;
+  gap: 16rpx;
   overflow-x: auto;
   white-space: nowrap;
-}
-
-.filter-tab {
-  padding: 10rpx 24rpx;
-  background: #1a3a5a;
-  color: #fff;
-  border-radius: 30rpx;
-  font-size: 28rpx;
-  white-space: nowrap;
-}
-
-.filter-tab.active {
-  background: #ff9500;
-  color: #fff;
-}
-
-.filter-icon {
-  margin-left: auto;
-  padding: 10rpx 20rpx;
-  color: #fff;
-  font-size: 28rpx;
+  background: #0D1034;
+  
+  .filter-tab {
+    padding: 12rpx 28rpx;
+    background: #353548;
+    color: #fff;
+    border-radius: 10rpx;
+    font-size: 26rpx;
+    white-space: nowrap;
+    flex-shrink: 0;
+    
+    &.active {
+      background: linear-gradient(90deg, #F3BC62 0%, #FEE6B6 50.34%, #F3BD64 100%);
+      color: #1b1f35;
+      font-weight: 600;
+    }
+  }
+  
+  .filter-icon {
+    margin-left: auto;
+    padding: 12rpx 20rpx;
+    color: #fff;
+    font-size: 26rpx;
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    flex-shrink: 0;
+    
+    .filter-img {
+      width: 28rpx;
+      height: 28rpx;
+    }
+  }
 }
 
 .room-list {
-  height: calc(100vh - 300rpx);
-  padding: 20rpx;
+  height: calc(100vh - 200rpx);
+  padding: 20rpx 30rpx;
+  box-sizing: border-box;
 }
 
 .room-card {
-  background: #1a3a5a;
+  background: #1E1F34;
   border-radius: 16rpx;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
   overflow: hidden;
   display: flex;
+  position: relative;
+  padding: 20rpx;
+  gap: 20rpx;
 }
 
 .room-image {
   width: 200rpx;
-  height: 200rpx;
+  height: 280rpx;
+  border-radius: 12rpx;
   flex-shrink: 0;
 }
 
 .room-content {
   flex: 1;
-  padding: 20rpx;
   display: flex;
   flex-direction: column;
-  position: relative;
+  gap: 8rpx;
+  padding-right: 100rpx;
 }
 
 .room-header {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  margin-bottom: 10rpx;
-}
-
-.room-type {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #fff;
-}
-
-.breakfast-badge {
-  background: #ff9500;
-  color: #fff;
-  padding: 4rpx 12rpx;
-  border-radius: 12rpx;
-  font-size: 22rpx;
+  gap: 12rpx;
+  
+  .room-type {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .breakfast-badge {
+background: linear-gradient(90deg, #F4BE65 0%, #FEE3B1 50.11%, #F3BD65 100%);
+    color: #380C00;
+    padding: 5rpx 20rpx;
+    border-radius: 10rpx;
+    font-size: 25rpx;
+    font-weight: 600;
+  }
 }
 
 .room-specs {
   display: flex;
-  gap: 10rpx;
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 8rpx;
+  gap: 32rpx;
+  font-size: 26rpx;
+  color: #E4E3E3;
+  
+  text {
+    position: relative;
+    
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -16rpx;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2rpx;
+      height: 20rpx;
+      background: #666;
+    }
+  }
 }
 
 .window-info {
   font-size: 24rpx;
-  color: #999;
-  margin-bottom: 8rpx;
+  color: #B8C5D6;
 }
 
 .cancel-policy {
   font-size: 24rpx;
-  color: #4a9eff;
-  margin-bottom: 10rpx;
+  color: #B8C5D6;
 }
 
 .price-section {
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
-  margin-bottom: 10rpx;
-}
-
-.price-item {
-  display: flex;
-  gap: 10rpx;
-  font-size: 24rpx;
-}
-
-.price-label {
-  color: #999;
-}
-
-.price-value {
-  color: #fff;
-}
-
-.price-item.vip .price-value {
-  color: #ff9500;
-}
-
-.price-item.share .price-value {
-  color: #ff0000;
+  gap: 6rpx;
+  margin-top: 8rpx;
+  
+  .price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12rpx;
+    font-size: 24rpx;
+    
+    .price-label {
+      color: #B8C5D6;
+      min-width: 100rpx;
+    }
+    
+    .price-value {
+      color: #fff;
+      font-weight: 600;
+    }
+    
+    &.vip .price-value {
+      background: linear-gradient(90deg, #F3BC63 0%, #FDE3B1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    &.share .price-value {
+      color: #fff;
+    }
+  }
 }
 
 .book-btn {
   position: absolute;
   right: 20rpx;
-  bottom: 20rpx;
-  background: #ff9500;
-  color: #fff;
-  border: none;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(107.61deg, #F3BD65 4.52%, #FEE3B1 100%);
+  color: #380C00;
   width: 80rpx;
-  height: 60rpx;
-  border-radius: 8rpx;
-  font-size: 28rpx;
+  height: 80rpx;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(243, 188, 98, 0.3);
 }
 
 .loading, .no-more, .empty {

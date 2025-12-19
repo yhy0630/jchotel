@@ -16,6 +16,7 @@
 		<view class="tabs-section">
 			<view 
 				v-for="(tab, index) in tabs" 
+				
 				:key="index"
 				:class="['tab-item', { active: hasTabClicked && currentTab === index }]"
 				@click="switchTab(index)"
@@ -121,9 +122,7 @@ import { trainList } from '@/api/train.js'
 			
 			// 轮播图
 			bannerList: [
-				{ image: '/static/images/banner1.jpg' },
-				{ image: '/static/images/banner2.jpg' },
-				{ image: '/static/images/banner3.jpg' }
+				{ image: '/static/images/酒店.png' }
 			],
 			
 			// 位置信息
@@ -263,18 +262,21 @@ import { trainList } from '@/api/train.js'
 			// 先更新当前选中，用于触发 .active 样式
 			if (this.currentTab !== index) {
 				this.currentTab = index
-				// 只有酒店/民宿需要刷新列表，其他 Tab 只是视觉效果或跳转
-				if (index === 0) {
-					this.refresh()
-				}
+			}
+			
+			// 点击酒店/民宿，跳转到酒店首页
+			if (index === 0) {
+				uni.navigateTo({
+					url: '/pages/hotel/hotel-home'
+				})
 			}
 			
 			// 点击机票/火车票，跳转到票务搜索页
 			if (index === 1) {
 				uni.navigateTo({
 					url: '/pages/ticket/search'
-						})
-					}
+				})
+			}
 		},
 		
 		// 选择位置
@@ -640,8 +642,11 @@ import { trainList } from '@/api/train.js'
 }
 
 .banner-section {
-	width: 100%;
+	width: calc(100% + 40rpx);
 	height: 400rpx;
+	margin-left: -20rpx;
+	margin-right: -20rpx;
+	margin-top: -20rpx;
 	
 	.banner-swiper {
 		width: 100%;

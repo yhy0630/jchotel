@@ -3,33 +3,31 @@
 		<view class="payment u-skeleton">
 			<!-- Header -->
 			<view class="payment-header">
-				<price-format class="u-skeleton-fillet" :subscript-size="40" :first-size="56" :second-size="40"
-					:price="amount" :weight="500" />
-				<template v-if="timeout > 0">
-					<view class="payment-count-down">
-						<text>支付剩余时间</text>
-						<u-count-down :timestamp="timeout" :font-size="22" />
-					</view>
-				</template>
+				<view class="amount-display">
+					<text class="amount-symbol">¥</text>
+					<text class="amount-value">{{ formatAmount(amount) }}</text>
+				</view>
+				<view class="amount-detail">
+					<text>机票订单 详情</text>
+					<text class="detail-arrow">∨</text>
+				</view>
 			</view>
 
 			<!-- Main -->
 			<view class="payment-main">
 				<view class="payway-container u-skeleton-fillet">
 					<!-- Payway -->
-					<u-radio-group v-model="payway" style="width: 100%;">
-						<view class="payway">
-							<view class="payway-item" v-for="(item, index) in paywayList" :key="item.id"
-								@click="changePayway(item.pay_way)">
-								<u-image :src="item.icon" width="48" height="48" mode="scaleToFill" />
-								<view class="payway-item-content">
-									<text class="payway-item-content-name">{{ item.name }}</text>
-									<text class="payway-item-content-tips">{{ item.extra }}</text>
-								</view>
-								<u-radio shape="circle" :name="item.pay_way" :active-color="primaryColor" />
+					<view class="payway">
+						<view :class="['payway-item', {'payway-item-selected': payway === item.pay_way}]" v-for="(item, index) in paywayList" :key="item.id"
+							@click="changePayway(item.pay_way)">
+							<u-image :src="item.icon" width="48" height="48" mode="scaleToFill" />
+							<view class="payway-item-content">
+								<text class="payway-item-content-name">{{ item.name }}</text>
 							</view>
+							<image v-if="payway === item.pay_way" class="check-icon" src="/static/images/编组 4.png" mode="aspectFit"></image>
+							<image v-else class="check-icon" src="/static/images/椭圆形备份@3x.png" mode="aspectFit"></image>
 						</view>
-					</u-radio-group>
+					</view>
 					<template v-if="!paywayList.length">
 						<view class="payway-empty">暂无支付方式</view>
 					</template>
@@ -40,13 +38,13 @@
 			<view class="payment-footer u-skeleton-fillet">
 				<view :class="['payment-submit', {'payment-submit--disabled': loadingPay}]" @tap="handlePrepay">
 					<u-loading mode="circle" :show="loadingPay" />
-					<text v-show="!loadingPay">立即支付</text>
+					<text v-show="!loadingPay">支付 ¥{{ formatAmount(amount) }}</text>
 				</view>
 			</view>
 
 		</view>
 
-		<u-skeleton :loading="loadingSkeleton" :animation="true" bgColor="#FFF" />
+		<u-skeleton :loading="loadingSkeleton" :animation="true" bgColor="#0D1034" />
 	</view>
 
 </template>
@@ -87,6 +85,13 @@
 		},
 
 		methods: {
+			// 格式化金额
+			formatAmount(amount) {
+				if (!amount && amount !== 0) return '0.00'
+				const num = typeof amount === 'number' ? amount : parseFloat(amount)
+				return num.toFixed(2)
+			},
+			
 			// 更改支付方式
 			changePayway(value) {
 				this.$set(this, 'payway', value)
@@ -261,54 +266,83 @@
 	page {
 		height: 100%;
 		padding: 0;
+		background: #0D1034;
 	}
 
 	.payment-pages {
 		height: 100%;
+		background: #0D1034;
 
 		.payment {
 			display: flex;
 			flex-direction: column;
 			height: calc(100% - env(safe-area-inset-bottom));
+			background: #0D1034;
 
 			&-header {
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
 				align-items: center;
-				height: 300rpx;
-				background: linear-gradient(270deg, #FF2C3C 0%, #F95F2F 100%);
+				padding: 60rpx 0 40rpx 0;
+				background: #0D1034;
 				color: #FFFFFF;
+				
+				.amount-display {
+					display: flex;
+					align-items: baseline;
+					margin-bottom: 20rpx;
+					
+					.amount-symbol {
+						font-size: 40rpx;
+						color: #FFFFFF;
+						margin-right: 10rpx;
+					}
+					
+					.amount-value {
+						font-size: 60rpx;
+						font-weight: bold;
+						color: #FFFFFF;
+					}
+				}
+				
+				.amount-detail {
+					display: flex;
+					align-items: center;
+					font-size: 28rpx;
+					color: #FFFFFF;
+					gap: 10rpx;
+					
+					.detail-arrow {
+						font-size: 24rpx;
+					}
+				}
 			}
-
 
 			&-main {
 				flex: 1;
-				margin-top: -40rpx;
-				padding: 0 20rpx;
+				padding: 20rpx;
 				overflow: hidden;
 			}
-
 
 			&-footer {
 				display: flex;
 				align-items: center;
-				height: 100rpx;
-				padding: 0 20rpx;
-				background-color: #FFFFFF;
+				padding: 20rpx;
+				background: #0D1034;
 			}
 
 			.payway-container {
-				padding: 0 20rpx;
-				border-radius: 7px;
-				background-color: #FFFFFF;
+				padding: 0;
+				border-radius: 12rpx;
+				background: transparent;
 
 				.payway-empty {
 					display: flex;
 					justify-content: center;
 					padding: 20rpx 0;
 					font-size: 26rpx;
-					color: $-color-muted;
+					color: #999;
 				}
 			}
 
@@ -319,41 +353,38 @@
 					width: 100%;
 					display: flex;
 					align-items: center;
-					height: 120rpx;
-
-					&:nth-child(n+2) {
-						border-top: $-dashed-border;
-					}
+					padding: 30rpx;
+					margin-bottom: 20rpx;
+					background: #4A4A5E;
+					border-radius: 12rpx;
+					border: 2rpx solid #4A4A5E;
 
 					&-content {
 						flex: 1;
 						display: flex;
 						flex-direction: column;
-						margin-left: 16rpx;
+						margin-left: 20rpx;
 
 						&-name {
 							font-size: 28rpx;
-							color: $-color-black;
+							color: #FFFFFF;
 						}
-
-						&-tips {
-							font-size: 22rpx;
-							color: $-color-muted;
+					}
+					
+					.check-icon {
+						width: 48rpx;
+						height: 48rpx;
+					}
+					
+					&-selected {
+						background: #353548;
+						border-color: #FCDDA6;
+						
+						.payway-item-content-name {
+							color: #FCDDA6;
 						}
 					}
 				}
-			}
-
-			&-count-down {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				padding: 7rpx 25rpx;
-				border-radius: 60px;
-				margin-top: 10rpx;
-				font-size: 22rpx;
-				background-color: #FFFFFF;
-				color: $-color-normal;
 			}
 
 			&-submit {
@@ -362,11 +393,11 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				height: 74rpx;
+				height: 88rpx;
 				font-size: 28rpx;
-				border-radius: 60px;
-				background: linear-gradient(270deg, #FF2C3C 0%, #F95F2F 100%);
-				color: #FFFFFF;
+				border-radius: 44rpx;
+				background: linear-gradient(90deg, #F4BD65 0%, #FEE3B0 49.83%, #F3BD65 100%);
+				color: #000000;
 
 				&--disabled::before {
 					position: absolute;

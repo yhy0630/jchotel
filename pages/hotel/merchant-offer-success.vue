@@ -1,14 +1,15 @@
 <template>
   <view class="page">
-    <!-- 成功提示 -->
+    <!-- 成功图标 -->
     <view class="success-content">
-      <view class="success-title">发布成功</view>
+      <image class="success-icon" src="/static/images/编组 4.png" mode="aspectFit"></image>
+      <view class="success-title">出价成功</view>
+      <view class="success-tip">您已成功出价，请耐心等待发单人确认。</view>
     </view>
 
-    <!-- 操作按钮 -->
+    <!-- 返回按钮 -->
     <view class="action-buttons">
-      <button class="btn btn-primary" @click="goToMyPublish">我的发布</button>
-      <button class="btn btn-outline" @click="goBack">返回上一级</button>
+      <button class="btn btn-primary" @click="goBack">返回</button>
     </view>
   </view>
 </template>
@@ -16,21 +17,13 @@
 <script>
 export default {
   data() {
-    return {
-      requestId: ''
-    }
-  },
-  onLoad(options) {
-    this.requestId = options.request_id || ''
+    return {}
   },
   methods: {
-    goToMyPublish() {
-      uni.redirectTo({
-        url: '/pages/hotel/custom-my'
-      })
-    },
     goBack() {
-      uni.navigateBack()
+      uni.navigateBack({
+        delta: 2
+      })
     }
   }
 }
@@ -51,22 +44,33 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 80rpx;
+  margin-bottom: 120rpx;
+}
+
+.success-icon {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 60rpx;
 }
 
 .success-title {
-  font-size: 36rpx;
-  font-weight: 400;
+  font-size: 48rpx;
+  font-weight: bold;
   color: #ffffff;
+  margin-bottom: 30rpx;
   text-align: center;
+}
+
+.success-tip {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  line-height: 1.6;
 }
 
 .action-buttons {
   width: 100%;
-  max-width: 600rpx;
-  display: flex;
-  flex-direction: column;
-  gap: 30rpx;
+  max-width: 500rpx;
 }
 
 .btn {
@@ -90,11 +94,4 @@ export default {
   color: #380C00;
   box-shadow: 0 4rpx 20rpx rgba(240, 190, 99, 0.3);
 }
-
-.btn-outline {
-  background: transparent;
-  border: 2rpx solid #ffffff;
-  color: #ffffff;
-}
 </style>
-
