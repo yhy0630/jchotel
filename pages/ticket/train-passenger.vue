@@ -1,64 +1,100 @@
 <template>
   <view class="page">
     <scroll-view scroll-y class="content">
-      <view class="card top">
-        <view class="title">车次信息</view>
-        <view class="row">
-          <text class="train-no">{{ trainNo || '—' }}</text>
-          <text class="seat">{{ seatName || '—' }}</text>
-        </view>
-        <view class="row stations">
-          <view class="block">
-            <text class="time">{{ formatTimeDisplay(depTime) }}</text>
-            <text class="station">{{ fromStationName || fromStation || '—' }}</text>
-          </view>
-          <text class="arrow">→</text>
-          <view class="block">
-            <text class="time">{{ formatTimeDisplay(arrTime) }}</text>
-            <text class="station">{{ toStationName || toStation || '—' }}</text>
+      <!-- 顶部车次摘要 -->
+      <view class="top-card">
+        <view class="card-header">
+          <view class="header-left">
+            <text class="ticket-type">直达</text>
+            <text class="route-text">{{ fromStationName || fromStation || '—' }}—{{ toStationName || toStation || '—' }}</text>
+            <text class="date-time">{{ formatDateDisplay(departureDate) }} {{ formatTimeDisplay(depTime) }}</text>
           </view>
         </view>
-        <view class="date-row">
-          <text>{{ formatDateDisplay(departureDate) }}</text>
-          <text v-if="spanTime" class="duration">{{ spanTime }}</text>
+        
+        <view class="card-content">
+          <view class="price-row">
+            <text class="price-label">{{ seatName || '—' }}</text>
+            <text class="price-amount">¥{{ formatPrice(ticketPrice) }}</text>
+          </view>
         </view>
       </view>
 
-      <view class="card">
-        <view class="title">乘客信息</view>
-        <view class="form-item">
-          <text class="label">姓名*</text>
-          <input class="input" v-model="passengerName" placeholder="请输入乘客姓名" />
+      <!-- 乘客信息 -->
+      <view class="section-card passenger-card card-margin">
+        <view class="section-title">乘客信息</view>
+        
+        <view class="form-group">
+          <view class="form-label-row">
+            <text class="form-label">姓名</text>
+            <text class="form-tip">与乘车证件一致</text>
+          </view>
+          <input
+            class="form-input"
+            v-model="passengerName"
+            placeholder="请输入乘客姓名"
+            placeholder-class="input-placeholder"
+          />
         </view>
-        <view class="form-item">
-          <text class="label">身份证号*</text>
-          <input class="input" v-model="idCard" maxlength="18" placeholder="请输入身份证号" />
+        
+        <view class="form-group">
+          <view class="form-label-row">
+            <text class="form-label">身份证</text>
+          </view>
+          <input
+            class="form-input"
+            v-model="idCard"
+            placeholder="请输入证件号码"
+            placeholder-class="input-placeholder"
+            maxlength="18"
+          />
         </view>
-        <view class="form-item">
-          <text class="label">手机号*</text>
-          <input class="input" v-model="mobile" type="number" maxlength="11" placeholder="请输入手机号" />
+        
+        <view class="form-group">
+          <view class="form-label-row">
+            <text class="form-label">手机号码</text>
+            <text class="form-tip">用于接收车次信息</text>
+          </view>
+          <input
+            class="form-input"
+            v-model="mobile"
+            type="number"
+            placeholder="请输入手机号码"
+            placeholder-class="input-placeholder"
+            maxlength="11"
+          />
         </view>
       </view>
 
-      <view class="card">
-        <view class="title">价格明细</view>
+      <!-- 优惠专区 -->
+      <view class="section-card coupon-card card-margin">
+        <view class="section-title">优惠专区</view>
+        <view class="coupon-row">
+          <text class="coupon-label">代金券</text>
+          <text class="coupon-value">无优惠券可用</text>
+          <text class="coupon-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 价格明细 -->
+      <view class="section-card price-card card-margin">
+        <view class="section-title">价格明细</view>
         <view class="price-row">
-          <text>票面价</text>
-          <text>¥{{ formatPrice(ticketPrice) }}</text>
+          <text class="label">票面价</text>
+          <text class="value">¥{{ formatPrice(ticketPrice) }}</text>
         </view>
         <view class="price-row total">
-          <text>需支付</text>
-          <text class="highlight">¥{{ formatPrice(totalAmount) }}</text>
+          <text class="label">本单您需支付</text>
+          <text class="value total">¥{{ formatPrice(totalAmount) }}</text>
         </view>
       </view>
     </scroll-view>
 
+    <!-- 底部操作栏 -->
     <view class="bottom-bar">
-      <view class="bottom-price">
-        <text class="label">需支付</text>
-        <text class="value">¥{{ formatPrice(totalAmount) }}</text>
-      </view>
-      <button class="submit" :disabled="!canSubmit" @click="submit">立即预订</button>
+      <text class="bottom-tip">请先添加乘客</text>
+      <button class="next-btn" :disabled="!canSubmit" @click="submit">
+        下一步
+      </button>
     </view>
   </view>
 </template>
@@ -140,6 +176,12 @@ export default {
       }
       return dateStr
     },
+    formatWeekday(dateStr) {
+      if (!dateStr) return ''
+      const d = new Date(dateStr)
+      const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      return weekDays[d.getDay()]
+    },
     validateIdCard(id) {
       const reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
       return reg.test(id)
@@ -191,142 +233,237 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #0D1034;
   display: flex;
   flex-direction: column;
 }
+
 .content {
   flex: 1;
-  padding-bottom: 140rpx;
+  padding-bottom: 120rpx;
 }
-.card {
+
+.top-card {
+  background: #4E474C;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30rpx;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15rpx;
+      flex: 1;
+      
+      .ticket-type {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .route-text {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .date-time {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+    }
+  }
+  
+  .card-content {
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 10rpx;
+      
+      .price-label {
+        font-size: 28rpx;
+        color: #FFE3BB;
+      }
+      
+      .price-amount {
+        font-size: 32rpx;
+        color: #FFE3BB;
+      }
+    }
+  }
+}
+
+.section-card {
   background: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  border-radius: 16rpx;
-  .title {
+  border-radius: 15rpx;
+  
+  &.card-margin {
+    margin-left: 20rpx;
+    margin-right: 20rpx;
+  }
+  
+  .section-title {
     font-size: 32rpx;
-    font-weight: 600;
-    margin-bottom: 20rpx;
-  }
-}
-.top .row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10rpx;
-  .train-no {
-    font-size: 40rpx;
-    font-weight: 700;
-    color: #1a4a8f;
-  }
-  .seat {
-    font-size: 26rpx;
-    color: #666;
-  }
-}
-.stations {
-  align-items: center;
-  .block {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .time {
-      font-size: 34rpx;
-      font-weight: 700;
-    }
-    .station {
-      font-size: 26rpx;
-      color: #666;
-    }
-  }
-  .arrow {
-    width: 80rpx;
-    text-align: center;
-    color: #999;
-  }
-}
-.date-row {
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  color: #666;
-  display: flex;
-  gap: 12rpx;
-}
-.duration {
-  color: #999;
-}
-.form-item {
-  display: flex;
-  align-items: center;
-  padding: 22rpx 0;
-  border-bottom: 1px solid #f0f0f0;
-  &:last-child {
-    border-bottom: none;
-  }
-  .label {
-    width: 160rpx;
-    font-size: 28rpx;
+    font-weight: bold;
     color: #333;
+    margin-bottom: 30rpx;
   }
-  .input {
-    flex: 1;
-    font-size: 28rpx;
-    color: #333;
+  
+  &.passenger-card {
+    background: #1E1F34;
+    padding: 40rpx 30rpx;
+    
+    .section-title {
+      font-size: 36rpx;
+      color: #fff;
+      margin-bottom: 40rpx;
+    }
+    
+    .form-group {
+      margin-bottom: 40rpx;
+      
+      .form-label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20rpx;
+        
+        .form-label {
+          font-size: 28rpx;
+          color: #fff;
+        }
+        
+        .form-tip {
+          font-size: 24rpx;
+          color: #999;
+        }
+      }
+      
+      .form-input {
+        width: 100%;
+        height: 80rpx;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #4A4A5E;
+        font-size: 28rpx;
+        color: #fff;
+        padding: 0;
+      }
+      
+      .input-placeholder {
+        color: #666;
+      }
+    }
+  }
+  
+  &.coupon-card {
+    background: #1E1F34;
+    padding: 40rpx 30rpx;
+    
+    .section-title {
+      font-size: 36rpx;
+      color: #fff;
+      margin-bottom: 30rpx;
+    }
+    
+    .coupon-row {
+      display: flex;
+      align-items: center;
+      padding: 20rpx 0;
+      
+      .coupon-label {
+        font-size: 28rpx;
+        color: #fff;
+        margin-right: 40rpx;
+      }
+      
+      .coupon-value {
+        flex: 1;
+        font-size: 28rpx;
+        color: #999;
+      }
+      
+      .coupon-arrow {
+        font-size: 36rpx;
+        color: #fff;
+      }
+    }
+  }
+  
+  &.price-card {
+    background: #1E1F34;
+    padding: 40rpx 30rpx;
+    
+    .section-title {
+      font-size: 36rpx;
+      color: #fff;
+      margin-bottom: 30rpx;
+    }
+    
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20rpx 0;
+      
+      .label {
+        font-size: 28rpx;
+        color: #fff;
+      }
+      
+      .value {
+        font-size: 28rpx;
+        color: #fff;
+        
+        &.total {
+          background: linear-gradient(90deg, #F3BC63 0%, #FFE6B6 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+      }
+      
+      &.total {
+        border-top: 1px solid #4A4A5E;
+      }
+    }
   }
 }
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 16rpx 0;
-  font-size: 28rpx;
-  color: #333;
-  &.total {
-    border-top: 1px solid #f0f0f0;
-    margin-top: 10rpx;
-    padding-top: 20rpx;
-  }
-  .highlight {
-    color: #ff7a00;
-    font-weight: 700;
-  }
-}
+
 .bottom-bar {
   position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  background: #1E1F34;
+  padding: 12rpx 30rpx 30rpx;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 20rpx;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: #fff;
-  border-top: 1px solid #e0e0e0;
-  .bottom-price {
-    flex: 1;
-    display: flex;
-    align-items: baseline;
-    gap: 10rpx;
-    .label {
-      font-size: 26rpx;
-      color: #666;
-    }
-    .value {
-      font-size: 36rpx;
-      font-weight: 700;
-      color: #ff7a00;
-    }
+  
+  .bottom-tip {
+    font-size: 28rpx;
+    color: #fff;
   }
-  .submit {
-    background: linear-gradient(90deg, #ffc966, #f8d07c);
-    color: #1a4a8f;
-    font-size: 32rpx;
-    font-weight: 600;
-    padding: 20rpx 60rpx;
-    border-radius: 50rpx;
+  
+  .next-btn {
+    background: linear-gradient(90deg, #F4BD67 0%, #FEE1AD 50.09%, #F3BD66 100%);
+    color: #000;
+    font-size: 28rpx;
+    padding: 0rpx 40rpx;
+    border-radius: 48rpx;
     border: none;
+    
+    &::after {
+      border: none;
+    }
+    
     &[disabled] {
       opacity: 0.6;
     }

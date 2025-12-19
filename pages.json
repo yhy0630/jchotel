@@ -223,7 +223,8 @@
 			"path": "pages/order_details/order_details",
 			"style": {
 				"navigationBarTitleText": "订单详情",
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -277,6 +278,12 @@
 			}
 		},
 		{
+			"path": "pages/hotel/hotel-home",
+			"style": {
+				"navigationBarTitleText": "酒店/民宿"
+			}
+		},
+		{
 			"path": "pages/hotel/custom-form",
 			"style": {
 				"navigationBarTitleText": "发布定制需求"
@@ -315,7 +322,8 @@
 		{
 			"path": "pages/hotel/order-detail",
 			"style": {
-				"navigationBarTitleText": "订单详情"
+				"navigationBarTitleText": "订单详情",
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -328,6 +336,18 @@
 			"path": "pages/hotel/order-create",
 			"style": {
 				"navigationBarTitleText": "确认订单"
+			}
+		},
+		{
+			"path": "pages/hotel/room-detail",
+			"style": {
+				"navigationBarTitleText": "房间详情"
+			}
+		},
+		{
+			"path": "pages/hotel/premium-room",
+			"style": {
+				"navigationBarTitleText": "尊享房"
 			}
 		},
 		{
@@ -370,6 +390,19 @@
             "path": "pages/ticket/train-order-confirm",
             "style": {
                 "navigationBarTitleText": "确认订单(火车票)"
+            }
+        },
+        {
+            "path": "pages/ticket/train-order-detail",
+            "style": {
+                "navigationBarTitleText": "订单详情(火车票)",
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/ticket/flight-order-detail",
+            "style": {
+                "navigationBarTitleText": "订单详情(飞机票)"
             }
         },
 		{

@@ -1,109 +1,80 @@
 <template>
   <view class="page">
     <scroll-view scroll-y class="content" v-if="detail">
-      <!-- 车次基本信息 -->
+      <!-- 顶部信息栏 -->
       <view class="train-info-card">
-        <view class="train-header">
-          <view class="train-no">{{ detail.trainNo || '—' }}</view>
-          <view class="train-type" v-if="detail.trainType">{{ detail.trainType }}</view>
-          <view v-if="detail.isFxh === '1'" class="train-badge">复兴号</view>
-          <view v-if="detail.isZndcz === '1'" class="train-badge">智能动车组</view>
+        <view class="train-top-bar">
+          <text class="trip-type">单程</text>
+          <text class="trip-date">{{ formatDateDisplay(detail.departureDate || detail.fromDate) }} {{ detail.fromStation || detail.departureStationName || '—' }}-{{ detail.toStation || detail.arrivalStationName || '—' }}</text>
+          <text class="duration-label">总时长 {{ formatDuration(detail.usedMinutes || detail.spanTime || detail.duration) }}</text>
+        </view>
+
+        <!-- 车次路线信息 -->
+        <view class="train-main">
+        <view class="route-header">
+          <text class="duration-label">当日到达</text>
+          <text class="duration-value">{{ formatDuration(detail.usedMinutes || detail.spanTime || detail.duration) }}</text>
         </view>
         
-        <view class="route-info">
-          <view class="departure">
+        <view class="route-main">
+          <view class="time-block">
             <text class="time">{{ formatTimeDisplay(detail.fromTime || detail.departureTime) }}</text>
             <text class="station">{{ detail.fromStation || detail.departureStationName || '—' }}</text>
           </view>
-          <view class="duration">
-            <text class="duration-text">{{ formatDuration(detail.usedMinutes || detail.spanTime || detail.duration) }}</text>
-            <view class="line">
-              <text class="dot"></text>
-              <text class="line-dash"></text>
-              <text class="train-icon">🚄</text>
-            </view>
+          
+          <view class="route-line">
+            <image class="arrow-img" src="/static/images/箭头大.png" mode="aspectFit"></image>
+            <text class="train-no">{{ detail.trainNo || '—' }}</text>
           </view>
-          <view class="arrival">
+          
+          <view class="time-block">
             <text class="time">{{ formatTimeDisplay(detail.toTime || detail.arrivalTime) }}</text>
             <text class="station">{{ detail.toStation || detail.arrivalStationName || '—' }}</text>
           </view>
         </view>
         
-        <view class="train-meta">
-          <text v-if="detail.departureDate || detail.fromDate" class="meta-item">出发日期：{{ formatDateDisplay(detail.departureDate || detail.fromDate) }}</text>
-          <text v-if="detail.isStop === '1' || detail.isStop === 1" class="meta-item warning">已停运</text>
-          <text v-else-if="detail.canBook !== '0' && detail.canBook !== 0" class="meta-item warning">不可预订</text>
+        <!-- 虚线分割 -->
+        <view class="divider-line"></view>
+        
+        <!-- 座位选择 -->
+        <scroll-view scroll-x class="seat-selection" scroll-with-animation>
+          <view class="seat-list">
+            <view 
+              v-for="(seat, index) in seatList" 
+              :key="index" 
+              class="seat-option"
+              :class="{ disabled: !canBookSeat(seat), selected: selectedSeatIndex === index }"
+              @click="selectSeat(index)"
+            >
+              <view class="seat-header">
+                <text class="seat-name">{{ seat.name || seat.seatName || seat.seatCode || '—' }}</text>
+                <text class="seat-discount" v-if="seat.discount">{{ seat.discount }}</text>
+              </view>
+              <view class="seat-price-info">
+                <text class="seat-price">¥{{ formatPrice(seat.display_price || seat.price || seat.seatPrice || 0) }}</text>
+                <text class="seat-status">/{{ seat.inventory !== undefined && seat.inventory !== null ? (seat.inventory > 0 ? '有票' : '无票') : '有票' }}</text>
+              </view>
+              <image v-if="selectedSeatIndex === index" class="check-mark" src="/static/images/勾号组合.png" mode="aspectFit"></image>
+            </view>
+            
+            <view v-if="seatList.length === 0" class="empty-seats">
+              <text>暂无座位信息</text>
+            </view>
+          </view>
+        </scroll-view>
         </view>
       </view>
 
-      <!-- 座位价格列表 -->
-      <view class="seat-list">
-        <view class="section-title">选择座位类型</view>
-        <view 
-          v-for="(seat, index) in seatList" 
-          :key="index" 
-          class="seat-item"
-          :class="{ disabled: !canBookSeat(seat) }"
-        >
-          <view class="seat-header">
-            <view class="seat-name-row">
-              <text class="seat-name">{{ seat.name || seat.seatName || seat.seatCode || '—' }}</text>
-              <text v-if="seat.inventory !== undefined && seat.inventory !== null" class="inventory-tag">
-                余{{ seat.inventory || seat.seatInventory || 0 }}
-              </text>
-            </view>
-            <view class="seat-price-row">
-              <text class="price-label">{{ detail.price_type_text || '尊享价' }}</text>
-              <text class="price-value">¥{{ formatPrice(seat.display_price || seat.price || seat.seatPrice || 0) }}</text>
-            </view>
-          </view>
-
-          <!-- 价格明细（可展开） -->
-          <view class="toggle-row" @click="toggleSeat(index)" v-if="seat.hasDetails">
-            <text class="toggle-text">{{ seat.expanded ? '收起详情' : '展开详情' }}</text>
-            <text class="toggle-arrow">{{ seat.expanded ? '▲' : '▼' }}</text>
-          </view>
-
-          <!-- 详细信息（可折叠） -->
-          <view v-if="seat.expanded && seat.hasDetails" class="seat-details">
-            <view class="detail-item">
-              <text class="detail-label">座位类型：</text>
-              <text class="detail-value">{{ seat.name || seat.seatName || '—' }}</text>
-            </view>
-            <view class="detail-item">
-              <text class="detail-label">座位代码：</text>
-              <text class="detail-value">{{ seat.code || seat.seatCode || '—' }}</text>
-            </view>
-            <view class="detail-item">
-              <text class="detail-label">票面价：</text>
-              <text class="detail-value">¥{{ formatPrice(seat.original_price || seat.price || seat.seatPrice || 0) }}</text>
-            </view>
-            <view class="detail-item">
-              <text class="detail-label">{{ detail.price_type_text || '尊享价' }}：</text>
-              <text class="detail-value highlight">¥{{ formatPrice(seat.display_price || seat.price || seat.seatPrice || 0) }}</text>
-            </view>
-            <view class="detail-item" v-if="seat.inventory !== undefined && seat.inventory !== null">
-              <text class="detail-label">余票：</text>
-              <text class="detail-value">{{ seat.inventory || seat.seatInventory || 0 }}张</text>
-            </view>
-          </view>
-
-          <!-- 订票按钮 -->
-          <view class="book-action">
-            <button 
-              class="book-btn" 
-              :class="{ disabled: !canBookSeat(seat) }"
-              @click.stop="goBook(seat)"
-              :disabled="!canBookSeat(seat)"
-            >
-              {{ canBookSeat(seat) ? '订票' : '不可预订' }}
-            </button>
+      <!-- 购票信息 -->
+      <view class="booking-info">
+        <view class="info-left">
+          <image class="info-icon" src="/static/images/12306.png" mode="aspectFit"></image>
+          <view class="info-text">
+            <text class="info-title">12306购票</text>
+            <text class="info-desc">12306支持05:00~23:30出票</text>
           </view>
         </view>
-        
-        <view v-if="seatList.length === 0" class="empty-seats">
-          <text>暂无座位信息</text>
-        </view>
+        <button class="booking-btn" @click="confirmBooking">预定</button>
       </view>
     </scroll-view>
 
@@ -123,6 +94,7 @@ export default {
     return {
       detail: null,
       seatList: [],
+      selectedSeatIndex: -1,
       loading: true,
       error: '',
       trainNo: '',
@@ -485,6 +457,24 @@ export default {
       return true
     },
     
+    selectSeat(index) {
+      const seat = this.seatList[index]
+      if (!this.canBookSeat(seat)) {
+        uni.showToast({ title: '该座位不可预订', icon: 'none' })
+        return
+      }
+      this.selectedSeatIndex = index
+    },
+    
+    confirmBooking() {
+      if (this.selectedSeatIndex === -1) {
+        uni.showToast({ title: '请先选择座位', icon: 'none' })
+        return
+      }
+      const seat = this.seatList[this.selectedSeatIndex]
+      this.goBook(seat)
+    },
+    
     goBook(seat) {
       if (!this.canBookSeat(seat)) {
         uni.showToast({ title: '该座位不可预订', icon: 'none' })
@@ -546,287 +536,273 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #0D1034;
 }
 
 .content {
-  padding: 20rpx;
-  padding-bottom: 40rpx;
+  padding-bottom: 180rpx;
 }
 
 .train-info-card {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
+  background: #1E1F34;
+  overflow: hidden;
   margin-bottom: 20rpx;
   
-  .train-header {
-    display: flex;
-    align-items: center;
-    gap: 15rpx;
-    margin-bottom: 30rpx;
-    
-    .train-no {
-      font-size: 40rpx;
-      font-weight: bold;
-      color: #1A4A8F;
-    }
-    
-    .train-type {
-      font-size: 26rpx;
-      color: #666;
-      padding: 4rpx 12rpx;
-      background: #f5f5f5;
-      border-radius: 4rpx;
-    }
-    
-    .train-badge {
-      display: inline-block;
-      padding: 4rpx 12rpx;
-      background: #F8D07C;
-      color: #1A4A8F;
-      font-size: 22rpx;
-      border-radius: 4rpx;
-    }
-  }
-  
-  .route-info {
+  .train-top-bar {
+    background: #4E474C;
+    padding: 20rpx 30rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20rpx;
+    font-size: 24rpx;
+    color: #FFE3BB;
     
-    .departure, .arrival {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      
-      .time {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 10rpx;
-      }
-      
-      .station {
-        font-size: 26rpx;
-        color: #666;
-      }
+    .trip-type {
+      font-size: 26rpx;
     }
     
-    .duration {
+    .trip-date {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0 20rpx;
-      
-      .duration-text {
-        font-size: 24rpx;
-        color: #999;
-        margin-bottom: 10rpx;
-      }
-      
-      .line {
-        position: relative;
-        width: 100%;
-        height: 2rpx;
-        background: #e0e0e0;
-        
-        .dot {
-          position: absolute;
-          left: 0;
-          top: -4rpx;
-          width: 10rpx;
-          height: 10rpx;
-          background: #999;
-          border-radius: 50%;
-        }
-        
-        .line-dash {
-          position: absolute;
-          left: 10rpx;
-          right: 30rpx;
-          top: 0;
-          height: 2rpx;
-          background: repeating-linear-gradient(
-            to right,
-            #e0e0e0 0,
-            #e0e0e0 8rpx,
-            transparent 8rpx,
-            transparent 16rpx
-          );
-        }
-        
-        .train-icon {
-          position: absolute;
-          right: -10rpx;
-          top: -10rpx;
-          font-size: 24rpx;
-        }
-      }
+      text-align: center;
+      font-size: 26rpx;
+    }
+    
+    .duration-label {
+      font-size: 26rpx;
+    }
+  }
+}
+
+.train-main {
+  padding: 30rpx 24rpx;
+  
+  .route-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12rpx;
+    margin-bottom: 10rpx;
+    
+    .duration-label {
+      font-size: 22rpx;
+      color: #d3d6e0;
+    }
+    
+    .duration-value {
+      font-size: 22rpx;
+      color: #FCDDA6;
     }
   }
   
-  .train-meta {
+  .route-main {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
     gap: 20rpx;
-    padding-top: 20rpx;
-    border-top: 1px solid #f0f0f0;
     
-    .meta-item {
-      font-size: 24rpx;
-      color: #999;
+    .time-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
       
-      &.warning {
-        color: #ff4444;
+      .time {
+        font-size: 48rpx;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.2;
+        margin-bottom: 8rpx;
+      }
+      
+      .station {
+        font-size: 30rpx;
+        color: #FCDDA6;
+      }
+    }
+    
+    .route-line {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8rpx;
+      
+      .arrow-img {
+        width: 200rpx;
+        height: 40rpx;
+      }
+      
+      .train-no {
+        font-size: 20rpx;
+        color: #d3d6e0;
       }
     }
   }
 }
 
-.seat-list {
-  .section-title {
-    font-size: 32rpx;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20rpx;
-    padding: 0 10rpx;
+.divider-line {
+  margin: 20rpx 0;
+  height: 1rpx;
+  background: repeating-linear-gradient(
+    to right,
+    #d3d6e0 0,
+    #d3d6e0 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+}
+
+.seat-selection {
+  padding: 0 0 20rpx 0;
+  white-space: nowrap;
+  
+  .seat-list {
+    display: inline-flex;
+    gap: 16rpx;
+    // padding: 0 24rpx;
   }
   
-  .seat-item {
-    background: #fff;
+  .seat-option {
+    display: inline-block;
+    min-width: 200rpx;
+    background: #353548;
     border-radius: 16rpx;
-    padding: 30rpx;
-    margin-bottom: 20rpx;
+    padding: 20rpx 24rpx;
+    border: 2rpx solid #ffffff;
+    position: relative;
+    
+    &.selected {
+      background: #4E474C;
+      border-color: #FCDDA6;
+      
+      .seat-name {
+        color: #FCDDA6;
+      }
+      
+      .seat-discount {
+        color: #FCDDA6;
+      }
+      
+      .seat-price {
+        color: #FCDDA6;
+      }
+      
+      .seat-status {
+        color: #FCDDA6;
+      }
+    }
     
     &.disabled {
-      opacity: 0.6;
+      opacity: 0.5;
+      border-color: #666;
     }
     
     .seat-header {
-      margin-bottom: 20rpx;
-      
-      .seat-name-row {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15rpx;
-        margin-bottom: 15rpx;
-        
-        .seat-name {
-          font-size: 32rpx;
-          font-weight: 600;
-          color: #333;
-          flex: 1;
-        }
-        
-        .inventory-tag {
-          font-size: 22rpx;
-          color: #ff4444;
-          background: #fff0f0;
-          padding: 4rpx 12rpx;
-          border-radius: 4rpx;
-        }
-      }
-      
-      .seat-price-row {
-        display: flex;
-        align-items: baseline;
-        gap: 10rpx;
-        
-        .price-label {
-          font-size: 24rpx;
-          color: #999;
-        }
-        
-        .price-value {
-          font-size: 36rpx;
-          font-weight: bold;
-          color: #F8D07C;
-        }
-      }
-    }
-
-    .toggle-row {
-      margin-top: 6rpx;
-      margin-bottom: 15rpx;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      color: #1A4A8F;
-      font-size: 26rpx;
-      padding: 12rpx 0;
-      border-top: 1px dashed #e7eef9;
-    }
-    
-    .seat-details {
-      padding: 20rpx;
-      background: #f8f8f8;
-      border-radius: 12rpx;
-      margin-bottom: 20rpx;
+      gap: 8rpx;
+      margin-bottom: 12rpx;
       
-      .detail-item {
-        display: flex;
-        align-items: center;
-        padding: 12rpx 0;
-        font-size: 26rpx;
-        
-        .detail-label {
-          width: 160rpx;
-          color: #666;
-          flex-shrink: 0;
-        }
-        
-        .detail-value {
-          flex: 1;
-          color: #333;
-          
-          &.highlight {
-            color: #F8D07C;
-            font-weight: 600;
-          }
-        }
-      }
-    }
-    
-    .book-action {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 20rpx;
-      padding-top: 20rpx;
-      border-top: 1px solid #f0f0f0;
-      
-      .book-btn {
-        background: linear-gradient(90deg, #FFC966, #F8D07C);
-        color: #1A4A8F;
+      .seat-name {
         font-size: 28rpx;
         font-weight: 600;
-        padding: 15rpx 50rpx;
-        border-radius: 50rpx;
-        border: none;
-        
-        &::after {
-          border: none;
-        }
-        
-        &.disabled {
-          background: #e0e0e0;
-          color: #999;
-        }
+        color: #ffffff;
       }
+      
+      .seat-discount {
+        font-size: 20rpx;
+        color: #ffffff;
+      }
+    }
+    
+    .seat-price-info {
+      display: flex;
+      align-items: baseline;
+      
+      .seat-price {
+        font-size: 24rpx;
+        color: #ffffff;
+        font-weight: 500;
+      }
+      
+      .seat-status {
+        font-size: 20rpx;
+        color: #ffffff;
+      }
+    }
+    
+    .check-mark {
+      position: absolute;
+      right: 0rpx;
+      bottom: 0rpx;
+      width: 40rpx;
+      height: 40rpx;
     }
   }
   
   .empty-seats {
+    display: inline-block;
     text-align: center;
     padding: 60rpx 30rpx;
     font-size: 28rpx;
     color: #999;
-    background: #fff;
-    border-radius: 16rpx;
+  }
+}
+
+.booking-info {
+  background: #2C2D42;
+  margin: 20rpx 16rpx;
+  border-radius: 18rpx;
+  padding: 24rpx 0rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  
+  .info-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 20rpx;
+    
+    .info-icon {
+      margin-left: 20rpx;
+      width: 80rpx;
+      height: 80rpx;
+      flex-shrink: 0;
+    }
+    
+    .info-text {
+      display: flex;
+      flex-direction: column;
+      gap: 8rpx;
+      
+      .info-title {
+        font-size: 32rpx;
+        color: #ffffff;
+        font-weight: 600;
+      }
+      
+      .info-desc {
+        font-size: 24rpx;
+        color: #d3d6e0;
+      }
+    }
+  }
+  
+  .booking-btn {
+    flex: 0 0 auto;
+    background: linear-gradient(90deg, #F4BD68 0%, #FEE0AC 50.32%, #F4BE68 100%);
+    color: #1E1F34;
+    font-size: 32rpx;
+    font-weight: 700;
+    padding: 0rpx 50rpx;
+    border-radius: 48rpx;
+    border: none;
+    color: #380c00;
+    margin-right: 20rpx;
+    &::after {
+      border: none;
+    }
   }
 }
 

@@ -7,20 +7,23 @@
 
     <!-- 日期选择 -->
     <view class="date-bar">
-      <scroll-view scroll-x class="date-scroll">
-        <view 
-          v-for="(date, index) in dateList" 
-          :key="index"
-          :class="['date-item', { active: selectedDateIndex === index }]"
-          @click="selectDate(index)"
-        >
-          <text class="date-text">{{ date.dateText }}</text>
-          <text class="week-text">{{ date.weekText }}</text>
+      <view class="date-wrapper">
+        <scroll-view scroll-x class="date-scroll" scroll-with-animation>
+          <view 
+            v-for="(date, index) in dateList" 
+            :key="index"
+            :class="['date-item', { active: selectedDateIndex === index }]"
+            @click="selectDate(index)"
+          >
+            <text class="date-text">{{ date.dateText }}</text>
+            <text class="week-text">{{ date.weekText }}</text>
+          </view>
+        </scroll-view>
+        <view class="date-calendar" @click="showCalendar">
+          <image class="calendar-icon" src="/static/images/日历.png" mode="widthFix"></image>
+          <text class="calendar-text">日历</text>
         </view>
-        <view class="date-item calendar" @click="showCalendar">
-          <text class="calendar-icon">📅</text>
-        </view>
-      </scroll-view>
+      </view>
     </view>
 
     <!-- 筛选栏 -->
@@ -104,58 +107,44 @@
     <!-- 车次列表 -->
     <scroll-view scroll-y class="list" @scrolltolower="loadMore">
       <view v-for="(item, index) in list" :key="index" class="train-item" @click="goDetail(item)">
-        <view class="time-info">
-          <view class="departure">
-            <text class="time">{{ item.fromTime || item.departureTime }}</text>
-            <text class="station">{{ item.fromStation || item.departureStationName }}</text>
-          </view>
-          <view class="duration">
-            <text class="duration-text">{{ item.duration || formatDuration(item.spanTime || item.usedMinutes) }}</text>
-            <view class="line">
-              <text class="dot"></text>
-              <text class="line-dash"></text>
-              <text class="train-icon">🚄</text>
+        <view class="train-main">
+          <view class="train-left">
+            <view class="time-row">
+              <view class="time-block">
+                <text class="time">{{ item.fromTime || item.departureTime }}</text>
+                <text class="station">{{ item.fromStation || item.departureStationName }}</text>
+              </view>
+              <view class="duration-block">
+                <text class="duration-text">{{ item.duration || formatDuration(item.spanTime || item.usedMinutes) }}</text>
+                <view class="line-wrapper">
+                  <view class="line-dot start"></view>
+                  <view class="line-dash"></view>
+                  <view class="line-dot end"></view>
+                </view>
+                <text class="train-no">{{ item.trainNo }}</text>
+              </view>
+              <view class="time-block">
+                <text class="time">{{ item.toTime || item.arrivalTime }}</text>
+                <text class="station">{{ item.toStation || item.arrivalStationName }}</text>
+              </view>
             </view>
           </view>
-          <view class="arrival">
-            <text class="time">{{ item.toTime || item.arrivalTime }}</text>
-            <text class="station">{{ item.toStation || item.arrivalStationName }}</text>
+          <view class="train-right">
+            <text class="price">¥{{ formatPrice(item.display_price || item.minPrice || item.price) }}</text>
+            <text class="price-unit">起</text>
           </view>
-        </view>
-        
-        <view class="train-info">
-          <text class="train-no">{{ item.trainNo }}</text>
-          <text v-if="item.trainType" class="train-type">{{ item.trainType }}</text>
-          <text v-if="item.isFxh === '1'" class="train-badge">复兴号</text>
-          <text v-if="item.isZndcz === '1'" class="train-badge">智能动车组</text>
         </view>
         
         <view class="seat-info">
           <view 
             v-for="(seat, seatIndex) in item.seats" 
             :key="seatIndex"
-            class="seat-tag"
+            class="seat-item"
           >
-            <text class="seat-name">{{ seat.name || seat.seatName }}</text>
-            <text class="seat-price">¥{{ formatPrice(seat.price || seat.seatPrice) }}</text>
-            <text v-if="seat.inventory !== undefined && seat.inventory !== null" class="seat-inventory">余{{ seat.inventory || seat.seatInventory }}</text>
+            <text class="seat-name">{{ seat.name || seat.seatName }}：</text>
+            <text class="seat-status">{{ seat.inventory !== undefined && seat.inventory !== null ? (seat.inventory > 0 ? '有票' : '无票') : '有票' }}</text>
           </view>
         </view>
-        
-        <view class="price-info">
-          <text class="price-label">{{ item.price_type_text || '尊享价' }}</text>
-          <text class="price">¥{{ formatPrice(item.display_price || item.minPrice || item.price) }}</text>
-          <text class="price-unit">起</text>
-        </view>
-        
-        <button 
-          class="book-btn" 
-          :class="{ disabled: !canBookTrain(item) }"
-          @click.stop="goBook(item)"
-          :disabled="!canBookTrain(item)"
-        >
-          {{ canBookTrain(item) ? '订票' : '不可预订' }}
-        </button>
       </view>
       
       <view v-if="loading" class="loading">加载中...</view>
@@ -795,7 +784,7 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #0D1034;
 }
 
 .header {
@@ -811,66 +800,110 @@ export default {
 }
 
 .date-bar {
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  background: #012158;
   
+  .date-wrapper{
+    display: flex;
+    align-items: stretch;
+  }
+
   .date-scroll {
     white-space: nowrap;
-    padding: 20rpx 0;
+    padding: 20rpx 20rpx;
+    flex: 1 1 auto;
+    min-width: 0;
     
     .date-item {
       display: inline-block;
-      padding: 20rpx 30rpx;
-      margin: 0 10rpx;
+      padding: 18rpx 26rpx;
+      margin: 0 8rpx;
       text-align: center;
       border-radius: 8rpx;
+      border: 1rpx solid transparent;
       
       .date-text {
         display: block;
         font-size: 28rpx;
-        color: #666;
+        color: #ffffff;
       }
       
       .week-text {
         display: block;
         font-size: 24rpx;
-        color: #999;
+        color: #ffffff;
         margin-top: 5rpx;
       }
       
       &.active {
-        background: #F8D07C;
-        
+        background: #4E474C;
+        border-color: #FCDDA6;
+
         .date-text, .week-text {
-          color: #1A4A8F;
-        }
-      }
-      
-      &.calendar {
-        .calendar-icon {
-          font-size: 40rpx;
+          color: #FCDDA6;
         }
       }
     }
+  }
+
+  .date-calendar{
+    flex: 0 0 150rpx;
+    width: 150rpx;
+    padding: 20rpx 12rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10rpx;
+    border-left: 1rpx solid rgba(255,255,255,0.2);
+  }
+
+  .calendar-icon{
+    width: 48rpx;
+    height: 48rpx;
+  }
+
+  .calendar-text{
+    font-size: 24rpx;
+    color: #e0e3ea;
   }
 }
 
 .filter-bar {
   display: flex;
-  background: #fff;
-  padding: 20rpx 30rpx;
-  border-bottom: 1px solid #e0e0e0;
-  
+  align-items: center;
+  gap: 26rpx;
+  background: #1E1F34;
+  padding: 24rpx 28rpx;
+  border-radius: 8rpx;
+  margin: 20rpx 16rpx 12rpx;
+
   .filter-item {
-    margin-right: 30rpx;
-    padding: 10rpx 20rpx;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 76rpx;
+    border-radius: 12rpx;
+    background: #353548;
+    color: #f0f0f0;
     font-size: 26rpx;
-    color: #666;
-    border-radius: 8rpx;
-    
+    font-weight: 600;
+    border: none;
+    padding: 0 10rpx;
+
+    &.filter-btn {
+      gap: 12rpx;
+
+      .filter-icon {
+        width: 28rpx;
+        height: 28rpx;
+      }
+    }
+
     &.active {
-      background: #F8D07C;
-      color: #1A4A8F;
+      background: #58585e;
+      color: #ffffff;
+      font-weight: 700;
     }
   }
 }
@@ -991,175 +1024,144 @@ export default {
 }
 
 .list {
-  height: calc(100vh - 300rpx);
-  padding: 20rpx 20rpx 20rpx 20rpx;
+  height: calc(100vh - 320rpx);
+  padding: 10rpx 16rpx;
   box-sizing: border-box;
 }
 
 .train-item {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
+  background: #1E1F34;
+  border-radius: 18rpx;
+  padding: 30rpx 24rpx;
+  margin-bottom: 16rpx;
   
-  .time-info {
+  .train-main {
     display: flex;
-    align-items: center;
-    margin-bottom: 20rpx;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24rpx;
+  }
+  
+  .train-left {
+    flex: 1;
+    min-width: 0;
     
-    .departure, .arrival {
-      text-align: center;
+    .time-row {
+      display: flex;
+      align-items: center;
+      gap: 18rpx;
       
-      .time {
-        display: block;
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333;
-      }
-      
-      .station {
-        display: block;
-        font-size: 24rpx;
-        color: #999;
-        margin-top: 5rpx;
-      }
-    }
-    
-    .duration {
-      flex: 1;
-      text-align: center;
-      margin: 0 20rpx;
-      
-      .duration-text {
-        font-size: 24rpx;
-        color: #999;
-      }
-      
-      .line {
-        position: relative;
-        margin: 10rpx 0;
-        height: 2rpx;
-        background: #e0e0e0;
+      .time-block {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
         
-        .dot {
-          position: absolute;
-          left: 0;
-          top: -4rpx;
-          width: 10rpx;
-          height: 10rpx;
-          background: #999;
-          border-radius: 50%;
+        .time {
+          font-size: 32rpx;
+          font-weight: 700;
+          color: #ffffff;
+          line-height: 1.2;
         }
         
-        .train-icon {
-          position: absolute;
-          right: -10rpx;
-          top: -10rpx;
-          font-size: 24rpx;
+        .station {
+          font-size: 20rpx;
+          color: #d3d6e0;
+          margin-top: 6rpx;
+        }
+      }
+      
+      .duration-block {
+        flex: 0 0 auto;
+        min-width: 70rpx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4rpx;
+        
+        .line-wrapper {
+          width: 90rpx;
+          position: relative;
+          display: flex;
+          align-items: center;
+          margin: 10rpx 80rpx;
+          
+          .line-dot {
+            width: 13rpx;
+            height: 13rpx;
+            border-radius: 50%;
+            border: 1px solid #fff;
+            
+            &.start {
+              position: absolute;
+              left: 0;
+            }
+            
+            &.end {
+              position: absolute;
+              right: 0;
+            }
+          }
+          
+          .line-dash {
+            flex: 1;
+            height: 1rpx;
+            background: #ffffff;
+            margin: 0 8rpx;
+          }
+        }
+        
+        .duration-text {
+          font-size: 18rpx;
+          color: #d3d6e0;
+        }
+        
+        .train-no {
+          font-size: 18rpx;
+          color: #d3d6e0;
         }
       }
     }
   }
   
-  .train-info {
-    margin-bottom: 20rpx;
+  .train-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: baseline;
+    gap: 4rpx;
+    margin-top: 20rpx;
+    margin-left: 16rpx;
     
-    .train-no {
-      font-size: 26rpx;
-      color: #333;
-      margin-right: 20rpx;
+    .price {
+      font-size: 30rpx;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.2;
     }
     
-    .train-type {
-      font-size: 24rpx;
-      color: #999;
-      margin-right: 10rpx;
-    }
-    
-    .train-badge {
-      display: inline-block;
-      padding: 4rpx 12rpx;
-      background: #F8D07C;
-      color: #1A4A8F;
-      font-size: 20rpx;
-      border-radius: 4rpx;
-      margin-right: 10rpx;
+    .price-unit {
+      font-size: 18rpx;
+      color: #d3d6e0;
     }
   }
   
   .seat-info {
     display: flex;
     flex-wrap: wrap;
-    gap: 10rpx;
-    margin-bottom: 20rpx;
+    gap: 20rpx;
     
-    .seat-tag {
-      padding: 8rpx 16rpx;
-      background: #f5f5f5;
-      border-radius: 6rpx;
+    .seat-item {
+      display: flex;
+      align-items: center;
       
       .seat-name {
         font-size: 24rpx;
-        color: #666;
-        margin-right: 10rpx;
+        color: #d3d6e0;
       }
       
-      .seat-price {
+      .seat-status {
         font-size: 24rpx;
-        color: #F8D07C;
-        font-weight: bold;
-        margin-right: 10rpx;
+        color: #d3d6e0;
       }
-      
-      .seat-inventory {
-        font-size: 20rpx;
-        color: #999;
-      }
-    }
-  }
-  
-  .price-info {
-    display: flex;
-    align-items: baseline;
-    justify-content: flex-end;
-    margin-bottom: 20rpx;
-    
-    .price-label {
-      font-size: 22rpx;
-      color: #999;
-      margin-right: 5rpx;
-    }
-    
-    .price {
-      font-size: 36rpx;
-      font-weight: bold;
-      color: #F8D07C;
-    }
-    
-    .price-unit {
-      font-size: 22rpx;
-      color: #999;
-      margin-left: 5rpx;
-    }
-  }
-  
-  .book-btn {
-    width: 100%;
-    background: #F8D07C;
-    color: #1A4A8F;
-    font-size: 28rpx;
-    font-weight: bold;
-    padding: 20rpx 0;
-    border-radius: 8rpx;
-    border: none;
-    
-    &::after {
-      border: none;
-    }
-    
-    &.disabled {
-      background: #e0e0e0;
-      color: #999;
     }
   }
 }

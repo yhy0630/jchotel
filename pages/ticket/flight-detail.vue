@@ -3,39 +3,38 @@
     <scroll-view scroll-y class="content" v-if="detail">
       <!-- 航班基本信息 -->
       <view class="flight-info-card">
-        <view class="flight-header">
-          <view class="flight-no">{{ detail.flightNo || '—' }}</view>
-          <view class="airline">{{ detail.carrierName || '—' }}</view>
+        <view class="flight-top-bar">
+          <text class="trip-type">单程</text>
+          <text class="trip-date">{{ formatDateDisplay(detail.depTime) }} {{ formatWeekday(detail.depTime) }} {{ detail.depCityName || '—' }}-{{ detail.arrCityName || '—' }}</text>
+          <text class="duration-label">总时长 {{ formatDuration(detail.depTime, detail.arrTime) }}</text>
         </view>
         
-        <view class="route-info">
-          <view class="departure">
-            <text class="time">{{ formatTime(detail.depTime) }}</text>
-            <text class="airport">{{ detail.depAirportName || '—' }}</text>
-            <text class="terminal" v-if="detail.depTerminal">T{{ detail.depTerminal }}</text>
+        <view class="flight-main">
+          <view class="route-info">
+            <view class="departure">
+              <text class="time">{{ formatTime(detail.depTime) }}</text>
+              <text class="terminal" v-if="detail.depTerminal">{{ detail.depAirportName || '—' }}T{{ detail.depTerminal }}</text>
+              <text class="terminal" v-else>{{ detail.depAirportName || '—' }}</text>
+            </view>
+            <view class="duration">
+              <image class="arrow-img" src="/static/images/箭头大.png" mode="aspectFit"></image>
+            </view>
+            <view class="arrival">
+              <text class="time">{{ formatTime(detail.arrTime) }}</text>
+              <text class="terminal" v-if="detail.arrTerminal">{{ detail.arrAirportName || '—' }}T{{ detail.arrTerminal }}</text>
+              <text class="terminal" v-else>{{ detail.arrAirportName || '—' }}</text>
+            </view>
+          </view> 
+          
+          <view class="flight-footer">
+            <image class="plane-icon" src="/static/images/飞机2.png" mode="aspectFit"></image>
+            <text class="flight-info">{{ detail.carrierName || '—' }}{{ detail.flightNo || '—' }}</text>
           </view>
-          <view class="duration">
-            <text class="duration-text">{{ formatDuration(detail.depTime, detail.arrTime) }}</text>
-            <text class="arrow">→</text>
-          </view>
-          <view class="arrival">
-            <text class="time">{{ formatTime(detail.arrTime) }}</text>
-            <text class="airport">{{ detail.arrAirportName || '—' }}</text>
-            <text class="terminal" v-if="detail.arrTerminal">T{{ detail.arrTerminal }}</text>
-          </view>
-        </view>
-        
-        <view class="flight-meta">
-          <text v-if="detail.planeCnName" class="meta-item">{{ detail.planeCnName }}</text>
-          <text v-if="detail.distance" class="meta-item">距离 {{ detail.distance }}km</text>
-          <text v-if="detail.stopNum > 0" class="meta-item">经停 {{ detail.stopNum }}次</text>
-          <text v-if="formatMeal(detail.meal)" class="meta-item">{{ formatMeal(detail.meal) }}</text>
         </view>
       </view>
 
       <!-- 舱位价格列表 -->
       <view class="seat-list">
-        <view class="section-title">选择舱位</view>
         <view 
           v-for="(seat, index) in seatList" 
           :key="index" 
@@ -66,7 +65,7 @@
 
           <!-- 展开折叠 -->
           <view class="toggle-row" @click="toggleSeat(index)">
-            <text class="toggle-text">{{ seat.expanded ? '收起详情' : '展开详情' }}</text>
+            <text class="toggle-text">{{ seat.expanded ? '收起详情' : '查看退改政策' }}</text>
             <text class="toggle-arrow">{{ seat.expanded ? '▲' : '▼' }}</text>
           </view>
 
@@ -103,7 +102,7 @@
                     class="rule-detail-item"
                   >
                     <text class="rule-type">{{ detail.detailFeeTypeName || detail.detailFeeType }}：</text>
-                    <text class="rule-desc">{{ detail.detailFeeDesc || '具体规则以航司为准' }}</text>
+                    <text class="rule-desc">{{ detail.detailFeeDesc }}</text>
                   </view>
                 </view>
                 <view v-if="rule.luggage" class="luggage-info">
@@ -237,6 +236,39 @@ export default {
       return `${minutes}分钟`
     },
     
+    formatDateDisplay(timestamp) {
+      if (!timestamp) return '—'
+      let date = null
+      
+      if (typeof timestamp === 'number' || /^\d+$/.test(timestamp)) {
+        date = new Date(parseInt(timestamp))
+      } else if (typeof timestamp === 'string' && timestamp.length >= 10) {
+        date = new Date(timestamp)
+      }
+      
+      if (!date) return '—'
+      
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${month}-${day}`
+    },
+    
+    formatWeekday(timestamp) {
+      if (!timestamp) return ''
+      let date = null
+      
+      if (typeof timestamp === 'number' || /^\d+$/.test(timestamp)) {
+        date = new Date(parseInt(timestamp))
+      } else if (typeof timestamp === 'string' && timestamp.length >= 10) {
+        date = new Date(timestamp)
+      }
+      
+      if (!date) return ''
+      
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      return weekdays[date.getDay()]
+    },
+    
     formatMeal(meal) {
       const mealMap = {
         'HOT': '热食',
@@ -354,43 +386,51 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #0D1038;
 }
 
 .content {
-  padding: 20rpx;
   padding-bottom: 40rpx;
 }
 
 .flight-info-card {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
+  background: #1E1F34;
+  overflow: hidden;
   margin-bottom: 20rpx;
   
-  .flight-header {
+  .flight-top-bar {
+    background: #4E474C;
+    padding: 20rpx 30rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 30rpx;
+    font-size: 24rpx;
+    color:#FFE3BB;
     
-    .flight-no {
-      font-size: 40rpx;
-      font-weight: bold;
-      color: #1A4A8F;
+    .trip-type {
+      font-size: 26rpx;
     }
     
-    .airline {
-      font-size: 28rpx;
-      color: #666;
+    .trip-date {
+      flex: 1;
+      text-align: center;
+      font-size: 26rpx;
     }
+    
+    .duration-label {
+      font-size: 26rpx;
+    }
+  }
+  
+  .flight-main {
+    padding: 50rpx 30rpx 30rpx;
   }
   
   .route-info {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20rpx;
+    margin-bottom: 40rpx;
     
     .departure, .arrival {
       flex: 1;
@@ -399,53 +439,46 @@ export default {
       align-items: center;
       
       .time {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 10rpx;
-      }
-      
-      .airport {
-        font-size: 26rpx;
-        color: #666;
-        margin-bottom: 5rpx;
+        font-size: 60rpx;
+        // font-weight: bold;
+        color: #fff;
+        margin-bottom: 15rpx;
+        line-height: 1;
       }
       
       .terminal {
-        font-size: 24rpx;
-        color: #999;
+        font-size: 28rpx;
+        color: #FCDDA6;
       }
     }
     
     .duration {
-      flex: 1;
+      flex: 0 0 200rpx;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: center;
       
-      .duration-text {
-        font-size: 24rpx;
-        color: #999;
-        margin-bottom: 10rpx;
-      }
-      
-      .arrow {
-        font-size: 28rpx;
-        color: #ccc;
+      .arrow-img {
+        width: 180rpx;
+        height: 40rpx;
       }
     }
   }
   
-  .flight-meta {
+  .flight-footer {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20rpx;
-    padding-top: 20rpx;
-    border-top: 1px solid #f0f0f0;
+    align-items: center;
+    justify-content: center;
+    gap: 15rpx;
     
-    .meta-item {
-      font-size: 24rpx;
-      color: #999;
+    .plane-icon {
+      width: 32rpx;
+      height: 32rpx;
+    }
+    
+    .flight-info {
+      font-size: 28rpx;
+      color: #fff;
     }
   }
 }
@@ -460,10 +493,10 @@ export default {
   }
   
   .seat-item {
-    background: #fff;
+    background: #1E1F34;
     border-radius: 16rpx;
-    padding: 30rpx;
-    margin-bottom: 20rpx;
+    padding: 30rpx 20rpx;
+    margin: 0 20rpx 20rpx 20rpx;
     
     .seat-header {
       display: flex;
@@ -479,21 +512,23 @@ export default {
         .seat-name {
           font-size: 32rpx;
           font-weight: 600;
-          color: #333;
+          color: #fff;
         }
         
         .discount {
           font-size: 24rpx;
-          color: #FF7A00;
-          background: #FFF4E6;
+          color: #FFE3BB;
+          background: #4E474C;
           padding: 4rpx 12rpx;
           border-radius: 4rpx;
+          border:1px solid #FFE3BB
+
         }
         
         .special-tag {
           font-size: 22rpx;
-          color: #fff;
-          background: #FF7A00;
+          color: #021745;
+          background: linear-gradient(115.46deg, #F4BE66 0.67%, #FEE3B2 55.65%, #F3BC62 94.35%);
           padding: 4rpx 12rpx;
           border-radius: 4rpx;
         }
@@ -501,15 +536,14 @@ export default {
       
       .seat-count {
         font-size: 24rpx;
-        color: #999;
+        color: #fff;
       }
     }
 
     .price-summary {
       margin: 10rpx 0 20rpx;
       padding: 20rpx;
-      background: #f9fbff;
-      border: 1px solid #e7eef9;
+      background: #1E1F34;
       border-radius: 12rpx;
       display: flex;
       justify-content: space-between;
@@ -522,25 +556,28 @@ export default {
 
         .price-title {
           font-size: 24rpx;
-          color: #666;
+          color: #fff;
         }
         .price-value {
           font-size: 36rpx;
           font-weight: bold;
-          color: #1A4A8F;
+          background: linear-gradient(90deg, #F3BC63 0%, #FFE6B6 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         .tax-desc {
           font-size: 22rpx;
-          color: #999;
+          color: #fff;
         }
       }
 
       .summary-right .book-btn {
-        background: linear-gradient(90deg, #2F80ED, #56CCF2);
-        color: #fff;
+        background: linear-gradient(107.61deg, #F3BD65 4.52%, #FEE3B1 100%);
+        color: #000000;
         border: none;
         padding: 16rpx 36rpx;
-        border-radius: 50rpx;
+        border-radius: 28rpx;
         font-size: 28rpx;
       }
     }
@@ -550,7 +587,7 @@ export default {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: #1A4A8F;
+      color: #fff;
       font-size: 26rpx;
       padding: 12rpx 0;
       border-top: 1px dashed #e7eef9;
@@ -564,8 +601,7 @@ export default {
         justify-content: space-between;
         align-items: center;
         padding: 20rpx;
-        background: #f8f8f8;
-        border-radius: 12rpx;
+        background: #1E1F34;
         margin-bottom: 15rpx;
         
         &:last-child {
@@ -579,21 +615,21 @@ export default {
             display: block;
             font-size: 28rpx;
             font-weight: 600;
-            color: #333;
+            color: #fff;
             margin-bottom: 8rpx;
           }
           
           .price-desc {
             display: block;
             font-size: 24rpx;
-            color: #666;
+            color: #fff;
             margin-bottom: 5rpx;
           }
           
           .tax-desc {
             display: block;
             font-size: 24rpx;
-            color: #999;
+            color: #fff;
           }
         }
         
@@ -604,14 +640,17 @@ export default {
             display: block;
             font-size: 40rpx;
             font-weight: bold;
-            color: #FF7A00;
+            background: linear-gradient(90deg, #F3BC63 0%, #FFE6B6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 5rpx;
           }
           
           .price-label {
             display: block;
             font-size: 22rpx;
-            color: #999;
+            color: #fff;
           }
         }
       }
@@ -633,17 +672,17 @@ export default {
           
           .rule-detail-item {
             font-size: 24rpx;
-            color: #666;
+            color: #FFF;
             line-height: 1.6;
             margin-bottom: 8rpx;
             
             .rule-type {
-              color: #333;
+              color: #E4E3E3;
               font-weight: 500;
             }
             
             .rule-desc {
-              color: #666;
+              color: #E4E3E3;
             }
           }
         }
@@ -654,12 +693,12 @@ export default {
           line-height: 1.6;
           
           .luggage-label {
-            color: #333;
+            color: #fff;
             font-weight: 500;
           }
           
           .luggage-desc {
-            color: #666;
+            color: #E4E3E3;
           }
         }
       }
@@ -674,7 +713,7 @@ export default {
       
       .book-btn {
         background: linear-gradient(90deg, #FFC966, #F8D07C);
-        color: #1A4A8F;
+        color: #000000;
         font-size: 28rpx;
         font-weight: 600;
         padding: 15rpx 50rpx;

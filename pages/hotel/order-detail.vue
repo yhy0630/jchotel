@@ -1,66 +1,87 @@
 <template>
   <view class="page">
+    <!-- #ifndef H5 -->
+    <u-sticky offset-top="0" h5-nav-height="0" bg-color="transparent">
+      <u-navbar :is-back="true" :is-fixed="false" :border-bottom="false" 
+        :background="{ backgroundImage: 'url(/static/images/导航栏.png)', backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat' }"
+        back-icon-color="#ffffff"></u-navbar>
+    </u-sticky>
+    <!-- #endif -->
+    
     <scroll-view scroll-y class="content">
       <!-- 状态提示 -->
       <view class="status-bar">
-        <text class="status-icon">{{ getStatusIcon(order.status) }}</text>
-        <text class="status-text">{{ getStatusText(order.status) }}</text>
+        <view class="status-title">
+          <image class="status-icon" :src="getStatusIcon(order.status)" mode="aspectFit"></image>
+          <text class="status-text">{{ getStatusText(order.status) }}</text>
+        </view>
         <text class="status-tip">{{ getStatusTip(order.status) }}</text>
       </view>
 
-      <!-- 需求信息 -->
-      <view class="info-card">
-        <view class="title">{{ order.type == 1 ? '定制房需求' : '酒店订单' }}</view>
-        <view class="room-name">{{ order.room_name || '豪华标间' }}</view>
-        <view class="location">{{ order.hotel_name || (order.request && (order.request.city_name + order.request.area)) }}</view>
-        <view v-if="order.type == 1 && order.request" class="detail-item">
-          <text>附近参照物: {{ order.request.landmark }}</text>
+      <!-- 酒店信息卡片 -->
+      <view class="hotel-card">
+        <view class="hotel-main">
+          <image v-if="order.hotel_image" class="hotel-image" :src="order.hotel_image" mode="aspectFill"></image>
+          <view class="hotel-info">
+            <view class="hotel-title">{{ order.hotel_name }}</view>
+            <view class="hotel-date" v-if="order.check_in_date && order.check_out_date">
+              {{ order.check_in_date }} - {{ order.check_out_date }} | {{ order.night_num }}晚
+            </view>
+            <view class="hotel-room" v-if="order.room_name">
+              {{ order.room_name }} | 
+            </view>
+            <view class="hotel-checkin" v-if="order.check_in_time">
+              入住当天18:00前可免费取消
+            </view>
+          </view>
         </view>
-        <view v-if="order.type == 1 && order.request" class="detail-item">
-          <text>酒店档次: {{ order.request.hotel_level }}</text>
+        <!-- 分割线 -->
+        <view class="divider"></view>
+        <!-- 实付总额 -->
+        <view class="total-price-inline">
+          <text class="price-label">实付总额：</text>
+          <text class="price-value">¥{{ order.amount_paid || order.amount_payable || 0 }}</text>
         </view>
-        <view class="dates">{{ order.check_in_date }} 至 {{ order.check_out_date }}·{{ order.night_num }}晚1间·{{ order.room_name || '大床房' }}</view>
-        <view v-if="order.type == 1 && order.offer" class="detail-item">
-          <text>商家: {{ order.offer.merchant_name }}</text>
+      </view>
+
+      <!-- 住客信息 -->
+      <view class="section-card">
+        <view class="section-title">住客信息</view>
+        <view class="info-row" v-if="order.guest_name">
+          <text class="info-label">住客姓名*</text>
+          <text class="info-value">{{ order.guest_name }}</text>
+        </view>
+        <view class="info-row" v-if="order.mobile">
+          <text class="info-label">联系电话*</text>
+          <text class="info-value">{{ order.mobile }}</text>
         </view>
       </view>
 
       <!-- 订单信息 -->
-      <view class="info-card">
-        <view class="title">订单信息</view>
-        <view class="info-item">
-          <text>下单编号: {{ order.order_sn }}</text>
+      <view class="section-card">
+        <view class="section-title">订单信息</view>
+        <view class="info-row" v-if="order.order_sn">
+          <text class="info-label">下单编号</text>
+          <text class="info-value">{{ order.order_sn }}</text>
         </view>
-        <view class="info-item">
-          <text>下单时间: {{ formatTime(order.create_time) }}</text>
+        <view class="info-row" v-if="order.create_time">
+          <text class="info-label">下单时间</text>
+          <text class="info-value">{{ formatTime(order.create_time) }}</text>
         </view>
-        <view v-if="order.status > 0" class="info-item">
-          <text>支付方式: 在线支付</text>
-        </view>
-      </view>
-
-      <!-- 价格信息 -->
-      <view class="price-card">
-        <view class="price-label">实付总额</view>
-        <view class="price-value">¥{{ order.amount_paid || order.amount_payable }}</view>
-      </view>
-
-      <!-- 底部价格栏 -->
-      <view class="bottom-bar">
-        <view class="price-info">
-          <text class="list-price">挂牌价: ¥{{ bottomPrice.list }}</text>
-          <text class="vip-price">尊享价: ¥{{ bottomPrice.vip }}</text>
-          <text class="share-price">股东价: ¥{{ bottomPrice.share }}</text>
+        <view class="info-row" v-if="order.pay_way_text">
+          <text class="info-label">支付方式</text>
+          <text class="info-value">{{ order.pay_way_text }}</text>
         </view>
       </view>
     </scroll-view>
 
     <!-- 操作按钮 -->
     <view class="action-bar">
-      <button v-if="order.status === 0" class="btn cancel" @click="cancelOrder">取消订单</button>
-      <button v-if="order.status === 0" class="btn pay" @click="goPay">去支付</button>
-      <button v-if="order.status === 1" class="btn cancel" @click="cancelOrder">取消订单</button>
-      <button v-if="order.status === 2" class="btn invoice" @click="applyInvoice">申请开票</button>
+      <button v-if="order.status === 0" class="btn-outline" @click="cancelOrder">取消订单</button>
+      <button v-if="order.status === 0" class="btn-filled" @click="goPay">去支付</button>
+      <button v-if="order.status === 1" class="btn-outline" @click="cancelOrder">取消订单</button>
+      <button v-if="order.status === 2" class="btn-outline" @click="goReview">去评价</button>
+      <button v-if="order.status === 2" class="btn-filled" @click="applyInvoice">申请开票</button>
     </view>
   </view>
 </template>
@@ -114,9 +135,9 @@ export default {
       return `${y}-${m}-${d} ${h}:${min}:${sec}`
     },
     getStatusIcon(status) {
-      if (status === 0) return '⏰'
-      if (status === 1) return '⏰'
-      if (status === 2) return '✓'
+      if (status === 0) return '/static/images/待付款.png'
+      if (status === 1) return '/static/images/待出行.png'
+      if (status === 2) return '/static/images/已完成.png'
       return ''
     },
     getStatusText(status) {
@@ -164,6 +185,12 @@ export default {
       uni.navigateTo({
         url: `/pages/hotel/invoice-apply?order_id=${this.order.id}&order_sn=${this.order.order_sn || ''}`
       })
+    },
+    goReview() {
+      // 跳转到评价页面
+      uni.navigateTo({
+        url: `/pages/hotel/review?order_id=${this.order.id}`
+      })
     }
   }
 }
@@ -172,125 +199,194 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #1a1a2e;
+  background-color: #0D1034;
   padding-bottom: 120rpx;
 }
+/* 设置导航栏返回图标为白色 */
+/deep/ .u-navbar__content__left {
+  color: #ffffff !important;
+}
+/deep/ .u-icon {
+  color: #ffffff !important;
+}
 .content {
-  padding: 20rpx;
+  padding: 0;
 }
 .status-bar {
-  background: #16213e;
-  padding: 40rpx;
+  background: #022057;
   text-align: center;
-  border-radius: 12rpx;
-  margin-bottom: 20rpx;
+  padding: 20rpx 30rpx 30rpx;
+}
+.status-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
 }
 .status-icon {
-  font-size: 60rpx;
-  display: block;
-  margin-bottom: 20rpx;
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 12rpx;
 }
 .status-text {
-  font-size: 32rpx;
-  color: #fff;
-  display: block;
-  margin-bottom: 10rpx;
+  font-size: 36rpx;
+  font-weight: 800;
+  background: linear-gradient(90deg, #F4C06C 0%, #FDE0AA 50.06%, #F4C06C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .status-tip {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 26rpx;
+  color: #B8C5D6;
 }
-.info-card {
-  background: #16213e;
+
+/* 酒店信息卡片 */
+.hotel-card {
+  background: #1E1F34;
+  margin-bottom: 20rpx;
   padding: 30rpx;
-  margin-bottom: 20rpx;
-  border-radius: 12rpx;
-}
-.title {
-  font-size: 28rpx;
-  color: #ff9500;
-  margin-bottom: 20rpx;
-}
-.room-name {
-  font-size: 32rpx;
-  font-weight: bold;
   color: #fff;
-  margin-bottom: 10rpx;
-}
-.location, .dates {
-  color: #999;
-  font-size: 24rpx;
-  margin-bottom: 5rpx;
-}
-.detail-item {
-  color: #999;
-  font-size: 24rpx;
-  margin-bottom: 5rpx;
-}
-.info-item {
-  color: #999;
-  font-size: 24rpx;
-  margin-bottom: 10rpx;
-}
-.price-card {
-  background: #16213e;
-  padding: 30rpx;
-  border-radius: 12rpx;
-  text-align: right;
-}
-.price-label {
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 10rpx;
-}
-.price-value {
-  font-size: 48rpx;
-  color: #ff9500;
-  font-weight: bold;
-}
-.bottom-bar {
-  background: #16213e;
-  padding: 20rpx;
-  border-radius: 12rpx;
-  margin-top: 20rpx;
-}
-.price-info {
   display: flex;
   flex-direction: column;
-  gap: 5rpx;
+  gap: 20rpx;
+}
+.hotel-main {
+  display: flex;
+  gap: 20rpx;
+}
+.hotel-image {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+}
+.hotel-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+.divider {
+  width: 100%;
+  height: 1rpx;
+  background: #787985;
+  margin: 0;
+}
+.total-price-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.price-label {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  margin-left: 440rpx;
+}
+.price-value {
+  font-size: 40rpx;
+  color: #fcdda6;
+  font-weight: 700;
+}
+.hotel-title {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+.hotel-date {
   font-size: 24rpx;
+  color: #fff;
 }
-.vip-price {
-  color: #ff9500;
+.hotel-room {
+  font-size: 24rpx;
+  color: #fff;
 }
-.share-price {
-  color: #ff0000;
+.hotel-checkin {
+  font-size: 22rpx;
+  color: #fff;
 }
+
+
+/* 信息卡片 */
+.section-card {
+  background: #1E1F34;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+}
+.section-title {
+  font-size: 28rpx;
+  color: #FCDDA6;
+  font-weight: 500;
+  margin-bottom: 24rpx;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.info-row:last-child {
+  margin-bottom: 0;
+}
+.info-label {
+  font-size: 26rpx;
+  color: #8A92A6;
+}
+.info-value {
+  font-size: 26rpx;
+  color: #FFFFFF;
+}
+
+/* 操作按钮 */
 .action-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #16213e;
-  padding: 20rpx;
+  background: #1E2139;
+  padding: 20rpx 30rpx;
+  padding-bottom: 60rpx;
   display: flex;
+  justify-content: flex-end;
   gap: 20rpx;
+  border-top: 1rpx solid #787985;
 }
-.btn {
-  flex: 1;
-  padding: 25rpx;
-  border-radius: 8rpx;
-  font-size: 28rpx;
-  border: none;
-}
-.btn.cancel {
+.btn-outline {
+  min-width: 200rpx;
+  height: 68rpx;
+  border-radius: 34rpx;
   background: transparent;
-  color: #fff;
-  border: 1px solid #fff;
+  border: 2rpx solid #FCDDA6;
+  color: #FCDDA6;
+  font-size: 28rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40rpx;
 }
-.btn.pay, .btn.invoice {
-  background: #ff9500;
-  color: #fff;
+.btn-outline:active {
+  background: linear-gradient(90deg, #F5C26F 0%, #FCDEA7 50.26%, #F3C06F 100%);
+  color: #000000;
+  border-color: transparent;
+}
+.btn-filled {
+  min-width: 200rpx;
+  height: 68rpx;
+  border-radius: 34rpx;
+  background: linear-gradient(90deg, #F5C26F 0%, #FCDEA7 50.26%, #F3C06F 100%);
+  color: #000000;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40rpx;
+}
+.btn-filled:active {
+  opacity: 0.8;
 }
 </style>
 
