@@ -21,6 +21,7 @@
       </swiper>
     </view>
 
+<<<<<<< HEAD
     <!-- 尊享房内容 -->
     <view v-if="currentTab === 0">
       <!-- 地址选择区域 -->
@@ -190,10 +191,11 @@ export default {
       priceRangeIndex: -1
     }
   },
-  
+
   computed: {
     form() {
       return this.customForm
+      noMore: false
     }
   },
   
@@ -209,7 +211,7 @@ export default {
   
   onShow() {
   },
-  
+
   methods: {
     switchTab(index) {
       this.currentTab = index
@@ -295,36 +297,36 @@ export default {
       const numPrice = typeof price === 'number' ? price : parseFloat(price)
       return numPrice.toFixed(2)
     },
-    
+
     selectCustomCity() {
       uni.navigateTo({ url: '/pages/hotel/city-select' })
     },
-    
+
     onCheckInChange(e) {
       this.customForm.check_in_date = e.detail.value
     },
-    
+
     onCheckOutChange(e) {
       this.customForm.check_out_date = e.detail.value
     },
-    
+
     onHotelLevelChange(e) {
       this.hotelLevelIndex = e.detail.value
       this.customForm.hotel_level = this.hotelLevels[e.detail.value]
     },
-    
+
     onRoomTypeChange(e) {
       this.roomTypeIndex = e.detail.value
       this.customForm.room_type = this.roomTypes[e.detail.value]
     },
-    
+
     onPriceRangeChange(e) {
       this.priceRangeIndex = e.detail.value
       this.customForm.price_range = this.priceRanges[e.detail.value]
     },
-    
+
     async submitCustomForm() {
-      if (!this.customForm.mobile || !this.customForm.city_code || !this.customForm.landmark || 
+      if (!this.customForm.mobile || !this.customForm.city_code || !this.customForm.landmark ||
           !this.customForm.hotel_level || !this.customForm.room_type || !this.customForm.price_range ||
           !this.customForm.check_in_date || !this.customForm.check_out_date) {
         uni.showToast({ title: '请填写完整信息', icon: 'none' })
