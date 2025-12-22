@@ -21,7 +21,6 @@
       </swiper>
     </view>
 
-<<<<<<< HEAD
     <!-- 尊享房内容 -->
     <view v-if="currentTab === 0">
       <!-- 地址选择区域 -->
@@ -195,7 +194,6 @@ export default {
   computed: {
     form() {
       return this.customForm
-      noMore: false
     }
   },
   
