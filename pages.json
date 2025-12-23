@@ -584,103 +584,6 @@
 				}
 			},
 			{
-				"path": "pages/hotel/hotel-list",
-				"style": {
-					"navigationBarTitleText": "酒店列表"
-				}
-			},
-			{
-				"path": "pages/hotel/hotel-detail",
-				"style": {
-					"navigationBarTitleText": "酒店详情"
-				}
-			},
-			{
-				"path": "pages/hotel/hotel-home",
-				"style": {
-					"navigationBarTitleText": "酒店/民宿"
-				}
-			},
-			{
-				"path": "pages/hotel/custom-form",
-				"style": {
-					"navigationBarTitleText": "发布定制需求"
-				}
-			},
-			{
-				"path": "pages/hotel/custom-my",
-				"style": {
-					"navigationBarTitleText": "我的发布"
-				}
-			},
-			{
-				"path": "pages/hotel/custom-detail",
-				"style": {
-					"navigationBarTitleText": "需求详情"
-				}
-			},
-			{
-				"path": "pages/hotel/custom-publish-success",
-				"style": {
-					"navigationBarTitleText": "发布成功"
-				}
-			},
-			{
-				"path": "pages/hotel/merchant-list",
-				"style": {
-					"navigationBarTitleText": "接单管理"
-				}
-			},
-			{
-				"path": "pages/hotel/merchant-offer",
-				"style": {
-					"navigationBarTitleText": "商家出价"
-				}
-			},
-			{
-				"path": "pages/hotel/merchant-offer-success",
-				"style": {
-					"navigationBarTitleText": "出价成功"
-				}
-			},
-			{
-				"path": "pages/hotel/order-list",
-				"style": {
-					"navigationStyle": "custom" 
-				}
-			},
-			{
-				"path": "pages/hotel/order-detail",
-				"style": {
-					"navigationBarTitleText": "订单详情",
-					"navigationStyle": "custom"
-				}
-			},
-			{
-				"path": "pages/hotel/city-select",
-				"style": {
-					"navigationBarTitleText": "选择城市"
-				}
-			},
-			{
-				"path": "pages/hotel/order-create",
-				"style": {
-					"navigationBarTitleText": "确认订单"
-				}
-			},
-			{
-				"path": "pages/hotel/room-detail",
-				"style": {
-					"navigationBarTitleText": "房间详情"
-				}
-			},
-			{
-				"path": "pages/hotel/premium-room",
-				"style": {
-					"navigationBarTitleText": "尊享房"
-				}
-			},
-			{
 				"path": "pages/ticket/search",
 				"style": {
 					"navigationBarTitleText": "机票/火车票"
@@ -764,6 +667,104 @@
 				"path": "pages/ticket/order-confirm",
 				"style": {
 					"navigationBarTitleText": "确认订单"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-list",
+				"style": {
+					"navigationBarTitleText": "酒店列表"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-detail",
+				"style": {
+					"navigationBarTitleText": "酒店详情"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-home",
+				"style": {
+					"navigationBarTitleText": "酒店/民宿"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-form",
+				"style": {
+					"navigationBarTitleText": "发布定制需求"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-my",
+				"style": {
+					"navigationBarTitleText": "我的发布"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-detail",
+				"style": {
+					"navigationBarTitleText": "需求详情"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-publish-success",
+				"style": {
+					"navigationBarTitleText": "发布成功"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-list",
+				"style": {
+					"navigationBarTitleText": "接单管理"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-offer",
+				"style": {
+					"navigationBarTitleText": "商家出价"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-offer-success",
+				"style": {
+					"navigationBarTitleText": "出价成功"
+				}
+			},
+			{
+				"path": "pages/hotel/order-list",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/hotel/order-detail",
+				"style": {
+					"navigationBarTitleText": "订单详情",
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/hotel/city-select",
+				"style": {
+					"navigationBarTitleText": "选择城市"
+				}
+			},
+			{
+				"path": "pages/hotel/order-create",
+				"style": {
+					"navigationBarTitleText": "确认订单"
+				}
+			},
+			{
+				"path": "pages/hotel/room-detail",
+				"style": {
+					"navigationBarTitleText": "房间详情"
+				}
+			},
+			{
+				"path": "pages/hotel/premium-room",
+				"style": {
+					"navigationBarTitleText": "尊享房",
+					"navigationStyle": "custom"
 				}
 			}
 		]

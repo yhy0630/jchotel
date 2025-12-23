@@ -319,7 +319,7 @@ export default {
 }
 .arrow {
   color: #B9B9BD;
-  font-size: 40rpx;
+  font-size: 45rpx;
   margin-left: 12rpx;
   font-weight: 300;
   flex-shrink: 0;

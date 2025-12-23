@@ -195,7 +195,7 @@ export default {
             distance: item.distince || '0',
             area: item.businessarea || '--',
             desc: item.hotelIntroduce || '暂无介绍',
-            image: item.hotelPic || '',
+            image: (item.images && item.images[0] && item.images[0].url) || item.hotelPic || '/static/images/default-hotel.png',
             list_price: item.listPrice || item.list_price || 0
           }))
           
