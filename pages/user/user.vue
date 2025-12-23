@@ -13,15 +13,10 @@
 					<view class="white" v-if="isLogin">
 						<view class="name-row">
 							<view class="name xxl line1">{{userInfo.nickname}}</view>
-							<view class="identity-chip" v-if="currentIdentityLabel">{{ currentIdentityLabel }}</view>
+							<view class="identity-chip" v-if="userInfo.member_category_name">{{ userInfo.member_category_name }}</view>
 						</view>
-						<!-- <view class="user-id row-between" v-if="userInfo.sn">
-							<view class="xs white ml20 mr20">会员ID: {{userInfo.sn || ''}}</view>
-							<view class="xs normal copy-btn row-center ml5" @tap.stop="onCopy">复制</view>
-						</view> -->
 						<view class="member-identity-pills" v-if="isLogin">
-							<!-- <view class="identity-pill">会员类别</view> -->
-							<view class="identity-pill">会员等级</view>
+							<view class="identity-pill" v-if="userInfo.member_grade_name">{{ userInfo.member_grade_name }}</view>
 						</view>
 					</view>
 					<view class="white" v-else @tap="goLogin">
@@ -398,11 +393,26 @@
 		props: {},
 		watch: {
 			'userInfo.member_category_code'(val) {
-				if (val) {
-					this.activeMemberType = val;
-				}
+			if (val) {
+				this.activeMemberType = val;
 			}
 		},
+		'userInfo.member_category_name'(val) {
+			if (val) {
+				// 根据会员类别名称映射到对应的 key
+				const nameToKeyMap = {
+					'商旅会员': 'business_travel',
+					'渠道会员': 'channel',
+					'企业会员': 'enterprise',
+					'商务会员': 'business'
+				};
+				const mappedKey = nameToKeyMap[val];
+				if (mappedKey) {
+					this.activeMemberType = mappedKey;
+				}
+			}
+		}
+	},
 
 		onLoad(options) {
 			setTabbar()

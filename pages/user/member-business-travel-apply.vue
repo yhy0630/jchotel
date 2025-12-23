@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="完善信息"></custom-navbar>
     <view class="nav-title">完善信息（商旅会员）</view>
     <scroll-view scroll-y class="form-wrap">
       <view class="form-item" v-for="item in fields" :key="item.key">
@@ -15,6 +16,14 @@
             :placeholder="item.placeholder"
             placeholder-class="ph"
           />
+          <view
+            v-else-if="item.type === 'select'"
+            class="select"
+            @tap="handleSelect(item)"
+          >
+            <text :class="{'ph': !form[item.key]}">{{ form[item.key] || item.placeholder }}</text>
+            <text class="arrow">›</text>
+          </view>
           <textarea
             v-else-if="item.type === 'textarea'"
             v-model="form[item.key]"
@@ -23,13 +32,6 @@
             class="textarea"
             auto-height
           />
-          <view
-            v-else
-            class="select"
-            @tap="handleSelect(item)"
-          >
-            <text :class="{'ph': !form[item.key]}">{{ form[item.key] || item.placeholder }}</text>
-          </view>
         </view>
       </view>
       <!-- 身份优惠选择 -->
@@ -40,15 +42,16 @@
         <view class="control">
           <view class="select" @tap="selectIdentityDiscount">
             <text :class="{'ph': !selectedIdentityDiscount}">{{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}</text>
+            <text class="arrow">›</text>
           </view>
         </view>
       </view>
       <!-- 身份优惠证明图片上传 -->
-      <view class="form-item" v-if="form.identity_discount_id">
+      <view class="form-item upload-item-wrap" v-if="form.identity_discount_id">
         <view class="label">
           <text>身份优惠证明图片</text>
         </view>
-        <view class="control">
+        <view class="control upload-control">
           <view class="upload-wrap">
             <view class="upload-item" v-for="(img, index) in identityProofImages" :key="index">
               <image :src="img" mode="aspectFill" class="upload-img"></image>
@@ -243,64 +246,101 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #1a2548 0%, #050814 100%);
+  background: #0D1034;
   display: flex;
   flex-direction: column;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 .nav-title {
   padding: 32rpx;
   padding-top: 80rpx;
   font-size: 32rpx;
   color: #ffffff;
+  display: none;
 }
 .form-wrap {
   flex: 1;
-  padding: 0 24rpx 24rpx;
+  padding: 0;
+  background: #1E1F1F;
+  box-sizing: border-box;
+  border-radius: 30rpx;
+  padding: 30rpx 30rpx;
+  margin: 30rpx 0;
 }
 .form-item {
-  background: #151c35;
-  border-radius: 12rpx;
-  padding: 22rpx 24rpx;
-  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  padding: 32rpx 32rpx;
+  border-bottom: 1rpx solid #E6E6E8;
 }
 .label {
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: #ffffff;
-  margin-bottom: 10rpx;
+  min-width: 160rpx;
+  flex-shrink: 0;
 }
 .required {
   color: #ff5b5b;
-  margin-right: 6rpx;
+  margin-right: 4rpx;
 }
-.control input,
-.select,
-.textarea {
-  border-radius: 8rpx;
-  background: #0c1224;
-  padding: 0 20rpx;
-  color: #ffffff;
-  font-size: 26rpx;
-}
-.control input {
-  height: 72rpx;
-}
-.textarea {
-  min-height: 140rpx;
-  padding-top: 12rpx;
-  line-height: 40rpx;
-}
-.ph {
-  color: #666d8f;
-}
-.select {
-  height: 72rpx;
+.control {
+  flex: 1;
   display: flex;
   align-items: center;
+}
+.control input {
+  flex: 1;
+  height: 60rpx;
+  background: transparent;
+  color: #B9B9BD;
+  font-size: 28rpx;
+  text-align: left;
+}
+.textarea {
+  flex: 1;
+  min-height: 100rpx;
+  background: transparent;
+  color: #999999;
+  font-size: 28rpx;
+  padding: 12rpx 0;
+  line-height: 40rpx;
+  text-align: left;
+}
+.ph {
+  color: #666666;
+}
+.select {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #999999;
+  font-size: 28rpx;
+}
+.arrow {
+  color: #B9B9BD;
+  font-size: 40rpx;
+  margin-left: 12rpx;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+.upload-item-wrap {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.upload-item-wrap .label {
+  margin-bottom: 20rpx;
+}
+.upload-control {
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
 }
 .upload-wrap {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
+  width: 100%;
 }
 .upload-item {
   position: relative;

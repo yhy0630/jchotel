@@ -1,5 +1,6 @@
 <template>
   <view class="page-container">
+    <custom-navbar title="会员升级"></custom-navbar>
     <view class="member-selector-wrap">
       <view class="member-selector">
         <view 
@@ -53,7 +54,7 @@
   </view>
 </template>
 
-<script>
+<script> 
 export default {
   data() {
     return {
@@ -201,6 +202,7 @@ export default {
 .page-container{
   min-height: 100vh;
   background: #0D1036;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .member-selector-wrap{
