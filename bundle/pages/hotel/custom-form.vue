@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { customPublish } from '../../api/hotel.js'
+import { customPublish } from '../../../api/hotel.js'
 
 export default {
   data() {

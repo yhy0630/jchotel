@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { customDetail, selectOffer } from '../../api/hotel.js'
+import { customDetail, selectOffer } from '../../../api/hotel.js'
 
 export default {
   data() {

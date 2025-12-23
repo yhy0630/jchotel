@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { merchantOffer, merchantRequestList } from '../../api/hotel.js'
+import { merchantOffer, merchantRequestList } from '../../../api/hotel.js'
 
 export default {
   data() {

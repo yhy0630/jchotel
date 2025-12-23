@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { customMyList } from '../../api/hotel.js'
+import { customMyList } from '../../../api/hotel.js'
 
 export default {
   data() {

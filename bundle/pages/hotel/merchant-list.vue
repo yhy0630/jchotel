@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { merchantRequestList, merchantOfferList } from '../../api/hotel.js'
+import { merchantRequestList, merchantOfferList } from '../../../api/hotel.js'
 
 export default {
   data() {

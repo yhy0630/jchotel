@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { cityList } from '../../api/hotel.js'
+import { cityList } from '../../../api/hotel.js'
 
 export default {
   data() {

@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { orderDetail, cancelOrder } from '../../api/hotel.js'
+import { orderDetail, cancelOrder } from '../../../api/hotel.js'
 import config from '@/config/app.js'
 
 export default {
