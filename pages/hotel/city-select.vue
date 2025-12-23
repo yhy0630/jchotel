@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="页面标题"></custom-navbar>
     <!-- 搜索框 -->
     <view class="search-box">
       <view class="search-inner">
@@ -141,6 +142,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1038;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 .search-box {
   padding: 20rpx;

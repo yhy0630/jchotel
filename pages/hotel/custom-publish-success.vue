@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="发布成功" :show-back="false"></custom-navbar>
     <!-- 成功提示 -->
     <view class="success-content">
       <view class="success-title">发布成功</view>
@@ -44,7 +45,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40rpx;
+  padding: calc(88rpx + var(--status-bar-height)) 40rpx 40rpx;
 }
 
 .success-content {

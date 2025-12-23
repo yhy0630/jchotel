@@ -1,6 +1,8 @@
 <template>
 <!--pages/user_spread/user_spread.wxml-->
 <view class="user-spread">
+    <custom-navbar title="邀请好友"></custom-navbar>
+    
 	<!-- <view class="explain row muted" v-if="vipState==0 || vipState==1">
 	    <image src="/static/images/icon_warning.png"></image>
 	    <span class="ml10">成为分销会员，推广下级可获得额外收益，推广越多收益越多</span>
@@ -443,6 +445,8 @@ export default {
 .user-spread { 
     background-color: #0D1038;
 	min-height: 100vh;
+    padding-top: calc(130rpx + var(--status-bar-height));
+    
 	.explain {
 		background-color: #FFFADE;
 	    padding: 18rpx 20rpx;

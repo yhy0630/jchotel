@@ -1,7 +1,7 @@
 <template>
 	<view class="index">
 		<!-- 顶部导航栏 -->
-		
+		<custom-navbar title="锦程汇" :show-back="false" ></custom-navbar>
 
 		<!-- 轮播图 -->
 		<view class="banner-section">
@@ -607,6 +607,7 @@ import { trainList } from '@/api/train.js'
 	background-color: #0c0d21;
 	padding: 20rpx 20rpx 40rpx;
 	box-sizing: border-box;
+	
 }
 
 .navbar-content {
@@ -646,7 +647,7 @@ import { trainList } from '@/api/train.js'
 	height: 400rpx;
 	margin-left: -20rpx;
 	margin-right: -20rpx;
-	margin-top: -20rpx;
+	margin-top: 50rpx;
 	
 	.banner-swiper {
 		width: 100%;

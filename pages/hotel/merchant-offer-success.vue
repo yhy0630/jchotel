@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="出价成功" :show-back="false"></custom-navbar>
     <!-- 成功图标 -->
     <view class="success-content">
       <image class="success-icon" src="/static/images/编组 4.png" mode="aspectFit"></image>
@@ -37,7 +38,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40rpx;
+  padding: calc(88rpx + var(--status-bar-height)) 40rpx 40rpx;
 }
 
 .success-content {

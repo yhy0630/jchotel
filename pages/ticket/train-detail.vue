@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="页面标题"></custom-navbar>
     <scroll-view scroll-y class="content" v-if="detail">
       <!-- 顶部信息栏 -->
       <view class="train-info-card">
@@ -537,6 +538,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .content {

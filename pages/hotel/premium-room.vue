@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="尊享房/定制房"></custom-navbar>
     <!-- 房型选项卡 -->
     <view class="room-tabs">
       <view 
@@ -204,7 +205,14 @@ export default {
     if (options.city_name) {
       this.cityName = decodeURIComponent(options.city_name)
     }
-    this.loadHotelList()
+    // 接收 tab 参数，自动切换到对应选项卡
+    if (options.tab !== undefined) {
+      this.currentTab = parseInt(options.tab)
+    }
+    // 只有在尊享房选项卡时才加载酒店列表
+    if (this.currentTab === 0) {
+      this.loadHotelList()
+    }
   },
   
   onShow() {
@@ -348,8 +356,8 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #0D1034;
-  padding: 20rpx 20rpx 40rpx;
+  background: #1E1F34;
+  padding: calc(88rpx + var(--status-bar-height)) 20rpx 40rpx;
   box-sizing: border-box;
 }
 
@@ -374,7 +382,7 @@ export default {
   display: flex;
   gap: 12rpx;
   padding: 0 6rpx;
-  margin-top: 10rpx;
+  margin-top: 60rpx;
   margin-bottom: 20rpx;
   background-color: #353548;
   color: #ffffff;

@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="酒店/民宿" ></custom-navbar>
     <!-- 顶部轮播图 -->
     <view class="banner-section">
       <swiper class="banner-swiper" :indicator-dots="true" :autoplay="true" :interval="3000" :duration="500" circular>
@@ -130,13 +131,13 @@ export default {
       // 点击尊享房的箭头，跳转到尊享房页面
       if (index === 0) {
         uni.navigateTo({
-          url: '/pages/hotel/premium-room'
+          url: '/pages/hotel/premium-room?tab=0'
         })
       }
-      // 点击定制房的箭头，跳转到定制房表单页面
+      // 点击定制房的箭头，跳转到定制房页面并自动切换到定制房选项卡
       else if (index === 1) {
         uni.navigateTo({
-          url: '/pages/hotel/custom-form'
+          url: '/pages/hotel/premium-room?tab=1'
         })
       }
     },
@@ -253,6 +254,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(88rpx + var(--status-bar-height));
 }
 
 /* 轮播图 */

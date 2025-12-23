@@ -1,5 +1,7 @@
 <template>
     <view class="page">
+      <custom-navbar title="飞机票/火车票"></custom-navbar>
+
     <!-- 顶部轮播图 -->
     <view class="banner-section">
       <swiper 
@@ -499,6 +501,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1038;
+  padding-top: calc(100rpx + var(--status-bar-height));
 }
 
 .banner-section {

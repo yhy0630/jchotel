@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="机票详情"></custom-navbar>
     <scroll-view scroll-y class="content" v-if="detail">
       <!-- 航班基本信息 -->
       <view class="flight-info-card">
@@ -387,6 +388,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1038;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .content {

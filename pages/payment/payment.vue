@@ -1,5 +1,6 @@
 <template>
 	<view class="payment-pages">
+		<custom-navbar title="支付"></custom-navbar>
 		<view class="payment u-skeleton">
 			<!-- Header -->
 			<view class="payment-header">
@@ -267,11 +268,14 @@
 		height: 100%;
 		padding: 0;
 		background: #0D1034;
+		padding-top: calc(130rpx + var(--status-bar-height));
 	}
 
 	.payment-pages {
 		height: 100%;
 		background: #0D1034;
+	    padding-top: calc(130rpx + var(--status-bar-height));
+
 
 		.payment {
 			display: flex;

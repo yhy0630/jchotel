@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="确认信息"></custom-navbar>
     <scroll-view scroll-y class="content">
       <!-- 航班/车次信息摘要 -->
       <view class="top-info-card">
@@ -351,6 +352,7 @@ export default {
   background: #0D1034;
   display: flex;
   flex-direction: column;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .content {

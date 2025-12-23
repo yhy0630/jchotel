@@ -238,7 +238,7 @@
 			</view>
 		</view>
 		<!-- 酒店相关功能 -->
-		<view class="server-nav bg-white">
+		<!-- <view class="server-nav bg-white">
 			<view>
 				<view class="title row-between">
 					<view class="lg">酒店服务</view>
@@ -288,7 +288,7 @@
 					<view class="sm mt10">{{item.name}}</view>
 				</button>
 			</view>
-		</view>
+		</view> -->
         <recommend/>
 	</view>
 </template>
@@ -686,7 +686,7 @@
 <style lang="scss">
 	.user {
 		background-color: #0D1038;
-		min-height: 210vh;
+		min-height: 100vh;
 		.header {
 			display: flex;
 			flex-direction: column;

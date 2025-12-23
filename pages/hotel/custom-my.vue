@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="我的发布"></custom-navbar>
     <scroll-view scroll-y class="list">
       <view v-for="item in list" :key="item.id" class="card">
         <view class="header">
@@ -90,6 +91,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .list {

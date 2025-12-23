@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="需求详情"></custom-navbar>
     <scroll-view scroll-y class="content">
       <!-- 需求信息卡片 -->
       <view class="request-card">
@@ -129,6 +130,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .content {

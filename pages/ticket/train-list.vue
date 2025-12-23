@@ -1,9 +1,10 @@
 <template>
   <view class="page">
+    <custom-navbar title="火车票"></custom-navbar>
     <!-- 顶部路线信息 -->
-    <view class="header">
+    <!-- <view class="header">
       <text class="route">{{ departureStationName }}-{{ arrivalStationName }}</text>
-    </view>
+    </view> -->
 
     <!-- 日期选择 -->
     <view class="date-bar">
@@ -785,6 +786,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .header {

@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="接单管理"></custom-navbar>
     <!-- Tab切换 -->
     <view class="tabs">
       <view :class="['tab', { active: currentTab === 0 }]" @click="switchTab(0)">定制需求</view>
@@ -111,6 +112,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(88rpx + var(--status-bar-height));
 }
 
 .tabs {

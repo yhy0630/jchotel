@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="酒店详情"></custom-navbar>
     <!-- 预订信息栏 -->
     <view class="booking-info">
       <text class="date">{{ formatDateShort(checkInDate) }}</text>
@@ -262,6 +263,7 @@ export default {
   min-height: 100vh;
   background: #0D1034;
   color: #fff;
+  padding-top: calc(120rpx + var(--status-bar-height));
 }
 
 .booking-info {
@@ -379,12 +381,14 @@ export default {
   }
   
   .breakfast-badge {
-background: linear-gradient(90deg, #F4BE65 0%, #FEE3B1 50.11%, #F3BD65 100%);
+    background: linear-gradient(90deg, #F4BE65 0%, #FEE3B1 50.11%, #F3BD65 100%);
     color: #380C00;
-    padding: 5rpx 20rpx;
+    padding: 4rpx 12rpx;
     border-radius: 10rpx;
-    font-size: 25rpx;
+    font-size: 20rpx;
     font-weight: 600;
+    white-space: nowrap;
+    margin-top: -30rpx;
   }
 }
 

@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="确认信息"></custom-navbar>
     <scroll-view scroll-y class="content">
       <!-- 顶部车次摘要 -->
       <view class="top-card">
@@ -222,6 +223,7 @@ export default {
   background: #0D1034;
   display: flex;
   flex-direction: column;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .content {

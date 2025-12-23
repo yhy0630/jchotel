@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="商家出价"></custom-navbar>
     <scroll-view scroll-y class="content">
       <!-- 需求信息 -->
       <view class="request-card">
@@ -89,6 +90,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(88rpx + var(--status-bar-height));
   padding-bottom: 120rpx;
 }
 

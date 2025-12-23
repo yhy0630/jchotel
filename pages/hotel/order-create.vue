@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="确认订单"></custom-navbar>
     <scroll-view scroll-y class="content">
       <!-- 顶部房型摘要 -->
       <view class="top-card">
@@ -264,6 +265,7 @@ export default {
   background: #0D1034;
   color: #fff;
   padding-bottom: 140rpx;
+  padding-top: calc(120rpx + var(--status-bar-height)); 
 }
 
 .content {
