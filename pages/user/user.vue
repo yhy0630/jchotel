@@ -196,27 +196,27 @@
 				<text class="menu-text">邀请好友</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/custom-my')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/custom-my')">
 				<image class="menu-icon" src="/static/images/jiudian-3 1.png"></image>
 				<text class="menu-text">我的发布</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" v-if="isMerchant" @tap="goPage('/pages/hotel/merchant-list')">
+			<view class="menu-item" v-if="isMerchant" @tap="goPage('/bundle/pages/hotel/merchant-list')">
 				<image class="menu-icon" src="/static/images/Work.png"></image>
 				<text class="menu-text">商家接单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=hotel')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/order-list?order_type=hotel')">
 				<image class="menu-icon" src="/static/images/jiudian-3 1.png"></image>
 				<text class="menu-text">酒店订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=flight')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/order-list?order_type=flight')">
 				<image class="menu-icon" src="/static/images/feiji_line 1.png"></image>
 				<text class="menu-text">机票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=train')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/order-list?order_type=train')">
 				<image class="menu-icon" src="/static/images/huochepiao-2 1.png"></image>
 				<text class="menu-text">车票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
@@ -240,19 +240,19 @@
 				</view>
 			</view>
 			<view class="nav row wrap">
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=hotel')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/order-list?order_type=hotel')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">酒店订单</view>
 				</view>
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=flight')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/order-list?order_type=flight')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">飞机票订单</view>
 				</view>
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=train')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/order-list?order_type=train')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">火车票订单</view>
 				</view>
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/custom-my')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/custom-my')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_custom_my.png"></image>
 					<view class="sm mt10">我的发布</view>
 				</view>
@@ -264,7 +264,7 @@
 					<image class="nav-icon" src="/static/images/buildings.png"></image>
 					<view class="sm mt10">关于我们</view>
 				</view>
-				<view v-if="isMerchant" class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/merchant-list')" style="width: 25%;">
+				<view v-if="isMerchant" class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/merchant-list')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_merchant_order.png"></image>
 					<view class="sm mt10">商家接单</view>
 				</view>
@@ -645,11 +645,11 @@
 						break;
 					case 'flight':
 						// 机票订单
-						uni.navigateTo({ url: '/pages/ticket/search?type=flight' });
+						uni.navigateTo({ url: '/bundle/pages/ticket/search?type=flight' });
 						break;
 					case 'train':
 						// 车票订单
-						uni.navigateTo({ url: '/pages/ticket/search?type=train' });
+						uni.navigateTo({ url: '/bundle/pages/ticket/search?type=train' });
 						break;
 					case 'rental':
 						// 租车订单

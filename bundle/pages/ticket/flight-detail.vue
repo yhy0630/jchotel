@@ -377,7 +377,7 @@ export default {
         .join('&')
       
       uni.navigateTo({
-        url: `/pages/ticket/passenger-info?${queryString}`
+        url: `/bundle/pages/ticket/passenger-info?${queryString}`
       })
     }
   }

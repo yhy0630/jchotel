@@ -27,7 +27,7 @@ export default {
   methods: {
     goToMyPublish() {
       uni.redirectTo({
-        url: '/pages/hotel/custom-my'
+        url: '/bundle/pages/hotel/custom-my'
       })
     },
     goBack() {

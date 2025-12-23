@@ -520,10 +520,10 @@ export default {
         .map(key => `${key}=${encodeURIComponent(String(params[key]))}`)
         .join('&')
       
-      console.log('跳转到乘客信息页:', `/pages/ticket/passenger-info?${queryString}`)
+      console.log('跳转到乘客信息页:', `/bundle/pages/ticket/passenger-info?${queryString}`)
       
       uni.navigateTo({
-        url: `/pages/ticket/train-passenger?${queryString}`,
+        url: `/bundle/pages/ticket/train-passenger?${queryString}`,
         fail: (err) => {
           console.error('跳转失败:', err)
           uni.showToast({ title: '跳转失败，请重试', icon: 'none' })

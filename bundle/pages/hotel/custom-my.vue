@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { customMyList } from '../../api/hotel.js'
+import { customMyList } from '../../../api/hotel.js'
 
 export default {
   data() {
@@ -80,7 +80,7 @@ export default {
     },
     goDetail(item) {
       uni.navigateTo({
-        url: `/pages/hotel/custom-detail?request_id=${item.id}`
+        url: `/bundle/pages/hotel/custom-detail?request_id=${item.id}`
       })
     }
   }

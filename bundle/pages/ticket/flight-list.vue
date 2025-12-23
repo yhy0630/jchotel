@@ -526,7 +526,7 @@ export default {
       // 优先使用routeId（新接口参数）
       if (item.routeId) {
       uni.navigateTo({
-          url: `/pages/ticket/flight-detail?route_id=${encodeURIComponent(item.routeId)}&route_type=OW`
+          url: `/bundle/pages/ticket/flight-detail?route_id=${encodeURIComponent(item.routeId)}&route_type=OW`
         })
       } else {
         // 使用旧接口参数
@@ -540,7 +540,7 @@ export default {
           .map(key => `${key}=${encodeURIComponent(params[key])}`)
           .join('&')
         uni.navigateTo({
-          url: `/pages/ticket/flight-detail?${queryString}`
+          url: `/bundle/pages/ticket/flight-detail?${queryString}`
       })
       }
     },
@@ -574,7 +574,7 @@ export default {
         .join('&')
       
       uni.navigateTo({
-        url: `/pages/ticket/passenger-info?${queryString}`,
+        url: `/bundle/pages/ticket/passenger-info?${queryString}`,
         fail: (err) => {
           console.error('跳转失败:', err)
           uni.showToast({ title: '页面跳转失败，请重试', icon: 'none' })

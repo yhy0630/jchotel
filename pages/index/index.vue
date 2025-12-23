@@ -268,14 +268,14 @@ import config from '@/config/app.js'
 			// 点击酒店/民宿，跳转到酒店首页
 			if (index === 0) {
 				uni.navigateTo({
-					url: '/pages/hotel/hotel-home'
+					url: '/bundle/pages/hotel/hotel-home'
 				})
 			}
 			
 			// 点击机票/火车票，跳转到票务搜索页
 			if (index === 1) {
 				uni.navigateTo({
-					url: '/pages/ticket/search'
+					url: '/bundle/pages/ticket/search'
 				})
 			}
 		},
@@ -283,7 +283,7 @@ import config from '@/config/app.js'
 		// 选择位置
 		selectLocation() {
 				uni.navigateTo({
-				url: '/pages/hotel/city-select?type=hotel'
+				url: '/bundle/pages/hotel/city-select?type=hotel'
 			})
 		},
 		
@@ -371,12 +371,12 @@ import config from '@/config/app.js'
 			if (this.currentTab === 0) {
 				// 跳转到酒店列表页
 				uni.navigateTo({
-					url: `/pages/hotel/hotel-list?cityCode=${this.locationCode}&cityName=${this.currentLocation}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
+					url: `/bundle/pages/hotel/hotel-list?cityCode=${this.locationCode}&cityName=${this.currentLocation}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
 				})
 			} else if (this.currentTab === 1) {
 				// 跳转到机票/火车票搜索页
 				uni.navigateTo({
-					url: '/pages/ticket/search'
+					url: '/bundle/pages/ticket/search'
 				})
 			} else if (this.currentTab === 2) {
 				// 租车搜索
@@ -580,14 +580,14 @@ import config from '@/config/app.js'
 		// 跳转到酒店详情
 		goHotelDetail(item) {
 			uni.navigateTo({
-				url: `/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}`
+				url: `/bundle/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}`
 			})
 		},
 		
 		// 跳转到票务详情
 		goTicketDetail(item) {
 			uni.navigateTo({
-				url: '/pages/ticket/flight-list'
+				url: '/bundle/pages/ticket/flight-list'
 			})
 		},
 		

@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { orderDetail, cancelOrder } from '../../api/hotel.js'
+import { orderDetail, cancelOrder } from '../../../api/hotel.js'
 import config from '@/config/app.js'
 
 export default {
@@ -194,13 +194,13 @@ export default {
     applyInvoice() {
       // 跳转到申请开票页面
       uni.navigateTo({
-        url: `/pages/hotel/invoice-apply?order_id=${this.order.id}&order_sn=${this.order.order_sn || ''}`
+        url: `/bundle/pages/hotel/invoice-apply?order_id=${this.order.id}&order_sn=${this.order.order_sn || ''}`
       })
     },
     goReview() {
       // 跳转到评价页面
       uni.navigateTo({
-        url: `/pages/hotel/review?order_id=${this.order.id}`
+        url: `/bundle/pages/hotel/review?order_id=${this.order.id}`
       })
     }
   }

@@ -43,13 +43,13 @@
 			this.from = options.from || 'order'; // 默认为普通订单
 			// 根据订单来源设置查看订单的跳转地址
 			if (this.from === 'hotel') {
-				this.orderUrl = '/pages/hotel/order-list?status=1';
+				this.orderUrl = '/bundle/pages/hotel/order-list?status=1';
 			} else if (this.from === 'flight') {
 				// 飞机票订单跳转到统一订单列表页面
-				this.orderUrl = '/pages/hotel/order-list?order_type=flight&status=1';
+				this.orderUrl = '/bundle/pages/hotel/order-list?order_type=flight&status=1';
 			} else if (this.from === 'train') {
 				// 火车票订单跳转到统一订单列表页面
-				this.orderUrl = '/pages/hotel/order-list?order_type=train&status=1';
+				this.orderUrl = '/bundle/pages/hotel/order-list?order_type=train&status=1';
 			}
 			this.getOrderResultFun();
 		},

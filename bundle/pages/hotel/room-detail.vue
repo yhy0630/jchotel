@@ -183,7 +183,7 @@ export default {
     },
     bookRoom() {
       uni.navigateTo({
-        url: `/pages/hotel/order-create?hotelCode=${this.hotelCode}&roomCode=${this.roomCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
+        url: `/bundle/pages/hotel/order-create?hotelCode=${this.hotelCode}&roomCode=${this.roomCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
       })
     }
   }
