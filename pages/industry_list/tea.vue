@@ -64,13 +64,12 @@
 </template>
 
 <script>
+import config from '@/config/app.js'
+
 export default {
   data() {
     return {
       currentTab: 'tea',
-      checkedIcon: '/static/images/编组 4.png',
-      uncheckedIcon: '/static/images/椭圆形备份@3x.png',
-      thumbIcon: '/static/images/位图.png',
       items: [
         { id: 1, title: '云南普洱高端茶叶', desc: '海浪8美包2个', price: 35.8, count: 1, checked: true },
         { id: 2, title: '云南普洱高端茶叶', desc: '25L', price: 35.8, count: 1, checked: false },
@@ -92,6 +91,15 @@ export default {
     allChecked() {
       return this.items.length > 0 && this.items.every(i => i.checked)
     },
+    checkedIcon() {
+      return config.baseURL + '/uploads/images/images/编组 4.png'
+    },
+    uncheckedIcon() {
+      return config.baseURL + '/uploads/images/images/椭圆形备份@3x.png'
+    },
+    thumbIcon() {
+      return config.baseURL + '/uploads/images/images/位图.png'
+    }
   },
   methods: {
     switchTab(key) {

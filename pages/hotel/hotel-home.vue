@@ -42,7 +42,7 @@
           class="hotel-item"
           @click="goHotelDetail(item)"
         >
-          <image :src="item.image || '/static/images/Rectangle 30184.png'" mode="aspectFill" class="hotel-image"></image>
+          <image :src="item.image" mode="aspectFill" class="hotel-image"></image>
           <view class="hotel-info">
             <view class="hotel-name">{{ item.hotelName }}</view>
             <view class="hotel-rating">
@@ -70,13 +70,14 @@
 
 <script>
 import { hotelList } from '@/api/hotel.js'
+import config from '@/config/app.js'
 
 export default {
   data() {
     return {
       // 轮播图
       bannerList: [
-        { image: '/static/images/酒店.png' }
+        { image: config.baseURL + '/uploads/images/images/酒店.png' }
       ],
       
       // 房型选项卡

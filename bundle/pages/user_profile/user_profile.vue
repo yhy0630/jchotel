@@ -1,5 +1,6 @@
 <template>
 	<view class="user-profile-container mt10">
+		<custom-navbar title="基本信息"></custom-navbar>
 		<view class="user-profile">
 			<view class="row-info row bdb-line">
 				<view class="label md">头像</view>
@@ -572,6 +573,7 @@
 		background-color: #0D1038;
 		min-height: 100vh;
 		padding-top: 10px;
+		padding-top: calc(130rpx + var(--status-bar-height));
 		
 		.user-profile {
 			background-color: #1F2034;

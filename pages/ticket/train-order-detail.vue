@@ -3,7 +3,7 @@
     <!-- #ifndef H5 -->
     <u-sticky offset-top="0" h5-nav-height="0" bg-color="transparent">
       <u-navbar :is-back="true" :is-fixed="false" :border-bottom="false" 
-        :background="{ backgroundImage: 'url(/static/images/导航栏.png)', backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat' }"
+        :background="navbarBackground"
         back-icon-color="#ffffff"></u-navbar>
     </u-sticky>
     <!-- #endif -->
@@ -92,13 +92,24 @@
 
 <script>
 import { getOrderDetail } from '@/api/order.js'
+import config from '@/config/app.js'
 
 export default {
   data() {
     return {
+      config: config,
       orderId: 0,
       orderSn: '',
       order: {}
+    }
+  },
+  computed: {
+    navbarBackground() {
+      return {
+        backgroundImage: `url(${this.config.baseURL}/uploads/images/images/导航栏.png)`,
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat'
+      }
     }
   },
   onLoad(options) {

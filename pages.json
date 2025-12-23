@@ -734,7 +734,7 @@
 				"style": {
 					"navigationBarTitleText": "忘记支付密码"
 				}
-			}
+			},
 			// {
 			// 	"path": "pages/store_list/store_list",
 			// 	"style": {
@@ -758,13 +758,14 @@
 			// 		"navigationBarTitleText": "商城直播",
 			// 		"enablePullDownRefresh": true
 			// 	}
-			// }, {
-			// 	"path": "pages/license/license",
-			// 	"style": {
-			// 		"navigationBarTitleText": "资质信息",
-			// 		"enablePullDownRefresh": true
-			// 	}
-			// }
+			// }, 
+			{
+				"path": "pages/license/license",
+				"style": {
+					"navigationBarTitleText": "资质信息",
+					"enablePullDownRefresh": true
+				}
+			}
 		]
 	}],
 	"tabBar": {

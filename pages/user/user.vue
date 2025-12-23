@@ -661,7 +661,7 @@
 			const {
 				center_setting
 			} = this.appConfig
-			const bgImage = center_setting?.top_bg_image || '/static/images/蒙版.png'
+			const bgImage = center_setting?.top_bg_image 
 			return {
 				'background-image': `url(${bgImage})`,
 				'background-size': '100% 420rpx',

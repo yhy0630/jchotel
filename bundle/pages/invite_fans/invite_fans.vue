@@ -1,5 +1,6 @@
 <template>
 	<view class="pages">
+		<custom-navbar title="平台分享"></custom-navbar>
 		<view class="invite-fans column column-center">
 			<image :src="path" mode="widthFix" class="poster"></image>
 			<invite-poster v-if="showPoster" :config="{
@@ -130,6 +131,7 @@
 	.invite-fans {
 		min-height: 100vh;
 		overflow: hidden;
+		padding-top: calc(130rpx + var(--status-bar-height));
 
 		.poster {
 			width: 600rpx;

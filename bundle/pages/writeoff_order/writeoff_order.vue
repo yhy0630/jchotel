@@ -1,5 +1,6 @@
 <template>
 	<view class="writeoff-order">
+		<custom-navbar title="申请提现"></custom-navbar>
 		<u-tabs :list="order" :active-color="primaryColor" inactive-color="#333" :is-scroll="false" :current="current"
 			@change="changeCurrent"></u-tabs>
 		<view class="list">
@@ -143,6 +144,7 @@
 <style lang="scss">
 	.writeoff-order {
 		padding-bottom: 120rpx;
+		padding-top: calc(130rpx + var(--status-bar-height));
 		.list {
 			padding: 20rpx;
 			.item {

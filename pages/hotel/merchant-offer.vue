@@ -90,7 +90,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
-  padding-top: calc(88rpx + var(--status-bar-height));
+  padding-top: calc(130rpx + var(--status-bar-height));
   padding-bottom: 120rpx;
 }
 

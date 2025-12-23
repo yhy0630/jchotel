@@ -1,8 +1,9 @@
 <template>
   <view class="page">
+    <custom-navbar title="查询房源"></custom-navbar>
     <!-- 顶部大图 -->
     <view class="header-image">
-      <image src="/static/images/酒店.png" mode="aspectFill" class="banner" />
+      <image :src="config.baseURL + '/uploads/images/images/酒店.png'" mode="aspectFill" class="banner" />
     </view>
 
     <!-- 筛选栏 -->
@@ -66,10 +67,12 @@
 
 <script>
 import { hotelList } from '@/api/hotel.js'
+import config from '@/config/app.js'
 
 export default {
   data() {
     return {
+      config: config,
       activeTab: 'premium', // 当前选中的选项卡: premium-尊享房, custom-定制房
       cityCode: '',
       cityName: '北京',
@@ -179,6 +182,8 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1034;
+  padding-top: calc(130rpx + var(--status-bar-height));
+
 }
 
 .header-image {

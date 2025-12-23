@@ -13,10 +13,10 @@
         circular
       >
         <swiper-item v-if="activeTab === 'flight'">
-          <image src="/static/images/飞机.png" mode="aspectFill" class="banner-image" />
+          <image :src="config.baseURL + '/uploads/images/images/飞机.png'" mode="aspectFill" class="banner-image" />
         </swiper-item>
         <swiper-item v-if="activeTab === 'train'">
-          <image src="/static/images/火车.png" mode="aspectFill" class="banner-image" />
+          <image :src="config.baseURL + '/uploads/images/images/火车.png'" mode="aspectFill" class="banner-image" />
         </swiper-item>
       </swiper>
     </view>
@@ -151,10 +151,12 @@
 <script>
 import { cityList } from '@/api/flight.js'
 import { stationList } from '@/api/train.js'
+import config from '@/config/app.js'
 
 export default {
   data() {
     return {
+      config: config,
       activeTab: 'flight', // flight-飞机票, train-火车票
       tripType: 'OW', // OW-单程, RT-往返
       

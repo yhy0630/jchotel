@@ -3,7 +3,7 @@
     <!-- 加油站信息 -->
     <view class="info-section">
       <view class="header-part">
-        <image class="station-logo" src="/static/images/加油.png" mode="aspectFill"></image>
+        <image class="station-logo" :src="config.baseURL + '/uploads/images/images/加油.png'" mode="aspectFill"></image>
         <view class="header-info">
           <text class="station-name">燕北加油站</text>
           <view class="header-tags">
@@ -65,9 +65,12 @@
 </template>
 
 <script>
+import config from '@/config/app.js'
+
 export default {
   data() {
     return {
+      config: config,
       selectedGun: '1',
       gunList: ['1', '2', '5', '6', '9', '10', '13', '14']
     }
