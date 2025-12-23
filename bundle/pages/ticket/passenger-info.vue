@@ -394,7 +394,7 @@ export default {
         .join('&')
       
       uni.navigateTo({
-        url: `/pages/ticket/order-confirm?${queryString}`,
+        url: `/bundle/pages/ticket/order-confirm?${queryString}`,
         fail: (err) => {
           console.error('跳转失败:', err)
           uni.showToast({ title: '页面跳转失败，请重试', icon: 'none' })

@@ -324,14 +324,14 @@ export default {
     // 选择城市（飞机票）
     async selectCity(type) {
       uni.navigateTo({
-        url: `/pages/ticket/city-select?type=${type}&ticket_type=flight`
+        url: `/bundle/pages/ticket/city-select?type=${type}&ticket_type=flight`
       })
     },
     
     // 选择车站（火车票）
     async selectStation(type) {
       uni.navigateTo({
-        url: `/pages/ticket/station-select?type=${type}&ticket_type=train`
+        url: `/bundle/pages/ticket/station-select?type=${type}&ticket_type=train`
       })
     },
     
@@ -349,7 +349,7 @@ export default {
       
       // 跳转到日期选择页面
       uni.navigateTo({
-        url: `/pages/ticket/date-picker?current=${currentDate || this.formatDate(new Date())}&type=${type}&activeTab=${this.activeTab}`
+        url: `/bundle/pages/ticket/date-picker?current=${currentDate || this.formatDate(new Date())}&type=${type}&activeTab=${this.activeTab}`
       })
     },
     
@@ -387,7 +387,7 @@ export default {
       }
       
       uni.navigateTo({
-        url: `/pages/ticket/flight-list?${this.buildFlightQuery()}`
+        url: `/bundle/pages/ticket/flight-list?${this.buildFlightQuery()}`
       })
     },
     
@@ -419,7 +419,7 @@ export default {
       }
       
       uni.navigateTo({
-        url: `/pages/ticket/train-list?${this.buildTrainQuery()}`
+        url: `/bundle/pages/ticket/train-list?${this.buildTrainQuery()}`
       })
     },
     

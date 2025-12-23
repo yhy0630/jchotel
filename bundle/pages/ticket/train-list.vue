@@ -758,10 +758,10 @@ export default {
         .map(key => `${key}=${encodeURIComponent(String(params[key]))}`)
         .join('&')
       
-      console.log('跳转到详情页:', `/pages/ticket/train-detail?${queryString}`)
+      console.log('跳转到详情页:', `/bundle/pages/ticket/train-detail?${queryString}`)
       
       uni.navigateTo({
-        url: `/pages/ticket/train-detail?${queryString}`,
+        url: `/bundle/pages/ticket/train-detail?${queryString}`,
         fail: (err) => {
           console.error('跳转失败:', err)
           uni.showToast({ title: '跳转失败，请重试', icon: 'none' })

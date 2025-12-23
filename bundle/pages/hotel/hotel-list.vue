@@ -106,7 +106,7 @@ export default {
     },
     goToCustomForm() {
       uni.navigateTo({
-        url: '/pages/hotel/custom-form'
+        url: '/bundle/pages/hotel/custom-form'
       })
     },
     formatDate(date) {
@@ -155,7 +155,7 @@ export default {
       }
     },
     selectCity() {
-      uni.navigateTo({ url: '/pages/hotel/city-select' })
+      uni.navigateTo({ url: '/bundle/pages/hotel/city-select' })
     },
     selectDate() {
       // 日期选择器
@@ -166,12 +166,12 @@ export default {
     },
     goDetail(item) {
       uni.navigateTo({
-        url: `/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}&cityCode=${item.cityCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
+        url: `/bundle/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}&cityCode=${item.cityCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
       })
     },
     goSearch() {
       uni.navigateTo({
-        url: `/pages/hotel/hotel-search?cityCode=${this.cityCode}&cityName=${this.cityName}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
+        url: `/bundle/pages/hotel/hotel-search?cityCode=${this.cityCode}&cityName=${this.cityName}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
       })
     }
   }

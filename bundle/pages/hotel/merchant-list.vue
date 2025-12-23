@@ -97,7 +97,7 @@ export default {
     },
     goOffer(item) {
       uni.navigateTo({
-        url: `/pages/hotel/merchant-offer?request_id=${item.id}`
+        url: `/bundle/pages/hotel/merchant-offer?request_id=${item.id}`
       })
     },
     getStatusText(status) {

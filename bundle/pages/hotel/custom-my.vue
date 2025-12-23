@@ -80,7 +80,7 @@ export default {
     },
     goDetail(item) {
       uni.navigateTo({
-        url: `/pages/hotel/custom-detail?request_id=${item.id}`
+        url: `/bundle/pages/hotel/custom-detail?request_id=${item.id}`
       })
     }
   }

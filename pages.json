@@ -264,189 +264,6 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
-		},
-		{
-			"path": "pages/hotel/hotel-list",
-			"style": {
-				"navigationBarTitleText": "酒店列表"
-			}
-		},
-		{
-			"path": "pages/hotel/hotel-detail",
-			"style": {
-				"navigationBarTitleText": "酒店详情"
-			}
-		},
-		{
-			"path": "pages/hotel/hotel-home",
-			"style": {
-				"navigationBarTitleText": "酒店/民宿"
-			}
-		},
-		{
-			"path": "pages/hotel/custom-form",
-			"style": {
-				"navigationBarTitleText": "发布定制需求"
-			}
-		},
-		{
-			"path": "pages/hotel/custom-my",
-			"style": {
-				"navigationBarTitleText": "我的发布"
-			}
-		},
-		{
-			"path": "pages/hotel/custom-detail",
-			"style": {
-				"navigationBarTitleText": "需求详情"
-			}
-		},
-		{
-			"path": "pages/hotel/custom-publish-success",
-			"style": {
-				"navigationBarTitleText": "发布成功"
-			}
-		},
-		{
-			"path": "pages/hotel/merchant-list",
-			"style": {
-				"navigationBarTitleText": "接单管理"
-			}
-		},
-		{
-			"path": "pages/hotel/merchant-offer",
-			"style": {
-				"navigationBarTitleText": "商家出价"
-			}
-		},
-		{
-			"path": "pages/hotel/merchant-offer-success",
-			"style": {
-				"navigationBarTitleText": "出价成功"
-			}
-		},
-		{
-			"path": "pages/hotel/order-list",
-			"style": {
-				"navigationStyle": "custom" 
-			}
-		},
-		{
-			"path": "pages/hotel/order-detail",
-			"style": {
-				"navigationBarTitleText": "订单详情",
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/hotel/city-select",
-			"style": {
-				"navigationBarTitleText": "选择城市"
-			}
-		},
-		{
-			"path": "pages/hotel/order-create",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
-		},
-		{
-			"path": "pages/hotel/room-detail",
-			"style": {
-				"navigationBarTitleText": "房间详情"
-			}
-		},
-		{
-			"path": "pages/hotel/premium-room",
-			"style": {
-				"navigationBarTitleText": "尊享房"
-			}
-		},
-		{
-			"path": "pages/ticket/search",
-			"style": {
-				"navigationBarTitleText": "机票/火车票"
-			}
-		},
-		{
-			"path": "pages/ticket/flight-list",
-			"style": {
-				"navigationBarTitleText": "航班列表"
-			}
-		},
-		{
-			"path": "pages/ticket/flight-detail",
-			"style": {
-				"navigationBarTitleText": "航班详情"
-			}
-		},
-		{
-			"path": "pages/ticket/train-list",
-			"style": {
-				"navigationBarTitleText": "车次列表"
-			}
-		},
-		{
-			"path": "pages/ticket/train-detail",
-			"style": {
-				"navigationBarTitleText": "车次详情"
-			}
-		},
-        {
-            "path": "pages/ticket/train-passenger",
-            "style": {
-                "navigationBarTitleText": "填写乘客信息(火车票)"
-            }
-        },
-        {
-            "path": "pages/ticket/train-order-confirm",
-            "style": {
-                "navigationBarTitleText": "确认订单(火车票)"
-            }
-        },
-        {
-            "path": "pages/ticket/train-order-detail",
-            "style": {
-                "navigationBarTitleText": "订单详情(火车票)",
-                "navigationStyle": "custom"
-            }
-        },
-        {
-            "path": "pages/ticket/flight-order-detail",
-            "style": {
-                "navigationBarTitleText": "订单详情(飞机票)"
-            }
-        },
-		{
-			"path": "pages/ticket/city-select",
-			"style": {
-				"navigationBarTitleText": "选择城市"
-			}
-		},
-		{
-			"path": "pages/ticket/station-select",
-			"style": {
-				"navigationBarTitleText": "选择车站"
-			}
-		},
-		{
-			"path": "pages/ticket/date-picker",
-			"style": {
-				"navigationBarTitleText": "选择日期",
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/ticket/passenger-info",
-			"style": {
-				"navigationBarTitleText": "填写乘客信息"
-			}
-		},
-		{
-			"path": "pages/ticket/order-confirm",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
 		}
 		// {
 		// 	"path": "components/uview-ui/components/u-avatar-cropper/u-avatar-cropper",
@@ -765,6 +582,189 @@
 					"navigationBarTitleText": "资质信息",
 					"enablePullDownRefresh": true
 				}
+			},
+			{
+				"path": "pages/hotel/hotel-list",
+				"style": {
+					"navigationBarTitleText": "酒店列表"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-detail",
+				"style": {
+					"navigationBarTitleText": "酒店详情"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-home",
+				"style": {
+					"navigationBarTitleText": "酒店/民宿"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-form",
+				"style": {
+					"navigationBarTitleText": "发布定制需求"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-my",
+				"style": {
+					"navigationBarTitleText": "我的发布"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-detail",
+				"style": {
+					"navigationBarTitleText": "需求详情"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-publish-success",
+				"style": {
+					"navigationBarTitleText": "发布成功"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-list",
+				"style": {
+					"navigationBarTitleText": "接单管理"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-offer",
+				"style": {
+					"navigationBarTitleText": "商家出价"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-offer-success",
+				"style": {
+					"navigationBarTitleText": "出价成功"
+				}
+			},
+			{
+				"path": "pages/hotel/order-list",
+				"style": {
+					"navigationStyle": "custom" 
+				}
+			},
+			{
+				"path": "pages/hotel/order-detail",
+				"style": {
+					"navigationBarTitleText": "订单详情",
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/hotel/city-select",
+				"style": {
+					"navigationBarTitleText": "选择城市"
+				}
+			},
+			{
+				"path": "pages/hotel/order-create",
+				"style": {
+					"navigationBarTitleText": "确认订单"
+				}
+			},
+			{
+				"path": "pages/hotel/room-detail",
+				"style": {
+					"navigationBarTitleText": "房间详情"
+				}
+			},
+			{
+				"path": "pages/hotel/premium-room",
+				"style": {
+					"navigationBarTitleText": "尊享房"
+				}
+			},
+			{
+				"path": "pages/ticket/search",
+				"style": {
+					"navigationBarTitleText": "机票/火车票"
+				}
+			},
+			{
+				"path": "pages/ticket/flight-list",
+				"style": {
+					"navigationBarTitleText": "航班列表"
+				}
+			},
+			{
+				"path": "pages/ticket/flight-detail",
+				"style": {
+					"navigationBarTitleText": "航班详情"
+				}
+			},
+			{
+				"path": "pages/ticket/train-list",
+				"style": {
+					"navigationBarTitleText": "车次列表"
+				}
+			},
+			{
+				"path": "pages/ticket/train-detail",
+				"style": {
+					"navigationBarTitleText": "车次详情"
+				}
+			},
+	        {
+	            "path": "pages/ticket/train-passenger",
+	            "style": {
+	                "navigationBarTitleText": "填写乘客信息(火车票)"
+	            }
+	        },
+	        {
+	            "path": "pages/ticket/train-order-confirm",
+	            "style": {
+	                "navigationBarTitleText": "确认订单(火车票)"
+	            }
+	        },
+	        {
+	            "path": "pages/ticket/train-order-detail",
+	            "style": {
+	                "navigationBarTitleText": "订单详情(火车票)",
+	                "navigationStyle": "custom"
+	            }
+	        },
+	        {
+	            "path": "pages/ticket/flight-order-detail",
+	            "style": {
+	                "navigationBarTitleText": "订单详情(飞机票)"
+	            }
+	        },
+			{
+				"path": "pages/ticket/city-select",
+				"style": {
+					"navigationBarTitleText": "选择城市"
+				}
+			},
+			{
+				"path": "pages/ticket/station-select",
+				"style": {
+					"navigationBarTitleText": "选择车站"
+				}
+			},
+			{
+				"path": "pages/ticket/date-picker",
+				"style": {
+					"navigationBarTitleText": "选择日期",
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/ticket/passenger-info",
+				"style": {
+					"navigationBarTitleText": "填写乘客信息"
+				}
+			},
+			{
+				"path": "pages/ticket/order-confirm",
+				"style": {
+					"navigationBarTitleText": "确认订单"
+				}
 			}
 		]
 	}],
@@ -819,3 +819,4 @@
 		}
 	}
 }
+

@@ -402,14 +402,14 @@ export default {
       const orderType = item._orderType || this.orderType
       
       const detailPages = {
-        'flight': '/pages/ticket/flight-order-detail',
-        'train': '/pages/ticket/train-order-detail',
+        'flight': '/bundle/pages/ticket/flight-order-detail',
+        'train': '/bundle/pages/ticket/train-order-detail',
         'car_rental': '/pages/car/order-detail',
         'taxi': '/pages/taxi/order-detail',
-        'hotel': '/pages/hotel/order-detail'
+        'hotel': '/bundle/pages/hotel/order-detail'
       }
       
-      const detailPage = detailPages[orderType] || '/pages/hotel/order-detail'
+      const detailPage = detailPages[orderType] || '/bundle/pages/hotel/order-detail'
       
       // 根据订单类型传递不同的参数
       let url = `${detailPage}?order_id=${item.id}`
@@ -467,7 +467,7 @@ export default {
     applyInvoice(item) {
       // 跳转到申请开票页面，传递订单信息
       uni.navigateTo({
-        url: `/pages/hotel/invoice-apply?order_id=${item.id}&order_sn=${item.order_sn || ''}`
+        url: `/bundle/pages/hotel/invoice-apply?order_id=${item.id}&order_sn=${item.order_sn || ''}`
       })
     },
     getOrderIcon(item) {

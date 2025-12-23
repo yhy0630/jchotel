@@ -73,7 +73,7 @@ export default {
         })
         if (res.code === 1) {
           uni.redirectTo({ 
-            url: '/pages/hotel/merchant-offer-success' 
+            url: '/bundle/pages/hotel/merchant-offer-success' 
           })
         } else {
           uni.showToast({ title: res.msg || '出价失败', icon: 'none' })

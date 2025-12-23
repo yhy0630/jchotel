@@ -220,7 +220,7 @@ export default {
         .map(k => `${k}=${encodeURIComponent(params[k] ?? '')}`)
         .join('&')
       uni.navigateTo({
-        url: `/pages/ticket/train-order-confirm?${qs}`,
+        url: `/bundle/pages/ticket/train-order-confirm?${qs}`,
         fail: err => {
           console.error('跳转失败', err)
           uni.showToast({ title: '跳转失败，请重试', icon: 'none' })

@@ -132,13 +132,13 @@ export default {
       // 点击尊享房的箭头，跳转到尊享房页面
       if (index === 0) {
         uni.navigateTo({
-          url: '/pages/hotel/premium-room?tab=0'
+          url: '/bundle/pages/hotel/premium-room?tab=0'
         })
       }
       // 点击定制房的箭头，跳转到定制房页面并自动切换到定制房选项卡
       else if (index === 1) {
         uni.navigateTo({
-          url: '/pages/hotel/premium-room?tab=1'
+          url: '/bundle/pages/hotel/premium-room?tab=1'
         })
       }
     },
@@ -244,7 +244,7 @@ export default {
     // 跳转到酒店详情
     goHotelDetail(item) {
       uni.navigateTo({
-        url: `/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}`
+        url: `/bundle/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}`
       })
     }
   }

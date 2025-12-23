@@ -240,12 +240,12 @@ export default {
     goRoomDetail(room) {
       const roomInfo = encodeURIComponent(JSON.stringify(room))
       uni.navigateTo({
-        url: `/pages/hotel/room-detail?hotelCode=${this.hotelCode}&roomCode=${room.roomCode}&cityCode=${this.cityCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}&roomInfo=${roomInfo}`
+        url: `/bundle/pages/hotel/room-detail?hotelCode=${this.hotelCode}&roomCode=${room.roomCode}&cityCode=${this.cityCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}&roomInfo=${roomInfo}`
       })
     },
     bookRoom(roomCode) {
       uni.navigateTo({
-        url: `/pages/hotel/order-create?hotelCode=${this.hotelCode}&roomCode=${roomCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}&adultCount=${this.adultCount}&childCount=${this.childCount}`
+        url: `/bundle/pages/hotel/order-create?hotelCode=${this.hotelCode}&roomCode=${roomCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}&adultCount=${this.adultCount}&childCount=${this.childCount}`
       })
     },
     loadMore() {

@@ -90,7 +90,7 @@ export default {
   },
   methods: {
     selectCity() {
-      uni.navigateTo({ url: '/pages/hotel/city-select' })
+      uni.navigateTo({ url: '/bundle/pages/hotel/city-select' })
     },
     onCheckInChange(e) {
       this.form.check_in_date = e.detail.value
@@ -122,7 +122,7 @@ export default {
         if (res.code === 1) {
           // 跳转到发布成功页面
           uni.redirectTo({
-            url: `/pages/hotel/custom-publish-success?request_id=${res.data.request_id || res.data.id || ''}`
+            url: `/bundle/pages/hotel/custom-publish-success?request_id=${res.data.request_id || res.data.id || ''}`
           })
         }
       } catch (e) {

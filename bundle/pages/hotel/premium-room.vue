@@ -233,7 +233,7 @@ export default {
     
     selectCity() {
       uni.navigateTo({
-        url: '/pages/hotel/city-select'
+        url: '/bundle/pages/hotel/city-select'
       })
     },
     
@@ -255,7 +255,7 @@ export default {
     
     searchHotels() {
       uni.navigateTo({
-        url: `/pages/hotel/hotel-list?city_code=${this.cityCode}&city_name=${encodeURIComponent(this.cityName)}&room_type=${this.currentTab === 0 ? '2' : '1'}`
+        url: `/bundle/pages/hotel/hotel-list?city_code=${this.cityCode}&city_name=${encodeURIComponent(this.cityName)}&room_type=${this.currentTab === 0 ? '2' : '1'}`
       })
     },
     
@@ -295,7 +295,7 @@ export default {
     
     goHotelDetail(item) {
       uni.navigateTo({
-        url: `/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}&cityCode=${this.cityCode}`
+        url: `/bundle/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}&cityCode=${this.cityCode}`
       })
     },
     
@@ -306,7 +306,7 @@ export default {
     },
 
     selectCustomCity() {
-      uni.navigateTo({ url: '/pages/hotel/city-select' })
+      uni.navigateTo({ url: '/bundle/pages/hotel/city-select' })
     },
 
     onCheckInChange(e) {
@@ -343,7 +343,7 @@ export default {
         const res = await customPublish(this.customForm)
         if (res.code === 1) {
           uni.redirectTo({
-            url: `/pages/hotel/custom-publish-success?request_id=${res.data.request_id || res.data.id || ''}`
+            url: `/bundle/pages/hotel/custom-publish-success?request_id=${res.data.request_id || res.data.id || ''}`
           })
         }
       } catch (e) {
