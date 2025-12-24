@@ -13,15 +13,10 @@
 					<view class="white" v-if="isLogin">
 						<view class="name-row">
 							<view class="name xxl line1">{{userInfo.nickname}}</view>
-							<view class="identity-chip" v-if="currentIdentityLabel">{{ currentIdentityLabel }}</view>
+							<view class="identity-chip" v-if="userInfo.member_category_name">{{ userInfo.member_category_name }}</view>
 						</view>
-						<!-- <view class="user-id row-between" v-if="userInfo.sn">
-							<view class="xs white ml20 mr20">会员ID: {{userInfo.sn || ''}}</view>
-							<view class="xs normal copy-btn row-center ml5" @tap.stop="onCopy">复制</view>
-						</view> -->
 						<view class="member-identity-pills" v-if="isLogin">
-							<!-- <view class="identity-pill">会员类别</view> -->
-							<view class="identity-pill">会员等级</view>
+							<view class="identity-pill" v-if="userInfo.member_grade_name">{{ userInfo.member_grade_name }}</view>
 						</view>
 					</view>
 					<view class="white" v-else @tap="goLogin">
@@ -201,22 +196,27 @@
 				<text class="menu-text">邀请好友</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" v-if="isMerchant" @tap="goPage('/pages/hotel/merchant-list')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/custom-my')">
+				<image class="menu-icon" src="/static/images/jiudian-3 1.png"></image>
+				<text class="menu-text">我的发布</text>
+				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
+			</view>
+			<view class="menu-item" v-if="isMerchant" @tap="goPage('/bundle/pages/hotel/merchant-list')">
 				<image class="menu-icon" src="/static/images/Work.png"></image>
 				<text class="menu-text">商家接单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=hotel')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/order-list?order_type=hotel')">
 				<image class="menu-icon" src="/static/images/jiudian-3 1.png"></image>
 				<text class="menu-text">酒店订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=flight')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/order-list?order_type=flight')">
 				<image class="menu-icon" src="/static/images/feiji_line 1.png"></image>
 				<text class="menu-text">机票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
 			</view>
-			<view class="menu-item" @tap="goPage('/pages/hotel/order-list?order_type=train')">
+			<view class="menu-item" @tap="goPage('/bundle/pages/hotel/order-list?order_type=train')">
 				<image class="menu-icon" src="/static/images/huochepiao-2 1.png"></image>
 				<text class="menu-text">车票订单</text>
 				<u-icon name="arrow-right" color="#999" size="28"></u-icon>
@@ -233,26 +233,26 @@
 			</view>
 		</view>
 		<!-- 酒店相关功能 -->
-		<view class="server-nav bg-white">
+		<!-- <view class="server-nav bg-white">
 			<view>
 				<view class="title row-between">
 					<view class="lg">酒店服务</view>
 				</view>
 			</view>
 			<view class="nav row wrap">
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=hotel')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/order-list?order_type=hotel')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">酒店订单</view>
 				</view>
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=flight')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/order-list?order_type=flight')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">飞机票订单</view>
 				</view>
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/order-list?order_type=train')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/order-list?order_type=train')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_hotel_order.png"></image>
 					<view class="sm mt10">火车票订单</view>
 				</view>
-				<view class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/custom-my')" style="width: 25%;">
+				<view class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/custom-my')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_custom_my.png"></image>
 					<view class="sm mt10">我的发布</view>
 				</view>
@@ -264,7 +264,7 @@
 					<image class="nav-icon" src="/static/images/buildings.png"></image>
 					<view class="sm mt10">关于我们</view>
 				</view>
-				<view v-if="isMerchant" class="item column-center mb20" hover-class="none" @tap="goPage('/pages/hotel/merchant-list')" style="width: 25%;">
+				<view v-if="isMerchant" class="item column-center mb20" hover-class="none" @tap="goPage('/bundle/pages/hotel/merchant-list')" style="width: 25%;">
 					<image class="nav-icon" src="/static/images/icon_merchant_order.png"></image>
 					<view class="sm mt10">商家接单</view>
 				</view>
@@ -283,7 +283,7 @@
 					<view class="sm mt10">{{item.name}}</view>
 				</button>
 			</view>
-		</view>
+		</view> -->
         <recommend/>
 	</view>
 </template>
@@ -393,11 +393,26 @@
 		props: {},
 		watch: {
 			'userInfo.member_category_code'(val) {
-				if (val) {
-					this.activeMemberType = val;
-				}
+			if (val) {
+				this.activeMemberType = val;
 			}
 		},
+		'userInfo.member_category_name'(val) {
+			if (val) {
+				// 根据会员类别名称映射到对应的 key
+				const nameToKeyMap = {
+					'商旅会员': 'business_travel',
+					'渠道会员': 'channel',
+					'企业会员': 'enterprise',
+					'商务会员': 'business'
+				};
+				const mappedKey = nameToKeyMap[val];
+				if (mappedKey) {
+					this.activeMemberType = mappedKey;
+				}
+			}
+		}
+	},
 
 		onLoad(options) {
 			setTabbar()
@@ -630,11 +645,11 @@
 						break;
 					case 'flight':
 						// 机票订单
-						uni.navigateTo({ url: '/pages/ticket/search?type=flight' });
+						uni.navigateTo({ url: '/bundle/pages/ticket/search?type=flight' });
 						break;
 					case 'train':
 						// 车票订单
-						uni.navigateTo({ url: '/pages/ticket/search?type=train' });
+						uni.navigateTo({ url: '/bundle/pages/ticket/search?type=train' });
 						break;
 					case 'rental':
 						// 租车订单
@@ -656,7 +671,7 @@
 			const {
 				center_setting
 			} = this.appConfig
-			const bgImage = center_setting?.top_bg_image || '/static/images/蒙版.png'
+			const bgImage = center_setting?.top_bg_image 
 			return {
 				'background-image': `url(${bgImage})`,
 				'background-size': '100% 420rpx',
@@ -681,7 +696,7 @@
 <style lang="scss">
 	.user {
 		background-color: #0D1038;
-		min-height: 210vh;
+		min-height: 100vh;
 		.header {
 			display: flex;
 			flex-direction: column;

@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="行业资讯" :show-back="false"></custom-navbar>
     <!-- 轮播图 -->
     <view class="swiper-wrapper">
       <swiper class="swiper" :indicator-dots="false" :autoplay="true" :interval="3000" :duration="500" :current="currentIndex" @change="onSwiperChange">
@@ -76,6 +77,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1038;
+  padding-top: calc(88rpx + var(--status-bar-height));
 }
 
 .swiper-wrapper {

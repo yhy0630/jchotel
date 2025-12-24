@@ -1,6 +1,6 @@
 {
     "name" : "LikeShop",
-    "appid" : "__UNI__6E0F3B6",
+    "appid" : "__UNI__354489B",
     "description" : "",
     "versionName" : "2.8.6",
     "versionCode" : 100,
@@ -148,8 +148,10 @@
     "mp-weixin" : {
         "appid" : "wx49d52db5a04eacf9",
         "setting" : {
-            "urlCheck" : false,
-            "es6" : true
+            "urlCheck" : true,
+            "es6" : true,
+            "postcss" : false,
+            "minified" : true
         },
         "usingComponents" : true,
         "optimization" : {

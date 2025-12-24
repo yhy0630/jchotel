@@ -36,12 +36,11 @@
 </template>
 
 <script>
+import config from '@/config/app.js'
+
 export default {
   data() {
     return {
-      checkedIcon: '/static/images/编组 4.png',
-      uncheckedIcon: '/static/images/椭圆形备份@3x.png',
-      thumbIcon: '/static/images/company.png',
       items: [
         { id: 1, title: '工商信息', desc: '介绍占位', price: 0.15, checked: true },
         { id: 2, title: '工商信息', desc: '介绍占位', price: 0.15, checked: true },
@@ -61,6 +60,15 @@ export default {
     },
     allChecked() {
       return this.items.length > 0 && this.items.every(i => i.checked)
+    },
+    checkedIcon() {
+      return config.baseURL + '/uploads/images/images/编组 4.png'
+    },
+    uncheckedIcon() {
+      return config.baseURL + '/uploads/images/images/椭圆形备份@3x.png'
+    },
+    thumbIcon() {
+      return config.baseURL + '/uploads/images/images/company.png'
     }
   },
   methods: {

@@ -67,6 +67,15 @@ service.interceptors.request.use(
 service.interceptors.response.use(
 	async (response) => {
 			if (response.data) {
+				if (typeof response.data === 'string') {
+					uni.showToast({
+						title: '服务器返回数据格式错误',
+						icon: 'none',
+						duration: 2000
+					})
+					return Promise.reject(new Error('服务器返回数据格式错误'))
+				}
+				
 				const {
 					code,
 					show,
@@ -102,9 +111,22 @@ service.interceptors.response.use(
 			return Promise.resolve(response.data)
 		},
 		error => {
-			// tryHideFullScreenLoading()
 			console.log(error)
-			console.log('err' + error) // for debug
+			console.log('err' + error)
+			
+			let errorMsg = '网络请求失败'
+			if (error.message) {
+				errorMsg = error.message
+			} else if (error.errMsg) {
+				errorMsg = error.errMsg
+			}
+			
+			uni.showToast({
+				title: errorMsg,
+				icon: 'none',
+				duration: 2000
+			})
+			
 			return Promise.reject(error)
 		}
 )

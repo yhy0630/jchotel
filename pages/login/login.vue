@@ -2,25 +2,28 @@
     <view class="login">
         <!-- #ifdef MP-WEIXIN -->
         <view class="mpwx-login column-center">
-            <view class="avatar">
+            <!-- <view class="avatar">
                 <open-data type="userAvatarUrl"></open-data>
             </view>
             <view class="user-name mt20">
                 <open-data type="userNickName"></open-data>
             </view>
-            <view class="title xxl mt20 bold">微信授权登录</view>
+            <view class="title xxl mt20 bold">微信授权登录</view> -->
+            <view class="title">
+                <text>锦程汇</text>
+            </view>
             <button
                 size="lg"
                 class="white br60 row-center btn"
                 @click="mnpLoginFun"
             >
-                <image
+                <!-- <image
                     class="mr10 image"
                     src="/static/images/icon_wechat.png"
-                ></image>
-                <text>微信一键授权</text>
+                ></image> -->
+                <text style="color: #380C00;">微信一键授权</text>
             </button>
-            <view class="muted mt20">微信授权登录后才可进行更多操作哦</view>
+            <view class="muted mt20">点击登录即表示同意《用户协议》和《隐私政策》</view>
         </view>
 
         <mplogin-popup
@@ -306,19 +309,10 @@ export default {
                     code: inviteCode,
                 });
             }
-            // #ifdef H5
-            location.replace("/mobile" + (Cache.get(BACK_URL) || "/"));
-            Cache.remove(BACK_URL);
-            //#endif
-            // #ifndef H5
-            uni.navigateBack({
-                success() {
-                    // 刷新上一页
-                    const { onLoad, options } = currentPage();
-                    onLoad && onLoad(options);
-                },
+            // 登录成功后跳转到首页
+            uni.switchTab({
+                url: '/pages/index/index'
             });
-            //#endif
         },
         changeLoginType() {
             if (this.loginType == loginType.ACCOUNT_LOGIN) {
@@ -392,13 +386,18 @@ export default {
 </script>
 <style lang="scss">
 page {
-    background-color: #fff;
+    background-color: #0D1034;
 
     .login {
         height: 100vh;
 
         .mpwx-login {
             height: 100%;
+
+            .title{
+                font-size: 50rpx;
+                color: #FFF;
+            }
 
             .avatar {
                 display: inline-block;
@@ -417,7 +416,7 @@ page {
             }
 
             .btn {
-                background-color: #09bb07;
+                background: linear-gradient(90deg, #F3BD63 0%, #FDE3B1 50.5%, #F3BD64 100%);
                 width: 580rpx;
                 margin: 80rpx auto 0;
             }

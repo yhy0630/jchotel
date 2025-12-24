@@ -1,25 +1,29 @@
 <template>
-	<DataListCard
-		v-if="dataListReady"
-		:containerBgColor="'#0D1038'"
-		:headerBgImage="'/static/images/Group 1171275124.png'"
-		:headerTitle="'我的积分'"
-		:mainValue="totalPoints"
-		:mainUnit="'积分'"
-		:listTitle="'积分明细'"
-		:dataList="formattedPointsList"
-		:hasMore="hasMore"
-		:loadMoreText="'已经到底啦~'"
-		:emptyText="'暂无积分记录'"
-		:listBgColor="'#1F2034'"
-		:positiveColor="'#FFE3BB'"
-		:negativeColor="'#FFFFFF'"
-		:valueSuffix="'积分'"
-	/>
+	<view class="page">
+		<custom-navbar title="我的积分"></custom-navbar>
+		<DataListCard
+			v-if="dataListReady"
+			:containerBgColor="'#0D1038'"
+			:headerBgImage="headerBgImage"
+			:headerTitle="'我的积分'"
+			:mainValue="totalPoints"
+			:mainUnit="'积分'"
+			:listTitle="'积分明细'"
+			:dataList="formattedPointsList"
+			:hasMore="hasMore"
+			:loadMoreText="'已经到底啦~'"
+			:emptyText="'暂无积分记录'"
+			:listBgColor="'#1F2034'"
+			:positiveColor="'#FFE3BB'"
+			:negativeColor="'#FFFFFF'"
+			:valueSuffix="'积分'"
+		/>
+	</view>
 </template>
 
 <script>
 import DataListCard from '@/components/DataListCard.vue'
+import config from '@/config/app.js'
 
 export default {
 	components: {
@@ -43,6 +47,9 @@ export default {
 				time: item.create_time,
 				value: item.points
 			}))
+		},
+		headerBgImage() {
+			return config.baseURL + '/uploads/images/images/Group 1171275124.png'
 		}
 	},
 	onLoad() {
@@ -128,3 +135,8 @@ export default {
 	}
 }
 </script>
+<style lang="css">
+	.page{
+		padding-top: calc(130rpx + var(--status-bar-height));
+	}
+</style>

@@ -1,6 +1,7 @@
 <template>
 <!-- pages/user_coupon/user_coupon.wxml -->
 <view class="user-coupon">
+  <custom-navbar title="代金券"></custom-navbar>
     <tabs :active="active" sticky line-width="40" @change="onChange">
         <tab v-for="(item, index) in coupons" :key="index" :title="item.title + '(' + item.num + ')'">
             <my-coupons :type="item.type" @getnum="onChangeNum($event, index)"></my-coupons>
@@ -49,4 +50,7 @@ export default {
 </script>
 <style>
 /* pages/user_coupon/user_coupon.wxss */
+.user-coupon {
+    padding-top: calc(130rpx + var(--status-bar-height));
+}
 </style>

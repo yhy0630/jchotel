@@ -79,6 +79,8 @@
 </template>
 
 <script>
+import config from '@/config/app.js'
+
 export default {
   data() {
     return {
@@ -135,7 +137,7 @@ export default {
       ],
       chargeList: [
         {
-          image: '/static/images/充电图片.png',
+          image: '',
           name: '凤尚维多充电站',
           info: '2分 | 皇冠五星13分钟 对外开放',
           desc: '充电车辆半个小时即免，超出半个小时每小时...',
@@ -144,7 +146,7 @@ export default {
           distance: '2.09km'
         },
         {
-          image: '/static/images/充电图片.png',
+          image: '',
           name: '凤尚维多充电站',
           info: '2分 | 皇冠五星13分钟 对外开放',
           desc: '充电车辆半个小时即免，超出半个小时每小时...',
@@ -153,7 +155,7 @@ export default {
           distance: '2.09km'
         },
         {
-          image: '/static/images/充电图片.png',
+          image: '',
           name: '凤尚维多充电站',
           info: '2分 | 皇冠五星13分钟 对外开放',
           desc: '充电车辆半个小时即免，超出半个小时每小时...',
@@ -162,7 +164,7 @@ export default {
           distance: '2.09km'
         },
         {
-          image: '/static/images/充电图片.png',
+          image: '',
           name: '凤尚维多充电站',
           info: '2分 | 皇冠五星13分钟 对外开放',
           desc: '充电车辆半个小时即免，超出半个小时每小时...',
@@ -174,7 +176,11 @@ export default {
     }
   },
   onLoad() {
-    
+    // 初始化充电站图片
+    const imageUrl = config.baseURL + '/uploads/images/images/充电图片.png'
+    this.chargeList.forEach(item => {
+      item.image = imageUrl
+    })
   },
   methods: {
     switchTab(tab) {
