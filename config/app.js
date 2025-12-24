@@ -16,9 +16,9 @@ const IS_H5 = false
 /** S API BaseURL **/
 const baseURLMap = {
 	// 开发环境
-	development: 'http://shop14.yihaiguantao.com',
+	development: 'https://shop14.yihaiguantao.com',
 	// 生产环境
-	production: IS_H5 ? location.origin : 'http://shop14.yihaiguantao.com',
+	production: IS_H5 ? location.origin : 'https://shop14.yihaiguantao.com',
 }
 
 const baseURL = SWITCH_DEVELOPMENT ? baseURLMap['development'] : baseURLMap[process.env.NODE_ENV]

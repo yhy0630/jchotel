@@ -156,10 +156,10 @@
 							}
 							
 						}
-						.info-footer {.btn {
+						.info-footer .btn {
 							padding: 0 30rpx;
 							background-color: #F95F2F;
-						}}
+						}
 					}
 				}
 			}

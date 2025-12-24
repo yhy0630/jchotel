@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <custom-navbar title="行业资讯" :show-back="false"></custom-navbar>
     <!-- 轮播图 -->
     <view class="swiper-wrapper">
       <swiper class="swiper" :indicator-dots="false" :autoplay="true" :interval="3000" :duration="500" :current="currentIndex" @change="onSwiperChange">
@@ -15,32 +16,32 @@
     <!-- 按钮区域 -->
     <view class="button-container">
       <view class="button-row">
-        <view class="button-item" @click="navigateTo('/pages/industry_list/ai')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/ai')">
           <text class="button-text">AI咨询</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/law')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/law')">
           <text class="button-text">法律援助</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/cheer')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/cheer')">
           <text class="button-text">加油/充电</text>
         </view>
       </view>
       <view class="button-row">
-        <view class="button-item" @click="navigateTo('/pages/industry_list/private')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/private')">
           <text class="button-text">私人秘书</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/agency')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/agency')">
           <text class="button-text">工商代办</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/company')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/company')">
           <text class="button-text">管企业</text>
         </view>
       </view>
       <view class="button-row">
-        <view class="button-item" @click="navigateTo('/pages/industry_list/doctor')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/doctor')">
           <text class="button-text">就医/陪诊</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/tea')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/tea')">
           <text class="button-text">酒水/茶</text>
         </view>
       </view>
@@ -76,6 +77,7 @@ export default {
 .page {
   min-height: 100vh;
   background: #0D1038;
+  padding-top: calc(88rpx + var(--status-bar-height));
 }
 
 .swiper-wrapper {

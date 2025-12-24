@@ -1,6 +1,7 @@
 <template>
 <!--pages/message_center/message_center.wxml-->
 <view class="message-center-container">
+  <custom-navbar title="信息通知"></custom-navbar>
   <navigator v-for="(item, index) in list" :key="index" class="message-item row" hover-class="none" :url="'/bundle/pages/notice/notice?type=' + item.type">
     <image style="width: 76rpx;height: 76rpx;flex: none" :src="item.img"></image>
     <view class="item-info ml20 column">
@@ -49,6 +50,7 @@ export default {
 .message-center-container {
   min-height: 100vh;
   padding: 20rpx;
+  padding-top: calc(130rpx + var(--status-bar-height));
   background-color: #0D1038;
   .message-item {
     padding: 32rpx 0;

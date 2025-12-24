@@ -1,7 +1,7 @@
 {
   "description": "项目配置文件",
   "packOptions": {
-    "ignore": []
+    "ignore": ["analyse-data.json", ".sourcemap/**"]
   },
   "setting": {
     "urlCheck": true,
@@ -24,7 +24,7 @@
     "useMultiFrameRuntime": false,
     "useApiHook": true,
     "babelSetting": {
-      "ignore": [],
+      "ignore": ["analyse-data.json", ".sourcemap/**"],
       "disablePlugins": [],
       "outputPath": ""
     },

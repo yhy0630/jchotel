@@ -10,89 +10,47 @@
 				// "navigationBarTextStyle": "white"
 			}
 		},
-		{
-			"path": "pages/address_edit/address_edit",
-			"style": {
-				"navigationBarTitleText": "收货地址"
-			}
-		},
-		{
-			"path": "pages/user_address/user_address",
-			"style": {
-				"navigationBarTitleText": "收货地址"
-			}
-		},
-		{
-			"path": "pages/news_list/news_list",
-			"style": {
-				"navigationBarTitleText": "商城资讯"
-			}
-		},
-		{
-			"path": "pages/news_details/news_details",
-			"style": {
-				"navigationBarTitleText": "资讯详情"
-			}
-		},
+		// {
+		// 	"path": "pages/address_edit/address_edit",
+		// 	"style": {
+		// 		"navigationBarTitleText": "收货地址"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/user_address/user_address",
+		// 	"style": {
+		// 		"navigationBarTitleText": "收货地址"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/news_list/news_list",
+		// 	"style": {
+		// 		"navigationBarTitleText": "商城资讯"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/news_details/news_details",
+		// 	"style": {
+		// 		"navigationBarTitleText": "资讯详情"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/sort/sort",
+		// 	"style": {
+		// 		"navigationBarTitleText": "分类",
+		// 		"disableScroll": true
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/shop_cart/shop_cart",
+		// 	"style": {
+		// 		"navigationBarTitleText": "购物车"
+		// 	}
+		// },
 		{
 			"path": "pages/industry/industry",
 			"style": {
 				"navigationBarTitleText": "行业资讯"
-			}
-		},
-		{
-			"path": "pages/industry_list/law",
-			"style": {
-				"navigationBarTitleText": "法律援助"
-			}
-		},
-		{
-			"path": "pages/industry_list/cheer",
-			"style": {
-				"navigationBarTitleText": "加油/充电"
-			}
-		},
-		{
-			"path": "pages/industry_list/cheer_detail",
-			"style": {
-				"navigationBarTitleText": "加油"
-			}
-		},
-		{
-			"path": "pages/industry_list/power_detail",
-			"style": {
-				"navigationBarTitleText": "充电站"
-			}
-		},
-		{
-			"path": "pages/industry_list/pile_detail",
-			"style": {
-				"navigationBarTitleText": "充电桩详情"
-			}
-		},
-		{
-			"path": "pages/industry_list/private",
-			"style": {
-				"navigationBarTitleText": "私人秘书"
-			}
-		},
-		{
-			"path": "pages/industry_list/agency",
-			"style": {
-				"navigationBarTitleText": "工商代办"
-			}
-		},
-		{
-			"path": "pages/sort/sort",
-			"style": {
-				"navigationBarTitleText": "分类",
-				"disableScroll": true
-			}
-		},
-		{
-			"path": "pages/shop_cart/shop_cart",
-			"style": {
-				"navigationBarTitleText": "购物车"
 			}
 		},
 		{
@@ -104,81 +62,33 @@
 			}
 
 		},
-		{
-			"path": "pages/user/member-business-travel-apply",
-			"style": {
-				"navigationBarTitleText": "商旅会员入驻"
-			}
-		},
-		{
-			"path": "pages/user/member-channel-apply",
-			"style": {
-				"navigationBarTitleText": "渠道会员入驻"
-			}
-		},
-		{
-			"path": "pages/user/member-enterprise-apply",
-			"style": {
-				"navigationBarTitleText": "企业会员入驻"
-			}
-		},
-		{
-			"path": "pages/user/member-business-apply",
-			"style": {
-				"navigationBarTitleText": "商务会员入驻"
-			}
-		},
-        {
-            "path": "pages/user/member-apply-record",
-            "style": {
-                "navigationBarTitleText": "入驻申请记录"
-            }
-        },
-        {
-            "path": "pages/user/member-apply-detail",
-            "style": {
-                "navigationBarTitleText": "申请详情"
-            }
-        },
-		{
-			"path": "pages/user/member-center",
-			"style": {
-				"navigationBarTitleText": "会员个人中心"
-			}
-		},
-		{
-			"path": "pages/user/member-upgrade",
-			"style": {
-				"navigationBarTitleText": "会员升级"
-			}
-		},
-		{
-			"path": "pages/goods_search/goods_search",
-			"style": {
-				"navigationBarTitleText": "商品搜索"
-			}
-		},
-		{
-			"path": "pages/goods_details/goods_details",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "商品详情"
-			}
+		// {
+		// 	"path": "pages/goods_search/goods_search",
+		// 	"style": {
+		// 		"navigationBarTitleText": "商品搜索"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/goods_details/goods_details",
+		// 	"style": {
+		// 		"navigationStyle": "custom",
+		// 		"navigationBarTitleText": "商品详情"
+		// 	}
 
-		},
-		{
-			"path": "pages/confirm_order/confirm_order",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
+		// },
+		// {
+		// 	"path": "pages/confirm_order/confirm_order",
+		// 	"style": {
+		// 		"navigationBarTitleText": "确认订单"
+		// 	}
 
-		},
-		{
-			"path": "pages/user_collection/user_collection",
-			"style": {
-				"navigationBarTitleText": "我的收藏"
-			}
-		},
+		// },
+		// {
+		// 	"path": "pages/user_collection/user_collection",
+		// 	"style": {
+		// 		"navigationBarTitleText": "我的收藏"
+		// 	}
+		// },
 		{
 			"path": "pages/user_coupon/user_coupon",
 			"style": {
@@ -211,21 +121,22 @@
 				"navigationBarTitleText": "注册账号"
 			}
 		},
-		{
-			"path": "pages/user_order/user_order",
-			"style": {
-				"navigationBarTitleText": "我的订单",
-				"navigationStyle": "custom",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/order_details/order_details",
-			"style": {
-				"navigationBarTitleText": "订单详情",
-				"navigationStyle": "custom"
-			}
-		},
+		// {
+		// 	"path": "pages/user_order/user_order",
+		// 	"style": {
+		// 		"navigationBarTitleText": "我的订单",
+		// 		"navigationStyle": "custom",
+		// 		"enablePullDownRefresh": true
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/order_details/order_details",
+		// 	"style": {
+		// 		"navigationBarTitleText": "订单详情",
+		// 		"navigationStyle": "custom",
+		// 		"enablePullDownRefresh": true
+		// 	}
+		// },
 		{
 			"path": "pages/all_comments/all_comments",
 			"style": {
@@ -263,246 +174,32 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
-		},
-		{
-			"path": "pages/hotel/hotel-list",
-			"style": {
-				"navigationBarTitleText": "酒店列表"
-			}
-		},
-		{
-			"path": "pages/hotel/hotel-detail",
-			"style": {
-				"navigationBarTitleText": "酒店详情"
-			}
-		},
-		{
-			"path": "pages/hotel/custom-form",
-			"style": {
-				"navigationBarTitleText": "发布定制需求"
-			}
-		},
-		{
-			"path": "pages/hotel/custom-my",
-			"style": {
-				"navigationBarTitleText": "我的发布"
-			}
-		},
-		{
-			"path": "pages/hotel/custom-detail",
-			"style": {
-				"navigationBarTitleText": "需求详情"
-			}
-		},
-		{
-			"path": "pages/hotel/merchant-list",
-			"style": {
-				"navigationBarTitleText": "接单管理"
-			}
-		},
-		{
-			"path": "pages/hotel/merchant-offer",
-			"style": {
-				"navigationBarTitleText": "商家出价"
-			}
-		},
-		{
-			"path": "pages/hotel/order-list",
-			"style": {
-				"navigationStyle": "custom" 
-			}
-		},
-		{
-			"path": "pages/hotel/order-detail",
-			"style": {
-				"navigationBarTitleText": "订单详情"
-			}
-		},
-		{
-			"path": "pages/hotel/city-select",
-			"style": {
-				"navigationBarTitleText": "选择城市"
-			}
-		},
-		{
-			"path": "pages/hotel/order-create",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
-		},
-		{
-			"path": "pages/ticket/search",
-			"style": {
-				"navigationBarTitleText": "机票/火车票"
-			}
-		},
-		{
-			"path": "pages/ticket/flight-list",
-			"style": {
-				"navigationBarTitleText": "航班列表"
-			}
-		},
-		{
-			"path": "pages/ticket/flight-detail",
-			"style": {
-				"navigationBarTitleText": "航班详情"
-			}
-		},
-		{
-			"path": "pages/ticket/train-list",
-			"style": {
-				"navigationBarTitleText": "车次列表"
-			}
-		},
-		{
-			"path": "pages/ticket/train-detail",
-			"style": {
-				"navigationBarTitleText": "车次详情"
-			}
-		},
-        {
-            "path": "pages/ticket/train-passenger",
-            "style": {
-                "navigationBarTitleText": "填写乘客信息(火车票)"
-            }
-        },
-        {
-            "path": "pages/ticket/train-order-confirm",
-            "style": {
-                "navigationBarTitleText": "确认订单(火车票)"
-            }
-        },
-		{
-			"path": "pages/ticket/city-select",
-			"style": {
-				"navigationBarTitleText": "选择城市"
-			}
-		},
-		{
-			"path": "pages/ticket/station-select",
-			"style": {
-				"navigationBarTitleText": "选择车站"
-			}
-		},
-		{
-			"path": "pages/ticket/date-picker",
-			"style": {
-				"navigationBarTitleText": "选择日期",
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/ticket/passenger-info",
-			"style": {
-				"navigationBarTitleText": "填写乘客信息"
-			}
-		},
-		{
-			"path": "pages/ticket/order-confirm",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
-		},
-		{
-			"path": "pages/ticket/flight-order-detail",
-			"style": {
-				"navigationBarTitleText": "机票订单详情"
-			}
-		},
-		{
-			"path": "pages/ticket/train-order-detail",
-			"style": {
-				"navigationBarTitleText": "火车票订单详情"
-			}
-		},
-		{
-			"path": "pages/taxi/taxi-index",
-			"style": {
-				"navigationBarTitleText": "打车",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/taxi/taxi-order",
-			"style": {
-				"navigationBarTitleText": "打车",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/taxi/destination-select",
-			"style": {
-				"navigationBarTitleText": "选择目的地",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/taxi/origin-select",
-			"style": {
-				"navigationBarTitleText": "选择起点",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/taxi/calling-driver",
-			"style": {
-				"navigationBarTitleText": "打车",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/taxi/driver-accepted",
-			"style": {
-				"navigationBarTitleText": "打车",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/taxi/cancel-reason",
-			"style": {
-				"navigationBarTitleText": "取消原因",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/taxi/order-detail",
-			"style": {
-				"navigationBarTitleText": "打车订单详情",
-				"navigationBarBackgroundColor": "#1A1B3D",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "components/uview-ui/components/u-avatar-cropper/u-avatar-cropper",
-			"style": {
-				"navigationBarTitleText": "头像裁剪",
-				"navigationBarBackgroundColor": "#000000"
-			}
 		}
+		// {
+		// 	"path": "components/uview-ui/components/u-avatar-cropper/u-avatar-cropper",
+		// 	"style": {
+		// 		"navigationBarTitleText": "头像裁剪",
+		// 		"navigationBarBackgroundColor": "#000000"
+		// 	}
+		// }
 	],
 	"subPackages": [{
 		"root": "bundle",
-		"pages": [{
-			"path": "pages/goods_seckill/goods_seckill",
-			"style": {
-				"navigationBarTitleText": "商品秒杀",
-				"navigationStyle": "custom"
-			}
-		},
+		"pages": [
+		// 	{
+		// 	"path": "pages/goods_seckill/goods_seckill",
+		// 	"style": {
+		// 		"navigationBarTitleText": "商品秒杀",
+		// 		"navigationStyle": "custom"
+		// 	}
+		// },
 
-			{
-				"path": "pages/goods_logistics/goods_logistics",
-				"style": {
-					"navigationBarTitleText": "物流详情"
-				}
-			},
+			// {
+			// 	"path": "pages/goods_logistics/goods_logistics",
+			// 	"style": {
+			// 		"navigationBarTitleText": "物流详情"
+			// 	}
+			// },
 			{
 				"path": "pages/goods_comment_list/goods_comment_list",
 				"style": {
@@ -515,49 +212,49 @@
 					"navigationBarTitleText": "商品评价"
 				}
 			},
-			{
-				"path": "pages/activity_detail/activity_detail",
-				"style": {}
-			},
-			{
-				"path": "pages/goods_combination/goods_combination",
-				"style": {
-					"navigationBarTitleText": "拼团活动",
-					"navigationStyle": "custom",
-					"enablePullDownRefresh": true
-				}
-			},
-			{
-				"path": "pages/user_group/user_group",
-				"style": {
-					"navigationBarTitleText": "我的拼团",
-					"enablePullDownRefresh": true
-				}
-			},
-			{
-				"path": "pages/hot_list/hot_list",
-				"style": {
-					"navigationBarTitleText": "热销榜单"
-				}
-			},
-			{
-				"path": "pages/user_sign/user_sign",
-				"style": {
-					"navigationBarTitleText": "签到"
-				}
-			},
-			{
-				"path": "pages/sign_detail/sign_detail",
-				"style": {
-					"navigationBarTitleText": "签到详情"
-				}
-			},
-			{
-				"path": "pages/sign_rule/sign_rule",
-				"style": {
-					"navigationBarTitleText": "签到规则"
-				}
-			},
+			// {
+			// 	"path": "pages/activity_detail/activity_detail",
+			// 	"style": {}
+			// },
+			// {
+			// 	"path": "pages/goods_combination/goods_combination",
+			// 	"style": {
+			// 		"navigationBarTitleText": "拼团活动",
+			// 		"navigationStyle": "custom",
+			// 		"enablePullDownRefresh": true
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/user_group/user_group",
+			// 	"style": {
+			// 		"navigationBarTitleText": "我的拼团",
+			// 		"enablePullDownRefresh": true
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/hot_list/hot_list",
+			// 	"style": {
+			// 		"navigationBarTitleText": "热销榜单"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/user_sign/user_sign",
+			// 	"style": {
+			// 		"navigationBarTitleText": "签到"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/sign_detail/sign_detail",
+			// 	"style": {
+			// 		"navigationBarTitleText": "签到详情"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/sign_rule/sign_rule",
+			// 	"style": {
+			// 		"navigationBarTitleText": "签到规则"
+			// 	}
+			// },
 			{
 				"path": "pages/user_spread/user_spread",
 				"style": {
@@ -570,18 +267,18 @@
 					"navigationBarTitleText": "邀请海报"
 				}
 			},
-			{
-				"path": "pages/user_spread_month_bill/user_spread_month_bill",
-				"style": {
-					"navigationBarTitleText": "月度账单"
-				}
-			},
-			{
-				"path": "pages/user_spread_month_bill_detail/user_spread_month_bill_detail",
-				"style": {
-					"navigationBarTitleText": "月度账单详情"
-				}
-			},
+			// {
+			// 	"path": "pages/user_spread_month_bill/user_spread_month_bill",
+			// 	"style": {
+			// 		"navigationBarTitleText": "月度账单"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/user_spread_month_bill_detail/user_spread_month_bill_detail",
+			// 	"style": {
+			// 		"navigationBarTitleText": "月度账单详情"
+			// 	}
+			// },
 			{
 				"path": "pages/user_spread_order/user_spread_order",
 				"style": {
@@ -618,12 +315,12 @@
 					"navigationBarTitleText": "钱包明细"
 				}
 			},
-			{
-				"path": "pages/user_payment/user_payment",
-				"style": {
-					"navigationBarTitleText": "用户充值"
-				}
-			},
+			// {
+			// 	"path": "pages/user_payment/user_payment",
+			// 	"style": {
+			// 		"navigationBarTitleText": "用户充值"
+			// 	}
+			// },
 			{
 				"path": "pages/widthdraw_result/widthdraw_result",
 				"style": {
@@ -684,75 +381,75 @@
 					"navigationBarTitleText": "售后详情"
 				}
 			},
-			{
-				"path": "pages/input_express_info/input_express_info",
-				"style": {
-					"navigationBarTitleText": "填写快递单号"
-				}
-			},
-			{
-				"path": "pages/contact_offical/contact_offical",
-				"style": {
-					"navigationBarTitleText": "联系客服"
-				}
-			},
-			{
-				"path": "pages/luckly_wheel/luckly_wheel",
-				"style": {
-					"navigationBarTitleText": "幸运抽奖"
-				}
-			},
-			{
-				"path": "pages/prize_record/prize_record",
-				"style": {
-					"navigationBarTitleText": "抽奖记录"
-				}
-			},
-			{
-				"path": "pages/win_prize_code/win_prize_code",
-				"style": {
-					"navigationBarTitleText": "中奖名单"
-				}
-			},
-			{
-				"path": "pages/bargain/bargain",
-				"style": {
-					"navigationBarTitleText": "砍价活动",
-					"navigationStyle": "custom"
-				}
-			},
-			{
-				"path": "pages/bargain_process/bargain_process",
-				"style": {
-					"navigationBarTitleText": "砍价进度",
-					"navigationStyle": "custom"
-				}
-			},
-			{
-				"path": "pages/bargain_code/bargain_code",
-				"style": {
-					"navigationBarTitleText": "砍价记录"
-				}
-			},
-			{
-				"path": "pages/recharge_code/recharge_code",
-				"style": {
-					"navigationBarTitleText": "充值记录",
-					"enablePullDownRefresh": false
-				}
-			},
-			{
-				"path": "pages/balance_transfer/balance_transfer",
-				"style": {
-					"navigationBarTitleText": "余额转账"
-				}
-			},
-			{
-				"path": "pages/transfer_record/transfer_record",
-				"style": {
-					"navigationBarTitleText": "转账记录"
-				}
-			},
+			// {
+			// 	"path": "pages/input_express_info/input_express_info",
+			// 	"style": {
+			// 		"navigationBarTitleText": "填写快递单号"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/contact_offical/contact_offical",
+			// 	"style": {
+			// 		"navigationBarTitleText": "联系客服"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/luckly_wheel/luckly_wheel",
+			// 	"style": {
+			// 		"navigationBarTitleText": "幸运抽奖"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/prize_record/prize_record",
+			// 	"style": {
+			// 		"navigationBarTitleText": "抽奖记录"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/win_prize_code/win_prize_code",
+			// 	"style": {
+			// 		"navigationBarTitleText": "中奖名单"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/bargain/bargain",
+			// 	"style": {
+			// 		"navigationBarTitleText": "砍价活动",
+			// 		"navigationStyle": "custom"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/bargain_process/bargain_process",
+			// 	"style": {
+			// 		"navigationBarTitleText": "砍价进度",
+			// 		"navigationStyle": "custom"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/bargain_code/bargain_code",
+			// 	"style": {
+			// 		"navigationBarTitleText": "砍价记录"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/recharge_code/recharge_code",
+			// 	"style": {
+			// 		"navigationBarTitleText": "充值记录",
+			// 		"enablePullDownRefresh": false
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/balance_transfer/balance_transfer",
+			// 	"style": {
+			// 		"navigationBarTitleText": "余额转账"
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/transfer_record/transfer_record",
+			// 	"style": {
+			// 		"navigationBarTitleText": "转账记录"
+			// 	}
+			// },
 			{
 				"path": "pages/set_pay_pwd/set_pay_pwd",
 				"style": {
@@ -765,33 +462,380 @@
 					"navigationBarTitleText": "忘记支付密码"
 				}
 			},
+			// {
+			// 	"path": "pages/store_list/store_list",
+			// 	"style": {
+			// 		"navigationBarTitleText": "门店自提"
+			// 	}
+			// }, {
+			// 	"path": "pages/writeoff_order/writeoff_order",
+			// 	"style": {
+			// 		"navigationBarTitleText": "核销订单",
+			// 		"enablePullDownRefresh": true
+			// 	}
+			// },
+			// {
+			// 	"path": "pages/writeoff_detail/writeoff_detail",
+			// 	"style": {
+			// 		"navigationBarTitleText": "订单结果"
+			// 	}
+			// }, {
+			// 	"path": "pages/live_broadcast/live_broadcast",
+			// 	"style": {
+			// 		"navigationBarTitleText": "商城直播",
+			// 		"enablePullDownRefresh": true
+			// 	}
+			// },
 			{
-				"path": "pages/store_list/store_list",
-				"style": {
-					"navigationBarTitleText": "门店自提"
-				}
-			}, {
-				"path": "pages/writeoff_order/writeoff_order",
-				"style": {
-					"navigationBarTitleText": "核销订单",
-					"enablePullDownRefresh": true
-				}
-			}, {
-				"path": "pages/writeoff_detail/writeoff_detail",
-				"style": {
-					"navigationBarTitleText": "订单结果"
-				}
-			}, {
-				"path": "pages/live_broadcast/live_broadcast",
-				"style": {
-					"navigationBarTitleText": "商城直播",
-					"enablePullDownRefresh": true
-				}
-			}, {
 				"path": "pages/license/license",
 				"style": {
 					"navigationBarTitleText": "资质信息",
 					"enablePullDownRefresh": true
+				}
+			},
+			{
+				"path": "pages/ticket/search",
+				"style": {
+					"navigationBarTitleText": "机票/火车票"
+				}
+			},
+			{
+				"path": "pages/ticket/flight-list",
+				"style": {
+					"navigationBarTitleText": "航班列表"
+				}
+			},
+			{
+				"path": "pages/ticket/flight-detail",
+				"style": {
+					"navigationBarTitleText": "航班详情"
+				}
+			},
+			{
+				"path": "pages/ticket/train-list",
+				"style": {
+					"navigationBarTitleText": "车次列表"
+				}
+			},
+			{
+				"path": "pages/ticket/train-detail",
+				"style": {
+					"navigationBarTitleText": "车次详情"
+				}
+			},
+	        {
+	            "path": "pages/ticket/train-passenger",
+	            "style": {
+	                "navigationBarTitleText": "填写乘客信息(火车票)"
+	            }
+	        },
+	        {
+	            "path": "pages/ticket/train-order-confirm",
+	            "style": {
+	                "navigationBarTitleText": "确认订单(火车票)"
+	            }
+	        },
+	        {
+	            "path": "pages/ticket/train-order-detail",
+	            "style": {
+	                "navigationBarTitleText": "订单详情(火车票)",
+	                "navigationStyle": "custom"
+	            }
+	        },
+	        {
+	            "path": "pages/ticket/flight-order-detail",
+	            "style": {
+	                "navigationBarTitleText": "订单详情(飞机票)"
+	            }
+	        },
+			{
+				"path": "pages/ticket/city-select",
+				"style": {
+					"navigationBarTitleText": "选择城市"
+				}
+			},
+			{
+				"path": "pages/ticket/station-select",
+				"style": {
+					"navigationBarTitleText": "选择车站"
+				}
+			},
+			{
+				"path": "pages/ticket/date-picker",
+				"style": {
+					"navigationBarTitleText": "选择日期",
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/ticket/passenger-info",
+				"style": {
+					"navigationBarTitleText": "填写乘客信息"
+				}
+			},
+			{
+				"path": "pages/ticket/order-confirm",
+				"style": {
+					"navigationBarTitleText": "确认订单"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-list",
+				"style": {
+					"navigationBarTitleText": "酒店列表"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-detail",
+				"style": {
+					"navigationBarTitleText": "酒店详情"
+				}
+			},
+			{
+				"path": "pages/hotel/hotel-home",
+				"style": {
+					"navigationBarTitleText": "酒店/民宿"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-form",
+				"style": {
+					"navigationBarTitleText": "发布定制需求"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-my",
+				"style": {
+					"navigationBarTitleText": "我的发布"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-detail",
+				"style": {
+					"navigationBarTitleText": "需求详情"
+				}
+			},
+			{
+				"path": "pages/hotel/custom-publish-success",
+				"style": {
+					"navigationBarTitleText": "发布成功"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-list",
+				"style": {
+					"navigationBarTitleText": "接单管理"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-offer",
+				"style": {
+					"navigationBarTitleText": "商家出价"
+				}
+			},
+			{
+				"path": "pages/hotel/merchant-offer-success",
+				"style": {
+					"navigationBarTitleText": "出价成功"
+				}
+			},
+			{
+				"path": "pages/hotel/order-list",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/hotel/order-detail",
+				"style": {
+					"navigationBarTitleText": "订单详情",
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/hotel/city-select",
+				"style": {
+					"navigationBarTitleText": "选择城市"
+				}
+			},
+			{
+				"path": "pages/hotel/order-create",
+				"style": {
+					"navigationBarTitleText": "确认订单"
+				}
+			},
+			{
+				"path": "pages/hotel/order-confirm",
+				"style": {
+					"navigationBarTitleText": "订单确认",
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/hotel/room-detail",
+				"style": {
+					"navigationBarTitleText": "房间详情"
+				}
+			},
+			{
+				"path": "pages/hotel/premium-room",
+				"style": {
+					"navigationBarTitleText": "尊享房",
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/taxi/taxi-index",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/taxi-order",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/destination-select",
+				"style": {
+					"navigationBarTitleText": "选择目的地",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/origin-select",
+				"style": {
+					"navigationBarTitleText": "选择起点",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/calling-driver",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/driver-accepted",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/cancel-reason",
+				"style": {
+					"navigationBarTitleText": "取消原因",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/order-detail",
+				"style": {
+					"navigationBarTitleText": "打车订单详情",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/industry_list/law",
+				"style": {
+					"navigationBarTitleText": "法律援助"
+				}
+			},
+			{
+				"path": "pages/industry_list/cheer",
+				"style": {
+					"navigationBarTitleText": "加油/充电"
+				}
+			},
+			{
+				"path": "pages/industry_list/cheer_detail",
+				"style": {
+					"navigationBarTitleText": "加油"
+				}
+			},
+			{
+				"path": "pages/industry_list/power_detail",
+				"style": {
+					"navigationBarTitleText": "充电站"
+				}
+			},
+			{
+				"path": "pages/industry_list/pile_detail",
+				"style": {
+					"navigationBarTitleText": "充电桩详情"
+				}
+			},
+			{
+				"path": "pages/industry_list/private",
+				"style": {
+					"navigationBarTitleText": "私人秘书"
+				}
+			},
+			{
+				"path": "pages/industry_list/agency",
+				"style": {
+					"navigationBarTitleText": "工商代办"
+				}
+			},
+			{
+				"path": "pages/user/member-business-travel-apply",
+				"style": {
+					"navigationBarTitleText": "商旅会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-channel-apply",
+				"style": {
+					"navigationBarTitleText": "渠道会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-enterprise-apply",
+				"style": {
+					"navigationBarTitleText": "企业会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-business-apply",
+				"style": {
+					"navigationBarTitleText": "商务会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-apply-record",
+				"style": {
+					"navigationBarTitleText": "入驻申请记录"
+				}
+			},
+			{
+				"path": "pages/user/member-apply-detail",
+				"style": {
+					"navigationBarTitleText": "申请详情"
+				}
+			},
+			{
+				"path": "pages/user/member-center",
+				"style": {
+					"navigationBarTitleText": "会员个人中心"
+				}
+			},
+			{
+				"path": "pages/user/member-upgrade",
+				"style": {
+					"navigationBarTitleText": "会员升级"
 				}
 			}
 		]
@@ -812,18 +856,18 @@
 				"selectedIconPath": "/static/images/Vector.png",
 				"text": "行业资讯"
 			},
-			{
-				"pagePath": "pages/sort/sort",
-				"iconPath": "/static/images/tab_sort.png",
-				"selectedIconPath": "/static/images/tab_sort_s.png",
-				"text": "分类"
-			},
-			{
-				"pagePath": "pages/shop_cart/shop_cart",
-				"iconPath": "/static/images/tab_cart.png",
-				"selectedIconPath": "/static/images/tab_cart_s.png",
-				"text": "购物车"
-			},  
+			// {
+			// 	"pagePath": "pages/sort/sort",
+			// 	"iconPath": "/static/images/tab_sort.png",
+			// 	"selectedIconPath": "/static/images/tab_sort_s.png",
+			// 	"text": "分类"
+			// },
+			// {
+			// 	"pagePath": "pages/shop_cart/shop_cart",
+			// 	"iconPath": "/static/images/tab_cart.png",
+			// 	"selectedIconPath": "/static/images/tab_cart_s.png",
+			// 	"text": "购物车"
+			// },
 			{
 				"pagePath": "pages/user/user",
 				"iconPath": "/static/images/tab_user.png",
@@ -833,19 +877,18 @@
 		]
 	},
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
+		"navigationStyle": "custom",
+		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "",
-		"navigationBarBackgroundColor": "#FFFFFF",
-		"backgroundColor": "#F8F8F8",
-		"h5": {
-			"navigationStyle": "custom"
-		}
-
+		"navigationBarBackgroundColor": "#00225A",
+		"backgroundColor": "#0D1034"
 	},
 	"easycom": {
 		"autoscan": true,
 		"custom": {
-			"^u-(.*)": "@/components/uview-ui/components/u-$1/u-$1.vue"
+			"^u-(.*)": "@/components/uview-ui/components/u-$1/u-$1.vue",
+			"^custom-navbar$": "@/components/custom-navbar/custom-navbar.vue"
 		}
 	}
 }
+

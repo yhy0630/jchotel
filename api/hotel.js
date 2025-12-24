@@ -79,6 +79,11 @@ export function merchantOfferList(data) {
     return request.post('hotel/merchantOfferList', data)
 }
 
+// 获取订单预览信息
+export function previewOffer(data) {
+    return request.post('hotel/previewOffer', data)
+}
+
 // 选择报价
 export function selectOffer(data) {
     return request.post('hotel/selectOffer', data)
@@ -92,6 +97,11 @@ export function orderList(data) {
 // 订单详情
 export function orderDetail(data) {
     return request.post('hotel/orderDetail', data)
+}
+
+// 预检查第三方酒店预订（验证是否能下单）
+export function checkBooking(data) {
+    return request.post('hotel/checkBooking', data)
 }
 
 // 创建第三方酒店订单

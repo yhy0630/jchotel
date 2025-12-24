@@ -1,7 +1,7 @@
 <template>
 	<view class="index">
 		<!-- 顶部导航栏 -->
-		
+		<custom-navbar title="锦程汇" :show-back="false" ></custom-navbar>
 
 		<!-- 轮播图 -->
 		<view class="banner-section">
@@ -16,6 +16,7 @@
 		<view class="tabs-section">
 			<view 
 				v-for="(tab, index) in tabs" 
+
 				:key="index"
 				:class="['tab-item', { active: hasTabClicked && currentTab === index }]"
 				@click="switchTab(index)"
@@ -77,7 +78,7 @@
 					class="hotel-item"
 					@click="goHotelDetail(item)"
 				>
-					<image :src="item.image || '/static/images/Rectangle 30184.png'" mode="aspectFill" class="hotel-image"></image>
+					<image :src="item.image" mode="aspectFill" class="hotel-image"></image>
 					<view class="hotel-info">
 						<view class="hotel-name">{{ item.hotelName }}</view>
 						<view class="hotel-rating">
@@ -89,9 +90,9 @@
 				</view>
 						<view class="hotel-desc">{{ item.desc }}</view>
 						<view class="hotel-price">
-							<text class="price-item">挂牌价¥{{ formatPrice(item.listPrice || 133.2) }}起</text>
-							<text class="price-item vip">尊享价¥{{ formatPrice(item.vipPrice || 133.2) }}起</text>
-							<text class="price-item share">股东价¥{{ formatPrice(item.sharePrice || 133.2) }}起</text>
+							<text class="price-item" :class="{ 'highlight': item.userPriceType === 'list' }">挂牌价¥{{ formatPrice(item.listPrice) }}起</text>
+							<text class="price-item vip" :class="{ 'highlight': item.userPriceType === 'vip' }">尊享价¥{{ formatPrice(item.vipPrice) }}起</text>
+							<text class="price-item share" :class="{ 'highlight': item.userPriceType === 'share' }">股东价¥{{ formatPrice(item.sharePrice) }}起</text>
 			</view>
 					</view>
 				</view>
@@ -106,6 +107,7 @@
 import { hotelList } from '@/api/hotel.js'
 import { flightList } from '@/api/flight.js'
 import { trainList } from '@/api/train.js'
+import config from '@/config/app.js'
 
 	export default {
 		data() {
@@ -121,9 +123,7 @@ import { trainList } from '@/api/train.js'
 			
 			// 轮播图
 			bannerList: [
-				{ image: '/static/images/banner1.jpg' },
-				{ image: '/static/images/banner2.jpg' },
-				{ image: '/static/images/banner3.jpg' }
+				{ image: config.baseURL + '/uploads/images/images/酒店.png' }
 			],
 			
 			// 位置信息
@@ -263,31 +263,34 @@ import { trainList } from '@/api/train.js'
 			// 先更新当前选中，用于触发 .active 样式
 			if (this.currentTab !== index) {
 				this.currentTab = index
-				// 只有酒店/民宿需要刷新列表，其他 Tab 只是视觉效果或跳转
-				if (index === 0) {
-					this.refresh()
-				}
+			}
+
+			// 点击酒店/民宿，跳转到酒店首页
+			if (index === 0) {
+				uni.navigateTo({
+					url: '/bundle/pages/hotel/hotel-home'
+				})
 			}
 			
 			// 点击机票/火车票，跳转到票务搜索页
 			if (index === 1) {
 				uni.navigateTo({
-					url: '/pages/ticket/search'
-						})
-					}
-			
-			// 点击租车/用车，跳转到打车页面
-			if (index === 2) {
-				uni.navigateTo({
-					url: '/pages/taxi/taxi-index'
+					url: '/bundle/pages/ticket/search'
 				})
 			}
+      // 点击租车/用车，跳转到打车页面
+      if (index === 2) {
+        uni.navigateTo({
+          url: '/bundle/pages/taxi/taxi-index'
+        })
+      }
+
 		},
 		
 		// 选择位置
 		selectLocation() {
 				uni.navigateTo({
-				url: '/pages/hotel/city-select?type=hotel'
+				url: '/bundle/pages/hotel/city-select?type=hotel'
 			})
 		},
 		
@@ -375,17 +378,17 @@ import { trainList } from '@/api/train.js'
 			if (this.currentTab === 0) {
 				// 跳转到酒店列表页
 				uni.navigateTo({
-					url: `/pages/hotel/hotel-list?cityCode=${this.locationCode}&cityName=${this.currentLocation}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
+					url: `/bundle/pages/hotel/hotel-list?cityCode=${this.locationCode}&cityName=${this.currentLocation}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}`
 				})
 			} else if (this.currentTab === 1) {
 				// 跳转到机票/火车票搜索页
 				uni.navigateTo({
-					url: '/pages/ticket/search'
+					url: '/bundle/pages/ticket/search'
 				})
 			} else if (this.currentTab === 2) {
 				// 跳转到打车页面
 				uni.navigateTo({
-					url: '/pages/taxi/taxi-index'
+					url: '/bundle/pages/taxi/taxi-index'
 				})
 			}
 		},
@@ -456,6 +459,7 @@ import { trainList } from '@/api/train.js'
 							listPrice: item.list_price || item.minPrice || 0,
 							vipPrice: item.vip_price || item.minPrice || 0,
 							sharePrice: item.share_price || item.minPrice || 0,
+							userPriceType: item.user_price_type || 'list', // 用户价格类型，用于高亮显示
 							image: (item.images && item.images[0] && item.images[0].url) || '/static/images/default-hotel.png'
 						}))
 					} else {
@@ -470,6 +474,7 @@ import { trainList } from '@/api/train.js'
 							listPrice: item.list_price || item.minPrice || 0,
 							vipPrice: item.vip_price || item.minPrice || 0,
 							sharePrice: item.share_price || item.minPrice || 0,
+							userPriceType: item.user_price_type || 'list', // 用户价格类型，用于高亮显示
 							image: (item.images && item.images[0] && item.images[0].url) || '/static/images/default-hotel.png'
 						}))
 						this.hotelList = [...this.hotelList, ...newList]
@@ -583,14 +588,14 @@ import { trainList } from '@/api/train.js'
 		// 跳转到酒店详情
 		goHotelDetail(item) {
 			uni.navigateTo({
-				url: `/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}`
+				url: `/bundle/pages/hotel/hotel-detail?hotelCode=${item.hotelCode}`
 			})
 		},
 		
 		// 跳转到票务详情
 		goTicketDetail(item) {
 			uni.navigateTo({
-				url: '/pages/ticket/flight-list'
+				url: '/bundle/pages/ticket/flight-list'
 			})
 		},
 		
@@ -611,6 +616,7 @@ import { trainList } from '@/api/train.js'
 	background-color: #0c0d21;
 	padding: 20rpx 20rpx 40rpx;
 	box-sizing: border-box;
+
 }
 
 .navbar-content {
@@ -646,9 +652,12 @@ import { trainList } from '@/api/train.js'
 }
 
 .banner-section {
-	width: 100%;
+	width: calc(100% + 40rpx);
 	height: 400rpx;
-	
+	margin-left: -20rpx;
+	margin-right: -20rpx;
+	margin-top: 50rpx;
+
 	.banner-swiper {
 		width: 100%;
 		height: 100%;
@@ -959,11 +968,18 @@ import { trainList } from '@/api/train.js'
 						color: #c8cbd9;
 						font-weight: 700;
 						
-						&.vip {
+						// 高亮样式（渐变）- 根据用户等级对应的价格类型
+						&.highlight {
 							background: linear-gradient(90deg, #F3BC63 0%, #FDE3B1 100%);
 							-webkit-background-clip: text;
 							-webkit-text-fill-color: transparent;
 							background-clip: text;
+							font-weight: 700;
+						}
+						
+						// 保留原来的 vip 样式，但如果没有高亮则使用默认样式
+						&.vip:not(.highlight) {
+							color: #c8cbd9;
 						}
 						
 						&.share {
