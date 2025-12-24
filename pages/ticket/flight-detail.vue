@@ -313,7 +313,11 @@ export default {
         return
       }
       
-      const totalPrice = this.calcTotalPrice(seat)
+      const ticketPrice = Number(adultPrice.price || 0)               // 票面价（第三方原始价）
+      const airportTax = Number(adultPrice.airportTax || 0)          // 机建
+      const fuelTax = Number(adultPrice.fuelTax || 0)                // 燃油
+      const memberBasePrice = Number(adultPrice.display_price || ticketPrice) // 会员价（不含税）
+      const totalPrice = memberBasePrice + airportTax + fuelTax      // 含税总价（展示给用户）
       const policyId = adultPrice.policyInfo?.policyId || ''
       
       // 跳转到乘客信息页面
@@ -321,8 +325,14 @@ export default {
         type: 'flight',
         flight_no: this.detail.flightNo || '',
         departure_date: this.detail.depDate || this.departureDate,
-        price: totalPrice,
-        original_price: (adultPrice.price || 0) + (adultPrice.airportTax || 0) + (adultPrice.fuelTax || 0),
+        // 价格明细：全部使用第三方返回的原始字段，后续验价直接透传
+        price: totalPrice,                                  // 兼容旧逻辑的总价
+        ticket_price: ticketPrice,                          // 票面价
+        airport_tax: airportTax,                            // 机建费
+        fuel_tax: fuelTax,                                  // 燃油费
+        display_price: memberBasePrice,                     // 会员价（不含税）
+        total_amount: totalPrice,                           // 本单应付总额（不含保险）
+        original_price: ticketPrice + airportTax + fuelTax, // 原始总价 = 票面 + 税费
         price_type: 2,
         price_type_text: '尊享价',
         seat_code: seat.seatCode || '',

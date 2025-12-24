@@ -268,11 +268,12 @@ export default {
                 arrAirportCode: this.arrAirport,
                 flightNo: this.flightNo,
                 seatCode: this.seatCode,
-                seatCount: '1',
+                seatCount: 1,
                 passengerType: 'ADULT',
-                price: this.ticketPrice,
-                airportTax: this.airportTax,
-                fuelTax: this.fuelTax
+                // 使用从详情页透传、在乘客页保持不变的原始价格字段
+                price: Number(this.ticketPrice),
+                airportTax: Number(this.airportTax),
+                fuelTax: Number(this.fuelTax)
               }
             ]
           }

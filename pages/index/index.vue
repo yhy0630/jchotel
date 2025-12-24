@@ -275,6 +275,13 @@ import { trainList } from '@/api/train.js'
 					url: '/pages/ticket/search'
 						})
 					}
+			
+			// 点击租车/用车，跳转到打车页面
+			if (index === 2) {
+				uni.navigateTo({
+					url: '/pages/taxi/taxi-index'
+				})
+			}
 		},
 		
 		// 选择位置
@@ -376,10 +383,9 @@ import { trainList } from '@/api/train.js'
 					url: '/pages/ticket/search'
 				})
 			} else if (this.currentTab === 2) {
-				// 租车搜索
-				uni.showToast({
-					title: '租车功能开发中',
-					icon: 'none'
+				// 跳转到打车页面
+				uni.navigateTo({
+					url: '/pages/taxi/taxi-index'
 				})
 			}
 		},

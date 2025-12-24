@@ -11,17 +11,54 @@
       <!-- 需求信息 -->
       <view class="info-card">
         <view class="title">{{ order.type == 1 ? '定制房需求' : '酒店订单' }}</view>
+
+        <!-- 尊享房酒店图片及基础信息 -->
+        <view v-if="order.type == 2" class="hotel-brief">
+          <image
+            class="hotel-image"
+            :src="getHotelImage(order)"
+            mode="aspectFill"
+          />
+          <view class="hotel-brief-right">
+            <view class="room-name">{{ order.room_name || '豪华标间' }}</view>
+            <view class="location">
+              {{ order.hotel_name || (order.city_name) || '酒店名称' }}
+            </view>
+            <view class="dates">
+              {{ order.check_in_date }} 至 {{ order.check_out_date }} ·
+              {{ order.night_num }}晚{{ order.room_num || 1 }}间
+            </view>
+          </view>
+        </view>
+
+        <!-- 定制房原有展示 -->
+        <view v-else>
         <view class="room-name">{{ order.room_name || '豪华标间' }}</view>
         <view class="location">{{ order.hotel_name || (order.request && (order.request.city_name + order.request.area)) }}</view>
+          <view class="dates">
+            {{ order.check_in_date }} 至 {{ order.check_out_date }}·{{ order.night_num }}晚1间·{{ order.room_name || '大床房' }}
+          </view>
+        </view>
+
         <view v-if="order.type == 1 && order.request" class="detail-item">
           <text>附近参照物: {{ order.request.landmark }}</text>
         </view>
         <view v-if="order.type == 1 && order.request" class="detail-item">
           <text>酒店档次: {{ order.request.hotel_level }}</text>
         </view>
-        <view class="dates">{{ order.check_in_date }} 至 {{ order.check_out_date }}·{{ order.night_num }}晚1间·{{ order.room_name || '大床房' }}</view>
         <view v-if="order.type == 1 && order.offer" class="detail-item">
           <text>商家: {{ order.offer.merchant_name }}</text>
+        </view>
+      </view>
+
+      <!-- 入住人信息 -->
+      <view class="info-card" v-if="order.guest_name || order.mobile">
+        <view class="title">入住人信息</view>
+        <view class="info-item" v-if="order.guest_name">
+          <text>姓名：{{ order.guest_name }}</text>
+        </view>
+        <view class="info-item" v-if="order.mobile">
+          <text>手机号：{{ order.mobile }}</text>
         </view>
       </view>
 
@@ -132,6 +169,23 @@ export default {
       }
       return map[status] || ''
     },
+    // 获取酒店图片（尊享房）
+    getHotelImage(order) {
+      if (order.hotel_image) {
+        return order.hotel_image
+      }
+      if (order.hotel_detail && order.hotel_detail.images && order.hotel_detail.images.length > 0) {
+        const first = order.hotel_detail.images[0]
+        if (Array.isArray(first)) {
+          return first[0] && first[0].url ? first[0].url : ''
+        }
+        if (typeof first === 'object' && first !== null) {
+          return first.url || ''
+        }
+        return first
+      }
+      return '/static/images/default_hotel.png'
+    },
     async cancelOrder() {
       uni.showModal({
         title: '提示',
@@ -205,6 +259,22 @@ export default {
   padding: 30rpx;
   margin-bottom: 20rpx;
   border-radius: 12rpx;
+}
+.hotel-brief {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+.hotel-image {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+}
+.hotel-brief-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .title {
   font-size: 28rpx;

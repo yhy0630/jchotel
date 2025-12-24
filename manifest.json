@@ -143,10 +143,10 @@
     },
     /* 快应用特有相关 */
     "quickapp" : {},
-	 "sassImplementationName": "node-sass",
+    "sassImplementationName" : "node-sass",
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx32bbb23f48306846",
+        "appid" : "wx49d52db5a04eacf9",
         "setting" : {
             "urlCheck" : false,
             "es6" : true

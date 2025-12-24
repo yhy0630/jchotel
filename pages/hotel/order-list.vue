@@ -32,8 +32,8 @@
         <view class="dates">{{ getOrderDates(item) }}</view>
         <view class="price">¥ {{ item.amount_payable || item.amount_paid || item.total_price || 0 }}</view>
         <view class="actions" @click.stop>
-          <button v-if="item.status === 0 && item.pay_status !== 1" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
-          <button v-if="item.status === 0 && item.pay_status !== 1" class="btn pay" @click.stop="goPay(item)">去支付</button>
+          <button v-if="item.status === 0 && item.pay_status !== 1 && item.pay_status !== '1'" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
+          <button v-if="item.status === 0 && item.pay_status !== 1 && item.pay_status !== '1'" class="btn pay" @click.stop="goPay(item)">去支付</button>
           <button v-if="item.status === 1 && (item._orderType || orderType) === 'hotel'" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
           <button v-if="item.status === 2 && (item._orderType || orderType) === 'hotel'" class="btn invoice" @click.stop="applyInvoice(item)">申请开票</button>
         </view>
@@ -69,6 +69,7 @@
 import { orderList, cancelOrder as cancelHotelOrder } from '@/api/hotel.js'
 import { getFlightOrderList } from '@/api/flight.js'
 import { getTrainOrderList } from '@/api/order.js'
+import { getCarOrderList, cancelCarOrder } from '@/api/taxi.js'
 
 export default {
   data() {
@@ -87,12 +88,14 @@ export default {
       allOrdersPage: {
         hotel: 1,
         flight: 1,
-        train: 1
+        train: 1,
+        taxi: 1
       },
       allOrdersNoMore: {
         hotel: false,
         flight: false,
-        train: false
+        train: false,
+        taxi: false
       },
       // 所有订单类型选项（统一管理）
       allOrderTypes: [
@@ -137,8 +140,8 @@ export default {
       // 重置全部订单的缓存
       if (this.orderType === 'all') {
         this.allOrdersCache = []
-        this.allOrdersPage = { hotel: 1, flight: 1, train: 1 }
-        this.allOrdersNoMore = { hotel: false, flight: false, train: false }
+        this.allOrdersPage = { hotel: 1, flight: 1, train: 1, taxi: 1 }
+        this.allOrdersNoMore = { hotel: false, flight: false, train: false, taxi: false }
       }
       this.loadList()
     },
@@ -169,6 +172,12 @@ export default {
       // 更新订单类型和子类型
       this.orderType = item.orderType
       this.activeType = item.activeType
+      // 切换类型时确保 loading 归零，避免上一次请求未归零导致新类型不触发
+      this.loading = false
+      this.noMore = false
+      // 切换类型时清空当前列表，避免视觉残留
+      this.list = []
+      console.log('切换订单类型为:', item.orderType)
       
       // 关闭弹窗
       this.toggleTypePicker(false)
@@ -179,8 +188,8 @@ export default {
       // 重置全部订单的缓存
       if (item.orderType === 'all') {
         this.allOrdersCache = []
-        this.allOrdersPage = { hotel: 1, flight: 1, train: 1 }
-        this.allOrdersNoMore = { hotel: false, flight: false, train: false }
+        this.allOrdersPage = { hotel: 1, flight: 1, train: 1, taxi: 1 }
+        this.allOrdersNoMore = { hotel: false, flight: false, train: false, taxi: false }
       }
       this.loadList()
     },
@@ -210,8 +219,14 @@ export default {
           }
           res = await getTrainOrderList(params)
         } else if (this.orderType === 'car_rental' || this.orderType === 'taxi') {
-          // 租车/打车订单列表（暂时使用空列表，后续可以创建专门的接口）
-          res = { code: 1, data: { list: [], count: 0, total: 0 } }
+          // 打车订单列表
+          const params = {
+            status: this.status,
+            page: this.page,
+            limit: this.limit
+          }
+          console.log('请求打车订单列表参数:', params)
+          res = await getCarOrderList(params)
         } else {
           // 酒店订单列表
           const params = {
@@ -250,9 +265,11 @@ export default {
             }
           }
         } else {
+          console.warn('订单列表加载失败', res)
           uni.showToast({ title: res.msg || '加载失败', icon: 'none' })
         }
       } catch (e) {
+        console.error('订单列表加载异常', e)
         uni.showToast({ title: e.msg || '加载失败', icon: 'none' })
       } finally {
         this.loading = false
@@ -264,8 +281,8 @@ export default {
       // 如果是第一页，清空缓存
       if (this.page === 1) {
         this.allOrdersCache = []
-        this.allOrdersPage = { hotel: 1, flight: 1, train: 1 }
-        this.allOrdersNoMore = { hotel: false, flight: false, train: false }
+        this.allOrdersPage = { hotel: 1, flight: 1, train: 1, taxi: 1 }
+        this.allOrdersNoMore = { hotel: false, flight: false, train: false, taxi: false }
       }
       
       // 如果缓存中的数据不够当前页显示，需要加载更多
@@ -314,6 +331,20 @@ export default {
             getTrainOrderList(trainParams)
               .then(res => ({ type: 'train', res }))
               .catch(e => ({ type: 'train', res: { code: 0, data: { list: [] } } }))
+          )
+        }
+        
+        // 4. 打车订单
+        if (!this.allOrdersNoMore.taxi) {
+          const taxiParams = {
+            status: this.status,
+            page: this.allOrdersPage.taxi,
+            limit: this.limit
+          }
+          promises.push(
+            getCarOrderList(taxiParams)
+              .then(res => ({ type: 'taxi', res }))
+              .catch(e => ({ type: 'taxi', res: { code: 0, data: { list: [] } } }))
           )
         }
         
@@ -376,7 +407,7 @@ export default {
     },
     // 判断所有类型是否都没有更多数据了
     isAllTypesNoMore() {
-      return this.allOrdersNoMore.hotel && this.allOrdersNoMore.flight && this.allOrdersNoMore.train
+      return this.allOrdersNoMore.hotel && this.allOrdersNoMore.flight && this.allOrdersNoMore.train && this.allOrdersNoMore.taxi
     },
     loadMore() {
       if (!this.noMore && !this.loading) {
@@ -387,8 +418,14 @@ export default {
       // 如果订单有 _orderType 标识（来自"全部订单"），使用该标识；否则使用 this.orderType
       const orderType = item?._orderType || this.orderType
       
-      // 飞机票/火车票/租车/打车订单状态
-      if (['flight', 'train', 'car_rental', 'taxi'].includes(orderType)) {
+      // 打车订单状态
+      if (orderType === 'taxi') {
+        const map = { 0: '待支付', 1: '待接单', 2: '进行中', 3: '已完成', 4: '已取消' }
+        return map[status] || item.status_text || '未知'
+      }
+      
+      // 飞机票/火车票/租车订单状态
+      if (['flight', 'train', 'car_rental'].includes(orderType)) {
         const map = { 0: '待支付', 1: '已支付', 2: '已出票', 3: '已取消', 4: '已退款' }
         return map[status] || '未知'
       }
@@ -431,7 +468,15 @@ export default {
         success: async (res) => {
           if (res.confirm) {
             try {
-              const cancelRes = await cancelHotelOrder({ order_id: item.id })
+              const orderType = item._orderType || this.orderType
+              let cancelRes
+              
+              if (orderType === 'taxi') {
+                cancelRes = await cancelCarOrder({ order_id: item.id })
+              } else {
+                cancelRes = await cancelHotelOrder({ order_id: item.id })
+              }
+              
               if (cancelRes.code === 1) {
                 uni.showToast({ title: '订单已取消', icon: 'success' })
                 setTimeout(() => {
@@ -476,9 +521,11 @@ export default {
         'flight': '/static/images/icon_flight_order.png',
         'train': '/static/images/icon_train_order.png',
         'car_rental': '/static/images/icon_car_order.png',
+        // 打车图标若缺失则回退到租车图标，避免 500 静态资源报错
         'taxi': '/static/images/icon_taxi_order.png'
       }
-      return iconMap[orderType] || '/static/images/jiudian-2 1.png'
+      const icon = iconMap[orderType] || '/static/images/jiudian-2 1.png'
+      return icon
     },
     getOrderTypeText(item) {
       const orderType = item?._orderType || this.orderType
@@ -500,6 +547,8 @@ export default {
         return `${item.flight_no || ''} ${item.airline_name || ''}`
       } else if (orderType === 'train') {
         return `${item.train_no || ''} ${item.train_type || ''}`
+      } else if (orderType === 'taxi') {
+        return `${item.vehicle_name || '快车'} - ${item.supplier_name || '供应商'}`
       }
       return item.room_name || ''
     },
@@ -509,6 +558,8 @@ export default {
         return `${item.departure_city_name || ''} → ${item.arrival_city_name || ''}`
       } else if (orderType === 'train') {
         return `${item.departure_station_name || item.departure_station || ''} → ${item.arrival_station_name || item.arrival_station || ''}`
+      } else if (orderType === 'taxi') {
+        return `${item.depart_address || ''} → ${item.arrive_address || ''}`
       }
       return item.hotel_name || ''
     },
@@ -518,6 +569,10 @@ export default {
         return `${item.departure_date || ''} ${item.departure_time || ''} - ${item.arrival_time || ''}`
       } else if (orderType === 'train') {
         return `${item.departure_date || ''} ${item.departure_time || ''} - ${item.arrival_time || ''}`
+      } else if (orderType === 'taxi') {
+        const timeText = item.estimate_time ? `约${Math.round(item.estimate_time)}分钟` : ''
+        const distanceText = item.estimate_distance ? `${(item.estimate_distance / 1000).toFixed(1)}km` : ''
+        return `${timeText}${timeText && distanceText ? ' · ' : ''}${distanceText}`
       }
       return `${item.check_in_date} 至 ${item.check_out_date}·${item.night_num}晚${item.room_num || 1}间·${item.room_name || '大床房'}`
     }

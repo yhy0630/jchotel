@@ -79,8 +79,24 @@
 
     <!-- 操作按钮 -->
     <view class="action-bar">
-      <button v-if="order.status === 0 && order.pay_status !== 1" class="btn cancel" @click="cancelOrder">取消订单</button>
-      <button v-if="order.status === 0 && order.pay_status !== 1" class="btn pay" @click="goPay">去支付</button>
+      <!-- 未支付：取消 / 去支付 -->
+      <button
+        v-if="order.status === 0 && order.pay_status !== 1"
+        class="btn cancel"
+        @click="cancelOrder"
+      >取消订单</button>
+      <button
+        v-if="order.status === 0 && order.pay_status !== 1"
+        class="btn pay"
+        @click="goPay"
+      >去支付</button>
+
+      <!-- 已支付/已出票：申请退款（本地申请，后台审核） -->
+      <button
+        v-if="[1,2].includes(order.status) && order.pay_status === 1"
+        class="btn cancel"
+        @click="applyRefund"
+      >申请退款</button>
     </view>
   </view>
 </template>
@@ -180,13 +196,58 @@ export default {
       return map[status] || ''
     },
     async cancelOrder() {
+      if (!this.order.id) return
       uni.showModal({
         title: '提示',
-        content: '确定取消订单？',
+        content: '确定取消该订单？',
         success: async (res) => {
-          if (res.confirm) {
-            // TODO: 调用取消订单接口
-            uni.showToast({ title: '取消订单功能开发中', icon: 'none' })
+          if (!res.confirm) return
+          try {
+            // 火车票未支付订单，走通用取消订单接口
+            const { cancelOrder } = await import('@/api/order.js')
+            const resp = await cancelOrder(this.order.id)
+            if (resp.code === 1) {
+              uni.showToast({ title: '订单已取消', icon: 'success' })
+              setTimeout(() => {
+                this.loadDetail()
+              }, 800)
+            } else {
+              uni.showToast({ title: resp.msg || '取消失败', icon: 'none' })
+            }
+          } catch (e) {
+            uni.showToast({ title: e.msg || '取消失败', icon: 'none' })
+          }
+        }
+      })
+    },
+    // 申请退款（仅已支付/已出票）
+    async applyRefund() {
+      if (!this.order.id) return
+      const that = this
+      uni.showModal({
+        title: '申请退款',
+        editable: true,
+        placeholderText: '请输入退款原因（必填）',
+        success: async (res) => {
+          if (!res.confirm) return
+          const reason = (res.content || '').trim()
+          if (!reason) {
+            uni.showToast({ title: '请输入退款原因', icon: 'none' })
+            return
+          }
+          try {
+            const { default: request } = await import('@/utils/request.js')
+            const resp = await request.post('train/applyRefund', {
+              order_id: that.order.id,
+              reason
+            })
+            if (resp.code === 1) {
+              uni.showToast({ title: '已提交退款申请', icon: 'success' })
+            } else {
+              uni.showToast({ title: resp.msg || '申请失败', icon: 'none' })
+            }
+          } catch (e) {
+            uni.showToast({ title: e.msg || '申请失败', icon: 'none' })
           }
         }
       })

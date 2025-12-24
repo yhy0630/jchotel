@@ -209,11 +209,11 @@ export default {
     this.ticketType = options.type || 'flight'
     this.departureDate = decodeURIComponent(options.departure_date || '')
     
-    // 解析价格（从详情页传递的是总价，需要拆分）
+    // 解析价格
     const totalPrice = parseFloat(options.price || 0)
     const originalTotal = parseFloat(options.original_price || options.price || 0)
     
-    // 火车票无机建/燃油，直接用总价；机票保留原逻辑
+    // 火车票无机建/燃油，直接用总价；机票走精确拆分逻辑
     if ((options.type || 'flight') === 'train') {
       this.ticketPrice = totalPrice
       this.airportTax = 0
@@ -221,12 +221,21 @@ export default {
       this.displayPrice = totalPrice
       this.originalPrice = originalTotal
     } else {
-      // 如果传递了详细价格信息，使用传递的值；否则从总价估算
-      this.ticketPrice = parseFloat(options.ticket_price || 0) || (originalTotal * 0.85) // 假设票面价占85%
-      this.airportTax = parseFloat(options.airport_tax || 0) || 50 // 默认50
-      this.fuelTax = parseFloat(options.fuel_tax || 0) || (originalTotal - this.ticketPrice - this.airportTax)
-      this.displayPrice = totalPrice - this.airportTax - this.fuelTax // 会员价 = 总价 - 税费
-      this.originalPrice = originalTotal
+      // 使用详情页透传的原始价格字段，避免“估算”导致验价失败
+      const ticketPrice = parseFloat(options.ticket_price || 0)
+      const airportTax = parseFloat(options.airport_tax || 0)
+      const fuelTax = parseFloat(options.fuel_tax || 0)
+      const displayPrice = parseFloat(options.display_price || 0)
+      
+      this.ticketPrice = isNaN(ticketPrice) ? 0 : ticketPrice
+      this.airportTax = isNaN(airportTax) ? 0 : airportTax
+      this.fuelTax = isNaN(fuelTax) ? 0 : fuelTax
+      this.displayPrice = !isNaN(displayPrice)
+        ? displayPrice
+        : Math.max(0, totalPrice - this.airportTax - this.fuelTax)
+      this.originalPrice = originalTotal > 0
+        ? originalTotal
+        : this.ticketPrice + this.airportTax + this.fuelTax
     }
     
     this.priceType = parseInt(options.price_type || 2)

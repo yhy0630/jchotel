@@ -404,6 +404,82 @@
 			}
 		},
 		{
+			"path": "pages/ticket/flight-order-detail",
+			"style": {
+				"navigationBarTitleText": "机票订单详情"
+			}
+		},
+		{
+			"path": "pages/ticket/train-order-detail",
+			"style": {
+				"navigationBarTitleText": "火车票订单详情"
+			}
+		},
+		{
+			"path": "pages/taxi/taxi-index",
+			"style": {
+				"navigationBarTitleText": "打车",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/taxi/taxi-order",
+			"style": {
+				"navigationBarTitleText": "打车",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/taxi/destination-select",
+			"style": {
+				"navigationBarTitleText": "选择目的地",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/taxi/origin-select",
+			"style": {
+				"navigationBarTitleText": "选择起点",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/taxi/calling-driver",
+			"style": {
+				"navigationBarTitleText": "打车",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/taxi/driver-accepted",
+			"style": {
+				"navigationBarTitleText": "打车",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/taxi/cancel-reason",
+			"style": {
+				"navigationBarTitleText": "取消原因",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/taxi/order-detail",
+			"style": {
+				"navigationBarTitleText": "打车订单详情",
+				"navigationBarBackgroundColor": "#1A1B3D",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
 			"path": "components/uview-ui/components/u-avatar-cropper/u-avatar-cropper",
 			"style": {
 				"navigationBarTitleText": "头像裁剪",

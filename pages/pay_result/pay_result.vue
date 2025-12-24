@@ -67,6 +67,9 @@
 	import {
 		orderDetail as getHotelOrderDetail
 	} from '@/api/hotel';
+	import {
+		getCarOrderDetail
+	} from '@/api/taxi';
 	
 	export default {
 		data() {
@@ -79,7 +82,7 @@
 
 		onLoad: function(options) {
 			this.id = options.id;
-			this.from = options.from || 'order'; // 默认为普通订单
+				this.from = options.from || 'order'; // 默认为普通订单
 			// 根据订单来源设置查看订单的跳转地址
 			if (this.from === 'hotel') {
 				this.orderUrl = '/pages/hotel/order-list?status=1';
@@ -89,6 +92,9 @@
 			} else if (this.from === 'train') {
 				// 火车票订单跳转到统一订单列表页面
 				this.orderUrl = '/pages/hotel/order-list?order_type=train&status=1';
+				} else if (this.from === 'taxi' || this.from === 'car') {
+					// 打车订单跳转到统一订单列表页面的打车类型
+					this.orderUrl = '/pages/hotel/order-list?order_type=taxi';
 			}
 			this.getOrderResultFun();
 		},
@@ -143,6 +149,32 @@
 							pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
 						}
 					})
+				} else if (this.from === 'taxi' || this.from === 'car') {
+					// 打车订单详情
+					getCarOrderDetail({
+						order_id: this.id
+					}).then(res => {
+						if (res.code == 1 && res.data) {
+							const payWayMap = { 1: '微信支付', 2: '支付宝', 3: '余额支付', 0: '未支付' }
+							this.payInfo = {
+								order_sn: res.data.order_sn || '',
+								pay_time: res.data.pay_time_text || res.data.pay_time || new Date().toISOString().replace('T', ' ').substring(0, 19),
+								pay_way_text: payWayMap[res.data.pay_way] || '余额支付',
+								order_amount: res.data.amount_payable || res.data.amount_paid || 0
+							}
+						} else {
+							this.payInfo = {
+								pay_way_text: '余额支付',
+								pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
+							}
+						}
+					}).catch(err => {
+						console.error('获取打车订单详情失败', err);
+						this.payInfo = {
+							pay_way_text: '余额支付',
+							pay_time: new Date().toISOString().replace('T', ' ').substring(0, 19)
+						}
+					});
 				} else {
 					// 普通订单
 					getOrderDetail(this.id).then(res => {
