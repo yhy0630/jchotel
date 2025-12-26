@@ -123,7 +123,7 @@ export default {
     },
     viewDetail(id) {
       uni.navigateTo({
-        url: `/pages/user/member-apply-detail?id=${id}`
+        url: `/bundle/pages/user/member-apply-detail?id=${id}`
       })
     },
     chooseGrade(item) {

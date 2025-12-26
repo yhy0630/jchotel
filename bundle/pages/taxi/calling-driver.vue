@@ -147,7 +147,7 @@ export default {
 					if (orderStatus === 'ACCEPTED' || orderStatus === 'DRIVER_ACCEPTED') {
 						this.stopPolling()
 						uni.redirectTo({
-							url: `/pages/taxi/driver-accepted?orderId=${this.orderId}`
+							url: `/bundle/pages/taxi/driver-accepted?orderId=${this.orderId}`
 						})
 					}
 					// 如果订单被取消或失败，停止轮询
@@ -182,7 +182,7 @@ export default {
 			this.hideCancelDialog()
 			// 跳转到取消原因页面
 			uni.navigateTo({
-				url: `/pages/taxi/cancel-reason?orderId=${this.orderId}`
+				url: `/bundle/pages/taxi/cancel-reason?orderId=${this.orderId}`
 			})
 		}
 	}

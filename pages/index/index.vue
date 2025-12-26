@@ -281,7 +281,7 @@ import config from '@/config/app.js'
       // 点击租车/用车，跳转到打车页面
       if (index === 2) {
         uni.navigateTo({
-          url: '/pages/taxi/taxi-index'
+          url: '/bundle/pages/taxi/taxi-index'
         })
       }
 
@@ -388,7 +388,7 @@ import config from '@/config/app.js'
 			} else if (this.currentTab === 2) {
 				// 跳转到打车页面
 				uni.navigateTo({
-					url: '/pages/taxi/taxi-index'
+					url: '/bundle/pages/taxi/taxi-index'
 				})
 			}
 		},

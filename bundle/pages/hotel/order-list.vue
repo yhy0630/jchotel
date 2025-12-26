@@ -442,7 +442,7 @@ export default {
         'flight': '/bundle/pages/ticket/flight-order-detail',
         'train': '/bundle/pages/ticket/train-order-detail',
         'car_rental': '/pages/car/order-detail',
-        'taxi': '/pages/taxi/order-detail',
+        'taxi': '/bundle/pages/taxi/order-detail',
         'hotel': '/bundle/pages/hotel/order-detail'
       }
       

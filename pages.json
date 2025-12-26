@@ -34,54 +34,6 @@
 		// 		"navigationBarTitleText": "资讯详情"
 		// 	}
 		// },
-		{
-			"path": "pages/industry/industry",
-			"style": {
-				"navigationBarTitleText": "行业资讯"
-			}
-		},
-		{
-			"path": "pages/industry_list/law",
-			"style": {
-				"navigationBarTitleText": "法律援助"
-			}
-		},
-		{
-			"path": "pages/industry_list/cheer",
-			"style": {
-				"navigationBarTitleText": "加油/充电"
-			}
-		},
-		{
-			"path": "pages/industry_list/cheer_detail",
-			"style": {
-				"navigationBarTitleText": "加油"
-			}
-		},
-		{
-			"path": "pages/industry_list/power_detail",
-			"style": {
-				"navigationBarTitleText": "充电站"
-			}
-		},
-		{
-			"path": "pages/industry_list/pile_detail",
-			"style": {
-				"navigationBarTitleText": "充电桩详情"
-			}
-		},
-		{
-			"path": "pages/industry_list/private",
-			"style": {
-				"navigationBarTitleText": "私人秘书"
-			}
-		},
-		{
-			"path": "pages/industry_list/agency",
-			"style": {
-				"navigationBarTitleText": "工商代办"
-			}
-		},
 		// {
 		// 	"path": "pages/sort/sort",
 		// 	"style": {
@@ -96,6 +48,12 @@
 		// 	}
 		// },
 		{
+			"path": "pages/industry/industry",
+			"style": {
+				"navigationBarTitleText": "行业资讯"
+			}
+		},
+		{
 			"path": "pages/user/user",
 			"style": {
 				"navigationBarTitleText": "个人中心",
@@ -104,81 +62,33 @@
 			}
 
 		},
-		{
-			"path": "pages/user/member-business-travel-apply",
-			"style": {
-				"navigationBarTitleText": "商旅会员入驻"
-			}
-		},
-		{
-			"path": "pages/user/member-channel-apply",
-			"style": {
-				"navigationBarTitleText": "渠道会员入驻"
-			}
-		},
-		{
-			"path": "pages/user/member-enterprise-apply",
-			"style": {
-				"navigationBarTitleText": "企业会员入驻"
-			}
-		},
-		{
-			"path": "pages/user/member-business-apply",
-			"style": {
-				"navigationBarTitleText": "商务会员入驻"
-			}
-		},
-        {
-            "path": "pages/user/member-apply-record",
-            "style": {
-                "navigationBarTitleText": "入驻申请记录"
-            }
-        },
-        {
-            "path": "pages/user/member-apply-detail",
-            "style": {
-                "navigationBarTitleText": "申请详情"
-            }
-        },
-		{
-			"path": "pages/user/member-center",
-			"style": {
-				"navigationBarTitleText": "会员个人中心"
-			}
-		},
-		{
-			"path": "pages/user/member-upgrade",
-			"style": {
-				"navigationBarTitleText": "会员升级"
-			}
-		},
-		{
-			"path": "pages/goods_search/goods_search",
-			"style": {
-				"navigationBarTitleText": "商品搜索"
-			}
-		},
-		{
-			"path": "pages/goods_details/goods_details",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "商品详情"
-			}
+		// {
+		// 	"path": "pages/goods_search/goods_search",
+		// 	"style": {
+		// 		"navigationBarTitleText": "商品搜索"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/goods_details/goods_details",
+		// 	"style": {
+		// 		"navigationStyle": "custom",
+		// 		"navigationBarTitleText": "商品详情"
+		// 	}
 
-		},
-		{
-			"path": "pages/confirm_order/confirm_order",
-			"style": {
-				"navigationBarTitleText": "确认订单"
-			}
+		// },
+		// {
+		// 	"path": "pages/confirm_order/confirm_order",
+		// 	"style": {
+		// 		"navigationBarTitleText": "确认订单"
+		// 	}
 
-		},
-		{
-			"path": "pages/user_collection/user_collection",
-			"style": {
-				"navigationBarTitleText": "我的收藏"
-			}
-		},
+		// },
+		// {
+		// 	"path": "pages/user_collection/user_collection",
+		// 	"style": {
+		// 		"navigationBarTitleText": "我的收藏"
+		// 	}
+		// },
 		{
 			"path": "pages/user_coupon/user_coupon",
 			"style": {
@@ -211,22 +121,22 @@
 				"navigationBarTitleText": "注册账号"
 			}
 		},
-		{
-			"path": "pages/user_order/user_order",
-			"style": {
-				"navigationBarTitleText": "我的订单",
-				"navigationStyle": "custom",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/order_details/order_details",
-			"style": {
-				"navigationBarTitleText": "订单详情",
-				"navigationStyle": "custom",
-				"enablePullDownRefresh": true
-			}
-		},
+		// {
+		// 	"path": "pages/user_order/user_order",
+		// 	"style": {
+		// 		"navigationBarTitleText": "我的订单",
+		// 		"navigationStyle": "custom",
+		// 		"enablePullDownRefresh": true
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/order_details/order_details",
+		// 	"style": {
+		// 		"navigationBarTitleText": "订单详情",
+		// 		"navigationStyle": "custom",
+		// 		"enablePullDownRefresh": true
+		// 	}
+		// },
 		{
 			"path": "pages/all_comments/all_comments",
 			"style": {
@@ -264,71 +174,7 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
-		},
-      {
-        "path": "pages/taxi/taxi-index",
-        "style": {
-          "navigationBarTitleText": "打车",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
-      {
-        "path": "pages/taxi/taxi-order",
-        "style": {
-          "navigationBarTitleText": "打车",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
-      {
-        "path": "pages/taxi/destination-select",
-        "style": {
-          "navigationBarTitleText": "选择目的地",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
-      {
-        "path": "pages/taxi/origin-select",
-        "style": {
-          "navigationBarTitleText": "选择起点",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
-      {
-        "path": "pages/taxi/calling-driver",
-        "style": {
-          "navigationBarTitleText": "打车",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
-      {
-        "path": "pages/taxi/driver-accepted",
-        "style": {
-          "navigationBarTitleText": "打车",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
-      {
-        "path": "pages/taxi/cancel-reason",
-        "style": {
-          "navigationBarTitleText": "取消原因",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
-      {
-        "path": "pages/taxi/order-detail",
-        "style": {
-          "navigationBarTitleText": "打车订单详情",
-          "navigationBarBackgroundColor": "#1A1B3D",
-          "navigationBarTextStyle": "white"
-        }
-      },
+		}
 		// {
 		// 	"path": "components/uview-ui/components/u-avatar-cropper/u-avatar-cropper",
 		// 	"style": {
@@ -829,6 +675,168 @@
 				"style": {
 					"navigationBarTitleText": "尊享房",
 					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/taxi/taxi-index",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/taxi-order",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/destination-select",
+				"style": {
+					"navigationBarTitleText": "选择目的地",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/origin-select",
+				"style": {
+					"navigationBarTitleText": "选择起点",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/origin-search",
+				"style": {
+					"navigationBarTitleText": "选择上车点",
+					"navigationBarBackgroundColor": "#0D1034",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/calling-driver",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/driver-accepted",
+				"style": {
+					"navigationBarTitleText": "打车",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/cancel-reason",
+				"style": {
+					"navigationBarTitleText": "取消原因",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/taxi/order-detail",
+				"style": {
+					"navigationBarTitleText": "打车订单详情",
+					"navigationBarBackgroundColor": "#1A1B3D",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
+				"path": "pages/industry_list/law",
+				"style": {
+					"navigationBarTitleText": "法律援助"
+				}
+			},
+			{
+				"path": "pages/industry_list/cheer",
+				"style": {
+					"navigationBarTitleText": "加油/充电"
+				}
+			},
+			{
+				"path": "pages/industry_list/cheer_detail",
+				"style": {
+					"navigationBarTitleText": "加油"
+				}
+			},
+			{
+				"path": "pages/industry_list/power_detail",
+				"style": {
+					"navigationBarTitleText": "充电站"
+				}
+			},
+			{
+				"path": "pages/industry_list/pile_detail",
+				"style": {
+					"navigationBarTitleText": "充电桩详情"
+				}
+			},
+			{
+				"path": "pages/industry_list/private",
+				"style": {
+					"navigationBarTitleText": "私人秘书"
+				}
+			},
+			{
+				"path": "pages/industry_list/agency",
+				"style": {
+					"navigationBarTitleText": "工商代办"
+				}
+			},
+			{
+				"path": "pages/user/member-business-travel-apply",
+				"style": {
+					"navigationBarTitleText": "商旅会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-channel-apply",
+				"style": {
+					"navigationBarTitleText": "渠道会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-enterprise-apply",
+				"style": {
+					"navigationBarTitleText": "企业会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-business-apply",
+				"style": {
+					"navigationBarTitleText": "商务会员入驻"
+				}
+			},
+			{
+				"path": "pages/user/member-apply-record",
+				"style": {
+					"navigationBarTitleText": "入驻申请记录"
+				}
+			},
+			{
+				"path": "pages/user/member-apply-detail",
+				"style": {
+					"navigationBarTitleText": "申请详情"
+				}
+			},
+			{
+				"path": "pages/user/member-center",
+				"style": {
+					"navigationBarTitleText": "会员个人中心"
+				}
+			},
+			{
+				"path": "pages/user/member-upgrade",
+				"style": {
+					"navigationBarTitleText": "会员升级"
 				}
 			}
 		]

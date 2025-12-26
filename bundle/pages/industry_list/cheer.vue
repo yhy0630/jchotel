@@ -188,12 +188,12 @@ export default {
     },
     goToDetail(item) {
       uni.navigateTo({
-        url: '/pages/industry_list/cheer_detail'
+        url: '/bundle/pages/industry_list/cheer_detail'
       })
     },
     goToPowerDetail(item) {
       uni.navigateTo({
-        url: '/pages/industry_list/power_detail'
+        url: '/bundle/pages/industry_list/power_detail'
       })
     }
   }

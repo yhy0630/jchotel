@@ -16,32 +16,32 @@
     <!-- 按钮区域 -->
     <view class="button-container">
       <view class="button-row">
-        <view class="button-item" @click="navigateTo('/pages/industry_list/ai')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/ai')">
           <text class="button-text">AI咨询</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/law')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/law')">
           <text class="button-text">法律援助</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/cheer')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/cheer')">
           <text class="button-text">加油/充电</text>
         </view>
       </view>
       <view class="button-row">
-        <view class="button-item" @click="navigateTo('/pages/industry_list/private')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/private')">
           <text class="button-text">私人秘书</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/agency')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/agency')">
           <text class="button-text">工商代办</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/company')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/company')">
           <text class="button-text">管企业</text>
         </view>
       </view>
       <view class="button-row">
-        <view class="button-item" @click="navigateTo('/pages/industry_list/doctor')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/doctor')">
           <text class="button-text">就医/陪诊</text>
         </view>
-        <view class="button-item" @click="navigateTo('/pages/industry_list/tea')">
+        <view class="button-item" @click="navigateTo('/bundle/pages/industry_list/tea')">
           <text class="button-text">酒水/茶</text>
         </view>
       </view>

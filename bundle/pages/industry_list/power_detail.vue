@@ -103,7 +103,7 @@ export default {
     },
     goToPileDetail(pile) {
       uni.navigateTo({
-        url: '/pages/industry_list/pile_detail'
+        url: '/bundle/pages/industry_list/pile_detail'
       })
     }
   }

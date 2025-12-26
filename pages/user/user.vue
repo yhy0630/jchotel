@@ -85,7 +85,7 @@
                 </view>
             </view>
             <view class="member-actions">
-                <view class="action-btn action-upgrade" @tap="goPage('/pages/user/member-upgrade')">升级会员</view>
+                <view class="action-btn action-upgrade" @tap="goPage('/bundle/pages/user/member-upgrade')">升级会员</view>
                 <view class="action-btn action-center" @tap="openMemberCenter">个人中心</view>
                 <view class="action-btn action-switch" @tap="switchIdentity">切换身份</view>
             </view>
@@ -574,13 +574,13 @@
 
                 // 未开通，跳转入驻表单
                 if (targetType === 'business_travel') {
-                    url = '/pages/user/member-business-travel-apply'
+                    url = '/bundle/pages/user/member-business-travel-apply'
                 } else if (targetType === 'channel') {
-                    url = '/pages/user/member-channel-apply'
+                    url = '/bundle/pages/user/member-channel-apply'
                 } else if (targetType === 'enterprise') {
-                    url = '/pages/user/member-enterprise-apply'
+                    url = '/bundle/pages/user/member-enterprise-apply'
                 } else if (targetType === 'business') {
-                    url = '/pages/user/member-business-apply'
+                    url = '/bundle/pages/user/member-business-apply'
                 }
                 
                 if (url) {
@@ -617,7 +617,7 @@
                     return;
                 }
                 uni.navigateTo({
-                    url: `/pages/user/member-center?type=${targetType}`
+                    url: `/bundle/pages/user/member-center?type=${targetType}`
                 })
             },
             // 辅助函数：根据会员key获取标签
@@ -630,7 +630,7 @@
 					return toLogin();
 				}
 				uni.navigateTo({
-					url: '/pages/user/member-apply-record'
+					url: '/bundle/pages/user/member-apply-record'
 				});
 			},
 			handleMenuClick(type) {

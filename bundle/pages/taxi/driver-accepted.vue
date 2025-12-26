@@ -336,7 +336,7 @@ export default {
 			this.hideCancelDialog()
 			// 跳转到取消原因页面
 			uni.navigateTo({
-				url: `/pages/taxi/cancel-reason?orderId=${this.orderId}`
+				url: `/bundle/pages/taxi/cancel-reason?orderId=${this.orderId}`
 			})
 		}
 	}

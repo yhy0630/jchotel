@@ -106,7 +106,7 @@ export default {
       this.currentTab = key
       // 需要切换到酒水页可在此添加跳转
       if (key === 'wine') {
-        // uni.navigateTo({ url: '/pages/industry_list/wine' })
+        // uni.navigateTo({ url: '/bundle/pages/industry_list/wine' })
       }
     },
     toggleItem(index) {

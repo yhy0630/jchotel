@@ -120,9 +120,9 @@ export default {
         travel: '/bundle/pages/hotel/order-list?status=1',
         review: '/bundle/pages/hotel/order-list?status=2',
         completed: '/bundle/pages/hotel/order-list?status=3',
-        complaint: '/pages/user/complaint',
-        platform: '/pages/user/platform-info',
-        archive: '/pages/user/user-profile'
+        complaint: '/bundle/pages/user/complaint',
+        platform: '/bundle/pages/user/platform-info',
+        archive: '/bundle/pages/user/user-profile'
       }
       
       if (routes[type]) {

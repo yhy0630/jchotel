@@ -139,12 +139,12 @@ export default {
 		},
 		selectOrigin() {
 			uni.navigateTo({
-				url: '/pages/taxi/origin-select'
+				url: '/bundle/pages/taxi/origin-select'
 			})
 		},
 		selectDestination() {
 			uni.navigateTo({
-				url: '/pages/taxi/destination-select'
+				url: '/bundle/pages/taxi/destination-select'
 			})
 		},
 		handleDestinationFocus() {
@@ -161,7 +161,7 @@ export default {
 
 			// 确认路线，跳转到呼叫司机页面
 			uni.navigateTo({
-				url: `/pages/taxi/calling-driver?origin=${encodeURIComponent(this.originText)}&destination=${encodeURIComponent(this.destinationText)}`
+				url: `/bundle/pages/taxi/calling-driver?origin=${encodeURIComponent(this.originText)}&destination=${encodeURIComponent(this.destinationText)}`
 			})
 		},
 		locateMap() {
