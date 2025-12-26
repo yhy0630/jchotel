@@ -1,5 +1,6 @@
 <template>
 	<view class="destination-select">
+		<custom-navbar title="打车"></custom-navbar>
 		<!-- 搜索输入框 -->
 		<view class="search-input">
 			<view class="input-dot orange"></view>
@@ -178,10 +179,11 @@ export default {
 .destination-select {
 	width: 100%;
 	height: 100vh;
-	background: #0D1038;
+	background: #0D1034;
 	display: flex;
 	flex-direction: column;
 	padding-bottom: 20rpx;
+	padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .navbar {

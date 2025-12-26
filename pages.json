@@ -717,6 +717,14 @@
 				}
 			},
 			{
+				"path": "pages/taxi/origin-search",
+				"style": {
+					"navigationBarTitleText": "选择上车点",
+					"navigationBarBackgroundColor": "#0D1034",
+					"navigationBarTextStyle": "white"
+				}
+			},
+			{
 				"path": "pages/taxi/calling-driver",
 				"style": {
 					"navigationBarTitleText": "打车",

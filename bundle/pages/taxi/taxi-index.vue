@@ -1,16 +1,6 @@
 <template>
   <view class="taxi-index">
-    <!-- 顶部导航 -->
-  <!--  <view class="navbar">
-      <view class="nav-left" @click="goBack">
-        <text class="nav-icon">‹</text>
-      </view>
-      <view class="nav-title">打车</view>
-      <view class="nav-right">
-        <text class="nav-icon">⋯</text>
-        <text class="nav-icon">◎</text>
-      </view>
-    </view> -->
+    <custom-navbar title="打车"></custom-navbar>
 
     <!-- 分段控制器 -->
     <view class="segment-control">
@@ -30,38 +20,9 @@
       </view>
     </view>
 
-    <!-- 地址输入区域 -->
-    <view class="address-input-area">
-      <!-- 起点输入 -->
-      <view class="origin-input" @click="handleOriginClick">
-        <view class="input-dot green"></view>
-        <view class="input-content">
-          <text v-if="departAddress.address" class="input-text">
-            从 {{ departAddress.address }}{{ departAddress.addressDetail ? ' ' + departAddress.addressDetail : '' }} 上车
-          </text>
-          <text v-else class="input-placeholder">请输入起点</text>
-        </view>
-      </view>
-
-      <!-- 目的地输入 -->
-      <view class="destination-input" @click="handleDestinationClick">
-        <view class="input-dot orange"></view>
-        <view class="input-content">
-          <text v-if="arriveAddress.address" class="input-text">
-            {{ arriveAddress.address }}{{ arriveAddress.addressDetail ? ' ' + arriveAddress.addressDetail : '' }}
-          </text>
-          <text v-else class="input-placeholder">您想去哪儿?</text>
-        </view>
-      </view>
-
-      <!-- 安全中心 -->
-      <view class="safety-center">
-        <view class="safety-icon">✓</view>
-        <text class="safety-text">安全中心</text>
-      </view>
-    </view>
-
-    <!-- 地图 -->
+    <!-- 地图容器 -->
+    <view class="map-wrapper">
+      <!-- 地图 -->
     <view class="map-container">
       <map
         id="taxiMap"
@@ -70,28 +31,162 @@
         :longitude="mapCenter.longitude"
         :scale="16"
         :markers="markers"
-        :polylines="polylines"
+        :polyline="polylines"
         :show-location="true"
+        :enable-3D="false"
         @regionchange="handleMapRegionChange"
       />
 
-      <!-- 拖图提示 -->
-      <view v-if="mapDragged" class="map-tip" @click="recenterMap">
-        <text class="tip-text">您已拖图,点击可重新定位</text>
-        <text class="tip-close" @click.stop="closeMapTip">×</text>
-        <text class="tip-icon">◎</text>
+      <!-- 定位控件（拖图后可点击重新定位） -->
+      <view class="map-control" @click="recenterMap" v-if="mapDragged">
+        <image class="control-icon" src="/static/images/dingwei zong.png" mode="aspectFit"></image>
       </view>
 
-      <!-- 左下角控件 -->
-      <view class="map-control">
-        <view class="control-icon">🛡+</view>
+      <!-- 地址输入区域 -->
+      <view class="address-input-area">
+        <!-- 起点输入 -->
+        <view class="origin-input" @click="handleOriginClick">
+          <view class="input-dot green"></view>
+          <view class="input-content">
+            <text v-if="departAddress.address" class="input-text">
+              从 {{ departAddress.address }}{{ departAddress.addressDetail ? ' ' + departAddress.addressDetail : '' }} 上车
+            </text>
+            <text v-else class="input-placeholder">从 {{ currentLocationText }} 上车</text>
+          </view>
+        </view>
+
+        <!-- 目的地输入 -->
+        <view class="destination-input" @click="handleDestinationClick">
+          <view class="input-dot orange"></view>
+          <view class="input-content">
+            <text v-if="arriveAddress.address" class="input-text">
+              {{ arriveAddress.address }}{{ arriveAddress.addressDetail ? ' ' + arriveAddress.addressDetail : '' }}
+            </text>
+            <text v-else class="input-placeholder">您想去哪儿?</text>
+          </view>
+        </view>
+
+        <!-- 安全中心 -->
+        <view class="safety-center">
+          <image class="safety-icon" src="/static/images/depend.png" mode="aspectFit"></image>
+          <text class="safety-text">安全中心</text>
+        </view>
+      </view>
+    </view>
+    </view>
+
+    <!-- 确认上车位置弹窗 -->
+    <view class="pickup-modal" v-if="showPickupPanel" @click.stop="closePickupPanel">
+      <view class="pickup-modal-mask" @click="closePickupPanel"></view>
+      
+      <!-- 搜索框 -->
+      <view class="pickup-search-box" @click.stop>
+        <view class="pickup-search-input-wrapper" @click.stop>
+          <view class="pickup-search-icon"></view>
+          <input 
+            class="pickup-search-input" 
+            v-model="pickupSearchKeyword"
+            placeholder="请输入起点"
+            placeholder-class="pickup-search-placeholder"
+            @input="handlePickupSearch"
+            @focus="handlePickupSearchFocus"
+            @click.stop
+          />
+          <view class="pickup-search-clear" v-if="pickupSearchKeyword" @click.stop="clearPickupSearch">
+            <text>×</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="pickup-modal-content" @click.stop>
+        <view class="pickup-modal-header">
+          <text class="pickup-title">请确认上车位置</text>
+          <text class="pickup-subtitle">点击列表选择上车点</text>
+        </view>
+
+        <!-- 搜索建议列表 -->
+        <scroll-view 
+          class="pickup-scroll-list" 
+          scroll-y 
+          v-if="!pickupLoading && showPickupSuggestions && pickupSuggestions.length > 0"
+        >
+          <view
+            v-for="(item, index) in pickupSuggestions"
+            :key="`sug-${index}`"
+            class="pickup-item suggestion-item"
+            @click="handlePickupSuggestionTap(index)"
+          >
+            <view class="pickup-dot"></view>
+            <view class="pickup-item-content">
+              <text class="pickup-name">{{ item.title }}</text>
+              <text class="pickup-distance" v-if="item.address">{{ item.address }}</text>
+            </view>
+          </view>
+        </scroll-view>
+
+        <!-- 搜索结果列表 -->
+        <scroll-view 
+          class="pickup-scroll-list" 
+          scroll-y 
+          v-if="!pickupLoading && !showPickupSuggestions && pickupSearched && pickupSearchResults.length > 0"
+        >
+          <view
+            v-for="(item, index) in pickupSearchResults"
+            :key="`result-${index}`"
+            class="pickup-item"
+            :class="{ active: selectedPickupIndex === index }"
+            @click="selectPickupSearchResult(item, index)"
+          >
+            <view class="pickup-dot"></view>
+            <view class="pickup-item-content">
+              <text class="pickup-name">{{ item.name }}</text>
+              <text class="pickup-distance" v-if="item.distance">{{ item.distance }}</text>
+            </view>
+          </view>
+        </scroll-view>
+
+        <!-- 默认附近上车点列表 -->
+        <scroll-view 
+          class="pickup-scroll-list" 
+          scroll-y 
+          v-if="!pickupLoading && !showPickupSuggestions && !pickupSearched"
+        >
+          <view
+            v-for="(item, index) in pickupLocations"
+            :key="index"
+            class="pickup-item"
+            :class="{ active: selectedPickupIndex === index }"
+            @click="selectPickupLocation(item, index)"
+          >
+            <view class="pickup-dot"></view>
+            <view class="pickup-item-content">
+              <text class="pickup-name">{{ item.name }}</text>
+              <text class="pickup-distance" v-if="item.distance">{{ item.distance }}</text>
+            </view>
+          </view>
+
+          <view class="pickup-empty" v-if="pickupLocations.length === 0">
+            <text class="pickup-empty-text">附近暂无可选上车点</text>
+          </view>
+        </scroll-view>
+
+        <!-- 搜索无结果 -->
+        <view class="pickup-empty" v-if="!pickupLoading && !showPickupSuggestions && pickupSearched && pickupSearchResults.length === 0">
+          <text class="pickup-empty-text">未找到相关上车点</text>
+        </view>
+
+        <view class="pickup-loading" v-else>
+          <text class="pickup-loading-text">加载中...</text>
+        </view>
+
+        <button class="pickup-confirm-btn" @click="confirmPickup">确认上车点</button>
       </view>
     </view>
 
     <!-- 底部确认上车并预估 -->
-    <view class="confirm-bar" v-if="!showPricePanel">
+    <!-- <view class="confirm-bar" v-if="!showPricePanel">
       <button class="confirm-btn" @click="handleConfirmEstimate" :loading="priceLoading">确认上车点并预估</button>
-    </view>
+    </view> -->
 
     <!-- 预估价格弹窗 -->
     <view class="price-panel" v-if="showPricePanel && priceData.length > 0">
@@ -192,6 +287,7 @@ export default {
         cityName: '',
         longitude: '',
         latitude: '',
+        name: '',
         address: '',
         addressDetail: ''
       },
@@ -200,6 +296,7 @@ export default {
         cityName: '',
         longitude: '',
         latitude: '',
+        name: '',
         address: '',
         addressDetail: ''
       },
@@ -230,17 +327,17 @@ export default {
       },
       currentVehicle: null,
       currentPrice: null,
-      markers: [
-        {
-          id: 1,
-          latitude: 39.908823,
-          longitude: 116.39747,
-          // 使用已有的定位图标，避免找不到 marker.png 报错
-          iconPath: '/static/images/dingwei 1.png',
-          width: 30,
-          height: 40
-        }
-      ]
+      currentLocationText: '我的位置',
+      markers: [],
+      pickupLoading: false,
+      selectedPickupIndex: -1,
+      pickupSearchKeyword: '',
+      originalPickupLocations: [],
+      pickupSuggestions: [],
+      showPickupSuggestions: false,
+      pickupSearchResults: [],
+      pickupSearched: false,
+      pickupSearchTimer: null
     }
   },
   onShow() {
@@ -264,20 +361,20 @@ export default {
       // 这里可以添加切换标签的逻辑
     },
     handleOriginClick() {
-      uni.navigateTo({
-        url: '/bundle/pages/taxi/origin-select'
-      })
+      this.openPickupPanel()
     },
     handleDestinationClick() {
       uni.navigateTo({
-        url: '/bundle/pages/taxi/destination-select'
+        url: '/bundle/pages/taxi/origin-search?type=destination'
       })
     },
     checkAddressSelection() {
+      console.log('checkAddressSelection 被调用')
       let changed = false
       // 检查是否有从地址选择页面返回的数据
       try {
         const selectedOrigin = uni.getStorageSync('selectedOrigin')
+        console.log('读取到的selectedOrigin:', selectedOrigin)
         if (selectedOrigin) {
           // 处理起点选择
           this.departAddress = {
@@ -285,9 +382,37 @@ export default {
             cityName: selectedOrigin.cityName || '',
             longitude: selectedOrigin.longitude || '',
             latitude: selectedOrigin.latitude || '',
+            name: selectedOrigin.name || '',
             address: selectedOrigin.address || selectedOrigin.name || '',
             addressDetail: selectedOrigin.addressDetail || ''
           }
+          console.log('更新后的departAddress:', this.departAddress)
+          
+          // 更新地图中心到选中的起点位置
+          if (selectedOrigin.latitude && selectedOrigin.longitude) {
+            const lat = Number(selectedOrigin.latitude)
+            const lng = Number(selectedOrigin.longitude)
+            console.log('更新地图中心到:', lat, lng)
+            
+            this.mapCenter = {
+              latitude: lat,
+              longitude: lng
+            }
+            // 更新用户位置
+            this.userLocation = {
+              latitude: selectedOrigin.latitude,
+              longitude: selectedOrigin.longitude
+            }
+            
+            // 使用$nextTick确保数据更新后再移动地图
+            this.$nextTick(() => {
+              console.log('开始移动地图，mapCenter已更新为:', this.mapCenter)
+              // 地图会自动响应mapCenter的变化
+              // 如果需要强制刷新，可以调用updateRoute
+              this.updateRoute()
+            })
+          }
+          
           // 清除存储的数据
           uni.removeStorageSync('selectedOrigin')
           changed = true
@@ -307,6 +432,7 @@ export default {
             cityName: selectedDestination.cityName || '',
             longitude: selectedDestination.longitude || '',
             latitude: selectedDestination.latitude || '',
+            name: selectedDestination.name || '',
             address: selectedDestination.address || selectedDestination.name || '',
             addressDetail: selectedDestination.addressDetail || ''
           }
@@ -414,7 +540,7 @@ export default {
     },
     recenterMap() {
       this.mapDragged = false
-      this.getCurrentLocation()
+      this.getCurrentLocationAndSetOrigin()
     },
     closeMapTip() {
       this.mapDragged = false
@@ -427,13 +553,10 @@ export default {
           id: 1001,
           latitude: Number(this.departAddress.latitude),
           longitude: Number(this.departAddress.longitude),
-          iconPath: '/static/images/dingwei 1.png',
-          width: 30,
-          height: 40,
           callout: {
-            content: '起点',
-            color: '#fff',
-            bgColor: '#1a1b3d',
+            content: this.departAddress.name || this.departAddress.address || '起点',
+            color: '#000',
+            bgColor: '#fff',
             padding: 8,
             display: 'ALWAYS',
             borderRadius: 6
@@ -446,13 +569,10 @@ export default {
           id: 1002,
           latitude: Number(this.arriveAddress.latitude),
           longitude: Number(this.arriveAddress.longitude),
-          iconPath: '/static/images/dingwei 1.png',
-          width: 30,
-          height: 40,
           callout: {
-            content: '终点',
-            color: '#fff',
-            bgColor: '#ff6b35',
+            content: this.arriveAddress.name || this.arriveAddress.address || '终点',
+            color: '#000',
+            bgColor: '#fff',
             padding: 8,
             display: 'ALWAYS',
             borderRadius: 6
@@ -464,18 +584,7 @@ export default {
         markers.push({
           id: 999,
           latitude: Number(this.userLocation.latitude),
-          longitude: Number(this.userLocation.longitude),
-          iconPath: '/static/images/dingwei 1.png',
-          width: 26,
-          height: 34,
-          callout: {
-            content: '我',
-            color: '#fff',
-            bgColor: '#2a2b4d',
-            padding: 6,
-            display: 'ALWAYS',
-            borderRadius: 6
-          }
+          longitude: Number(this.userLocation.longitude)
         })
       }
       this.markers = markers
@@ -486,24 +595,11 @@ export default {
         this.arriveAddress.latitude &&
         this.arriveAddress.longitude
       ) {
-        this.polylines = [
-          {
-            points: [
-              {
-                latitude: Number(this.departAddress.latitude),
-                longitude: Number(this.departAddress.longitude)
-              },
-              {
-                latitude: Number(this.arriveAddress.latitude),
-                longitude: Number(this.arriveAddress.longitude)
-              }
-            ],
-            color: '#ffb84d',
-            width: 6,
-            dottedLine: false
-          }
-        ]
+        console.log('updateRoute: 起点和终点都存在，调用路线规划')
+        // 调用驾车路线规划API获取实际路线
+        this.getDirectionRoute()
       } else {
+        console.log('updateRoute: 起点或终点不存在，清空路线')
         this.polylines = []
       }
 
@@ -523,10 +619,187 @@ export default {
         }
       }
     },
+    getDirectionRoute() {
+      // 调用腾讯地图驾车路线规划API
+      const from = `${this.departAddress.latitude},${this.departAddress.longitude}`
+      const to = `${this.arriveAddress.latitude},${this.arriveAddress.longitude}`
+      
+      console.log('请求驾车路线:', from, '->', to)
+      
+      uni.request({
+        url: 'https://apis.map.qq.com/ws/direction/v1/driving/',
+        data: {
+          from: from,
+          to: to,
+          key: '7ESBZ-IFMRN-IQSFQ-SFVGS-5UA35-5IBDQ'
+        },
+        success: (res) => {
+          console.log('路线规划API返回:', res.data)
+          if (res.data && res.data.status === 0 && res.data.result && res.data.result.routes && res.data.result.routes.length > 0) {
+            const route = res.data.result.routes[0]
+            console.log('路线数据:', route)
+            
+            // 解析路线坐标（按照腾讯地图官方示例）
+            const points = []
+            if (route.polyline) {
+              console.log('polyline类型:', typeof route.polyline)
+              console.log('polyline内容:', route.polyline)
+              
+              // 获取坐标数组
+              let coors = []
+              if (typeof route.polyline === 'string') {
+                coors = route.polyline.split(';')
+              } else if (Array.isArray(route.polyline)) {
+                coors = route.polyline
+              } else {
+                console.error('未知的polyline格式')
+              }
+              
+              console.log('原始坐标数组长度:', coors.length)
+              console.log('前10个坐标:', coors.slice(0, 10))
+              
+              // 坐标解压（返回的点串坐标，通过前向差分进行压缩）
+              const kr = 1000000
+              for (let i = 2; i < coors.length; i++) {
+                coors[i] = Number(coors[i - 2]) + Number(coors[i]) / kr
+              }
+              
+              // 将解压后的坐标放入点串数组points中
+              for (let i = 0; i < coors.length; i += 2) {
+                points.push({ 
+                  latitude: coors[i], 
+                  longitude: coors[i + 1] 
+                })
+              }
+              
+              console.log('解压后的前3个点:', points.slice(0, 3))
+            }
+            
+            console.log('解析后的路线点数:', points.length)
+            console.log('前3个解析后的点:', points.slice(0, 3))
+            console.log('最后3个解析后的点:', points.slice(-3))
+            
+            // 更新地图polyline
+            // 1. 解压后的 points 已经拿到
+            if (!points.length) return
+            
+            // 设置polyline属性，将路线显示出来
+            this.polylines = [{
+              points: points,
+              color: '#02CF62',
+              width: 8,
+              borderColor: '#059E47',
+              borderWidth: 2
+            }]
+            
+            console.log('===== 路线绘制成功 =====')
+            console.log('polylines数据:', this.polylines)
+            console.log('路线点数:', points.length)
+            console.log('第一个点:', points[0])
+            console.log('最后一个点:', points[points.length - 1])
+            
+            // 使用$nextTick确保polylines更新后再调整地图视野
+            this.$nextTick(() => {
+              // 收集所有需要显示的点：起点、终点标记
+              const allPoints = []
+              if (this.departAddress.latitude && this.departAddress.longitude) {
+                allPoints.push({
+                  latitude: Number(this.departAddress.latitude),
+                  longitude: Number(this.departAddress.longitude)
+                })
+              }
+              if (this.arriveAddress.latitude && this.arriveAddress.longitude) {
+                allPoints.push({
+                  latitude: Number(this.arriveAddress.latitude),
+                  longitude: Number(this.arriveAddress.longitude)
+                })
+              }
+              
+              // 让地图自动缩放到能看见起点和终点
+              if (allPoints.length > 0 && this.mapCtx) {
+                this.mapCtx.includePoints({
+                  points: allPoints,
+                  padding: [80, 80, 80, 80]
+                })
+              }
+            })
+            
+            if (false) {
+              console.error('路线点为空')
+              // 如果解析失败，使用直线连接
+              this.polylines = [
+                {
+                  points: [
+                    {
+                      latitude: Number(this.departAddress.latitude),
+                      longitude: Number(this.departAddress.longitude)
+                    },
+                    {
+                      latitude: Number(this.arriveAddress.latitude),
+                      longitude: Number(this.arriveAddress.longitude)
+                    }
+                  ],
+                  color: '#1aad19',
+                  width: 6,
+                  dottedLine: false
+                }
+              ]
+            }
+          } else {
+            console.error('路线规划API返回异常:', res.data)
+            // API调用失败，使用直线连接
+            this.polylines = [
+              {
+                points: [
+                  {
+                    latitude: Number(this.departAddress.latitude),
+                    longitude: Number(this.departAddress.longitude)
+                  },
+                  {
+                    latitude: Number(this.arriveAddress.latitude),
+                    longitude: Number(this.arriveAddress.longitude)
+                  }
+                ],
+                color: '#1aad19',
+                width: 6,
+                dottedLine: false
+              }
+            ]
+          }
+        },
+        fail: (err) => {
+          console.error('路线规划API调用失败:', err)
+          // API调用失败，使用直线连接
+          this.polylines = [
+            {
+              points: [
+                {
+                  latitude: Number(this.departAddress.latitude),
+                  longitude: Number(this.departAddress.longitude)
+                },
+                {
+                  latitude: Number(this.arriveAddress.latitude),
+                  longitude: Number(this.arriveAddress.longitude)
+                }
+              ],
+              color: '#000',
+              width: 6,
+              dottedLine: false
+            }
+          ]
+        }
+      })
+    },
     getCurrentLocation() {
+      console.log('开始获取当前位置...')
       uni.getLocation({
         type: 'gcj02',
+        altitude: true,
+        geocode: true,
         success: (res) => {
+          console.log('定位成功，返回坐标:', res)
+          console.log('纬度:', res.latitude, '经度:', res.longitude)
+          
           this.mapCenter = {
             latitude: res.latitude,
             longitude: res.longitude
@@ -535,26 +808,485 @@ export default {
             latitude: res.latitude,
             longitude: res.longitude
           }
+          
+          // 获取地理位置名称
+          this.getLocationName(res.latitude, res.longitude)
           this.updateRoute()
         },
-        fail: () => {
+        fail: (err) => {
+          console.error('获取位置失败:', err)
           uni.showToast({
-            title: '获取位置失败',
-            icon: 'none'
+            title: '获取位置失败，请检查定位权限',
+            icon: 'none',
+            duration: 2000
+          })
+          this.currentLocationText = '我的位置'
+        }
+      })
+    },
+    getCurrentLocationAndSetOrigin() {
+      console.log('开始获取当前位置并设置为起点...')
+      uni.getLocation({
+        type: 'gcj02',
+        altitude: true,
+        geocode: true,
+        success: (res) => {
+          console.log('定位成功，返回坐标:', res)
+          console.log('纬度:', res.latitude, '经度:', res.longitude)
+          
+          this.mapCenter = {
+            latitude: res.latitude,
+            longitude: res.longitude
+          }
+          this.userLocation = {
+            latitude: res.latitude,
+            longitude: res.longitude
+          }
+          
+          // 获取地理位置名称并设置为起点
+          this.getLocationNameAndSetOrigin(res.latitude, res.longitude)
+        },
+        fail: (err) => {
+          console.error('获取位置失败:', err)
+          uni.showToast({
+            title: '获取位置失败，请检查定位权限',
+            icon: 'none',
+            duration: 2000
           })
         }
       })
     },
-    selectPickupLocation(item) {
-      // 这里可以记录选中的上车点
-      console.log('选择上车点:', item)
+    getLocationName(latitude, longitude) {
+      // 使用逆地理编码获取位置名称
+      uni.request({
+        url: `https://apis.map.qq.com/ws/geocoder/v1/?location=${latitude},${longitude}&key=7ESBZ-IFMRN-IQSFQ-SFVGS-5UA35-5IBDQ&get_poi=1`,
+        success: (res) => {
+          if (res.data && res.data.result) {
+            const result = res.data.result
+            // 优先使用POI名称，其次使用地址
+            if (result.pois && result.pois.length > 0) {
+              this.currentLocationText = result.pois[0].title || '我的位置'
+            } else if (result.formatted_addresses && result.formatted_addresses.recommend) {
+              this.currentLocationText = result.formatted_addresses.recommend
+            } else if (result.address) {
+              this.currentLocationText = result.address
+            } else {
+              this.currentLocationText = '我的位置'
+            }
+          }
+        },
+        fail: () => {
+          this.currentLocationText = '我的位置'
+        }
+      })
+    },
+    getLocationNameAndSetOrigin(latitude, longitude) {
+      // 使用逆地理编码获取位置名称并设置为起点
+      uni.request({
+        url: `https://apis.map.qq.com/ws/geocoder/v1/?location=${latitude},${longitude}&key=7ESBZ-IFMRN-IQSFQ-SFVGS-5UA35-5IBDQ&get_poi=1`,
+        success: (res) => {
+          if (res.data && res.data.result) {
+            const result = res.data.result
+            let locationName = '我的位置'
+            let locationAddress = ''
+            let cityId = ''
+            let cityName = ''
+            
+            // 从ad_info中获取城市信息
+            if (result.ad_info) {
+              cityId = result.ad_info.adcode || ''
+              cityName = result.ad_info.city || ''
+            }
+            
+            // 优先使用POI名称，其次使用地址
+            if (result.pois && result.pois.length > 0) {
+              locationName = result.pois[0].title || '我的位置'
+              locationAddress = result.pois[0].address || ''
+            } else if (result.formatted_addresses && result.formatted_addresses.recommend) {
+              locationName = result.formatted_addresses.recommend
+              locationAddress = result.address || ''
+            } else if (result.address) {
+              locationName = result.address
+              locationAddress = result.address || ''
+            }
+            
+            // 更新当前位置文本
+            this.currentLocationText = locationName
+            
+            // 设置为起点
+            this.departAddress = {
+              cityId: cityId,
+              cityName: cityName,
+              longitude: String(longitude),
+              latitude: String(latitude),
+              name: locationName,
+              address: locationName,
+              addressDetail: locationAddress
+            }
+            
+            // 更新路线和地图
+            this.updateRoute()
+            this.checkAndQueryPrice()
+            
+            uni.showToast({
+              title: '已设置为起点',
+              icon: 'success',
+              duration: 1500
+            })
+          }
+        },
+        fail: () => {
+          this.currentLocationText = '我的位置'
+          uni.showToast({
+            title: '获取位置信息失败',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      })
+    },
+    openPickupPanel() {
+      this.showPickupPanel = true
+      this.selectedPickupIndex = -1
+      this.fetchNearbyPickupPoints()
+    },
+    closePickupPanel() {
       this.showPickupPanel = false
     },
-    confirmPickup() {
-      this.showPickupPanel = false
-      uni.navigateTo({
-        url: '/bundle/pages/taxi/taxi-order'
+    getCurrentMapCenter() {
+      return new Promise((resolve) => {
+        if (!this.mapCtx || !this.mapCtx.getCenterLocation) {
+          resolve({
+            latitude: Number(this.mapCenter.latitude),
+            longitude: Number(this.mapCenter.longitude)
+          })
+          return
+        }
+        this.mapCtx.getCenterLocation({
+          success: (res) => {
+            resolve({
+              latitude: Number(res.latitude),
+              longitude: Number(res.longitude)
+            })
+          },
+          fail: () => {
+            resolve({
+              latitude: Number(this.mapCenter.latitude),
+              longitude: Number(this.mapCenter.longitude)
+            })
+          }
+        })
       })
+    },
+    calcDistanceMeters(lat1, lng1, lat2, lng2) {
+      const toRad = (v) => (v * Math.PI) / 180
+      const R = 6371000
+      const dLat = toRad(lat2 - lat1)
+      const dLng = toRad(lng2 - lng1)
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+      return R * c
+    },
+    async fetchNearbyPickupPoints() {
+      try {
+        this.pickupLoading = true
+        const center = await this.getCurrentMapCenter()
+
+        uni.request({
+          url: `https://apis.map.qq.com/ws/geocoder/v1/?location=${center.latitude},${center.longitude}&key=7ESBZ-IFMRN-IQSFQ-SFVGS-5UA35-5IBDQ&get_poi=1`,
+          success: (res) => {
+            const result = res.data && res.data.result
+            const pois = (result && result.pois) || []
+            
+            // 从逆地理编码结果中获取城市信息
+            let cityName = ''
+            let cityId = ''
+            if (result && result.address_component) {
+              cityName = result.address_component.city || ''
+            }
+            if (result && result.ad_info) {
+              cityId = result.ad_info.adcode || ''
+            }
+            
+            const list = pois
+              .filter((p) => p && (p.title || p.address) && p.location)
+              .slice(0, 10)
+              .map((p) => {
+                const dist = this.calcDistanceMeters(
+                  center.latitude,
+                  center.longitude,
+                  Number(p.location.lat),
+                  Number(p.location.lng)
+                )
+                return {
+                  name: p.title || p.address || '',
+                  address: p.address || '',
+                  latitude: String(p.location.lat),
+                  longitude: String(p.location.lng),
+                  distance: `${Math.round(dist)}m`,
+                  cityName: cityName,
+                  cityId: cityId
+                }
+              })
+
+            this.pickupLocations = list
+            this.originalPickupLocations = [...list]
+            if (list.length > 0) {
+              this.selectedPickupIndex = 0
+            }
+          },
+          fail: () => {
+            this.pickupLocations = []
+          },
+          complete: () => {
+            this.pickupLoading = false
+          }
+        })
+      } catch (e) {
+        this.pickupLocations = []
+        this.pickupLoading = false
+      }
+    },
+    selectPickupLocation(item, index) {
+      this.selectedPickupIndex = index
+    },
+    confirmPickup() {
+      let selected = null
+      
+      // 根据当前显示状态获取选中的项目
+      if (this.showPickupSuggestions && this.pickupSuggestions.length > 0) {
+        // 如果显示建议列表，但没有选中项，选择第一个建议
+        selected = this.pickupSuggestions[0]
+        this.selectPickupSearchLocation(selected)
+        return
+      } else if (this.pickupSearched && this.pickupSearchResults.length > 0) {
+        // 如果显示搜索结果列表
+        if (this.selectedPickupIndex < 0 || !this.pickupSearchResults[this.selectedPickupIndex]) {
+          uni.showToast({ title: '请选择上车点', icon: 'none' })
+          return
+        }
+        selected = this.pickupSearchResults[this.selectedPickupIndex]
+        this.selectPickupSearchLocation(selected)
+        return
+      } else {
+        // 默认附近上车点列表
+        if (this.selectedPickupIndex < 0 || !this.pickupLocations[this.selectedPickupIndex]) {
+          uni.showToast({ title: '请选择上车点', icon: 'none' })
+          return
+        }
+        selected = this.pickupLocations[this.selectedPickupIndex]
+        this.departAddress = {
+          ...this.departAddress,
+          longitude: selected.longitude,
+          latitude: selected.latitude,
+          name: selected.name,
+          address: selected.name,
+          addressDetail: selected.address || '',
+          cityName: selected.cityName || '',
+          cityId: selected.cityId || ''
+        }
+        this.showPickupPanel = false
+        this.mapCenter = {
+          latitude: Number(selected.latitude),
+          longitude: Number(selected.longitude)
+        }
+        this.updateRoute()
+        this.checkAndQueryPrice()
+        
+        // 清空搜索状态
+        this.pickupSearchKeyword = ''
+        this.pickupSuggestions = []
+        this.showPickupSuggestions = false
+        this.pickupSearchResults = []
+        this.pickupSearched = false
+      }
+    },
+    handlePickupSearch() {
+      clearTimeout(this.pickupSearchTimer)
+      
+      if (!this.pickupSearchKeyword.trim()) {
+        this.pickupSuggestions = []
+        this.showPickupSuggestions = false
+        this.pickupSearchResults = []
+        this.pickupSearched = false
+        this.selectedPickupIndex = this.pickupLocations.length > 0 ? 0 : -1
+        return
+      }
+      
+      this.pickupSearchTimer = setTimeout(() => {
+        if (this.pickupSearchKeyword.trim()) {
+          this.getPickupSuggestions()
+        }
+      }, 300)
+    },
+    getPickupSuggestions() {
+      const keyword = this.pickupSearchKeyword.trim()
+      if (!keyword) {
+        return
+      }
+      
+      const location = this.userLocation.latitude && this.userLocation.longitude 
+        ? `${this.userLocation.latitude},${this.userLocation.longitude}`
+        : ''
+      
+      // 使用腾讯地图输入提示API
+      uni.request({
+        url: 'https://apis.map.qq.com/ws/place/v1/suggestion',
+        data: {
+          keyword: keyword,
+          region: '全国',
+          location: location,
+          region_fix: 0,
+          key: '7ESBZ-IFMRN-IQSFQ-SFVGS-5UA35-5IBDQ'
+        },
+        success: (res) => {
+          if (res.data && res.data.status === 0 && res.data.data) {
+            this.pickupSuggestions = res.data.data.map(item => ({
+              title: item.title || '',
+              address: item.address || '',
+              latitude: item.location ? item.location.lat : '',
+              longitude: item.location ? item.location.lng : '',
+              cityName: item.city || '',
+              cityId: item.ad_info ? item.ad_info.adcode : '',
+              id: item.id || ''
+            }))
+            this.showPickupSuggestions = true
+            this.pickupSearched = false
+          } else {
+            this.pickupSuggestions = []
+          }
+        },
+        fail: () => {
+          this.pickupSuggestions = []
+        }
+      })
+    },
+    handlePickupSuggestionTap(index) {
+      const item = this.pickupSuggestions[index]
+      if (!item) {
+        return
+      }
+      this.selectPickupSuggestion(item)
+    },
+    selectPickupSuggestion(item) {
+      if (!item || !item.title) {
+        return
+      }
+      
+      // 如果建议项有经纬度，直接选择该地点
+      if (item.latitude && item.longitude) {
+        this.selectPickupSearchLocation(item)
+      } else {
+        // 如果没有经纬度，进行详细搜索
+        this.pickupSearchKeyword = item.title
+        this.showPickupSuggestions = false
+        this.handlePickupDetailSearch()
+      }
+    },
+    handlePickupDetailSearch() {
+      if (!this.pickupSearchKeyword.trim()) {
+        return
+      }
+      
+      this.pickupSearched = true
+      this.showPickupSuggestions = false
+      
+      const keyword = this.pickupSearchKeyword.trim()
+      const location = this.userLocation.latitude && this.userLocation.longitude 
+        ? `${this.userLocation.latitude},${this.userLocation.longitude}`
+        : ''
+      
+      uni.request({
+        url: 'https://apis.map.qq.com/ws/place/v1/search',
+        data: {
+          keyword: keyword,
+          boundary: location ? `nearby(${location},5000)` : '',
+          page_size: 20,
+          page_index: 1,
+          key: '7ESBZ-IFMRN-IQSFQ-SFVGS-5UA35-5IBDQ'
+        },
+        success: (res) => {
+          if (res.data && res.data.status === 0 && res.data.data) {
+            this.pickupSearchResults = res.data.data.map(item => {
+              // 计算距离（如果有当前位置）
+              let distance = ''
+              if (this.userLocation.latitude && item.location) {
+                const dist = this.calcDistanceMeters(
+                  this.userLocation.latitude,
+                  this.userLocation.longitude,
+                  item.location.lat,
+                  item.location.lng
+                )
+                if (dist < 1000) {
+                  distance = Math.round(dist) + 'm'
+                } else {
+                  distance = (dist / 1000).toFixed(1) + 'km'
+                }
+              }
+              
+              return {
+                title: item.title,
+                name: item.title,
+                address: item.address,
+                latitude: item.location ? item.location.lat : '',
+                longitude: item.location ? item.location.lng : '',
+                cityName: item.ad_info ? item.ad_info.city : '',
+                cityId: item.ad_info ? item.ad_info.adcode : '',
+                distance: distance,
+                addressDetail: ''
+              }
+            })
+            this.selectedPickupIndex = this.pickupSearchResults.length > 0 ? 0 : -1
+          } else {
+            this.pickupSearchResults = []
+          }
+        },
+        fail: () => {
+          this.pickupSearchResults = []
+        }
+      })
+    },
+    selectPickupSearchResult(item, index) {
+      this.selectedPickupIndex = index
+    },
+    selectPickupSearchLocation(item) {
+      // 选择搜索到的地点作为起点
+      this.departAddress = {
+        cityId: item.cityId || '',
+        cityName: item.cityName || '',
+        longitude: String(item.longitude),
+        latitude: String(item.latitude),
+        name: item.title || item.name,
+        address: item.title || item.name,
+        addressDetail: item.address || ''
+      }
+      this.showPickupPanel = false
+      this.mapCenter = {
+        latitude: Number(item.latitude),
+        longitude: Number(item.longitude)
+      }
+      this.updateRoute()
+      this.checkAndQueryPrice()
+      
+      // 清空搜索状态
+      this.pickupSearchKeyword = ''
+      this.pickupSuggestions = []
+      this.showPickupSuggestions = false
+      this.pickupSearchResults = []
+      this.pickupSearched = false
+    },
+    handlePickupSearchFocus() {
+      // 搜索框获得焦点时的处理
+    },
+    clearPickupSearch() {
+      this.pickupSearchKeyword = ''
+      this.pickupSuggestions = []
+      this.showPickupSuggestions = false
+      this.pickupSearchResults = []
+      this.pickupSearched = false
+      this.selectedPickupIndex = this.pickupLocations.length > 0 ? 0 : -1
     },
     calculateScrollViewHeight() {
       // 计算滚动区域高度：屏幕高度 - 弹窗头部 - 底部安全区域
@@ -671,6 +1403,10 @@ export default {
         return
       }
 
+      // 保存当前选择的车辆和价格信息，避免在异步操作中被清空
+      const selectedVehicle = this.currentVehicle
+      const selectedPrice = this.currentPrice
+
       // 关闭弹窗
       this.showPassengerModal = false
 
@@ -683,21 +1419,20 @@ export default {
         content: '确定使用当前信息创建订单并去支付？',
         success: async (res) => {
           if (res.confirm) {
-            await this.submitOrder(this.currentVehicle, this.currentPrice, {
+            await this.submitOrder(selectedVehicle, selectedPrice, {
               passengerName: passengerName,
               passengerPhone: passengerPhone,
               contactName: passengerName,
               contactPhone: passengerPhone
             })
           }
+          // 无论确认还是取消，都清空表单和当前选择
+          this.passengerForm.name = ''
+          this.passengerForm.phone = ''
+          this.currentVehicle = null
+          this.currentPrice = null
         }
       })
-
-      // 清空表单
-      this.passengerForm.name = ''
-      this.passengerForm.phone = ''
-      this.currentVehicle = null
-      this.currentPrice = null
     },
     async submitOrder(vehicle, price, userInfo = {}) {
       try {
@@ -789,9 +1524,11 @@ export default {
 .taxi-index {
   width: 100%;
   height: 100vh;
-  background: #0d1038;
-  position: relative;
+  background: #0d1034;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .navbar {
@@ -829,105 +1566,134 @@ export default {
 /* 分段控制器 */
 .segment-control {
   display: flex;
-  margin: 20rpx;
-  background: #1a1b3d;
-  border-radius: 10rpx;
-  padding: 6rpx;
+  margin: 20rpx 20rpx 20rpx;
+  background: #353548;
+  border-radius: 50rpx;
+  position: relative;
+  z-index: 10;
+
 }
 
 .segment-item {
   flex: 1;
   text-align: center;
-  padding: 16rpx 0;
-  border-radius: 8rpx;
+  padding: 25rpx 0;
+  border-radius: 50rpx;
   font-size: 28rpx;
-  color: #999;
+  color: #fff;
   transition: all 0.3s;
+  font-weight: 500;
 }
 
 .segment-item.active {
-  background: #ffb84d;
-  color: #fff;
+  background: linear-gradient(90deg, #F4BD63 0%, #FDE4B4 49.71%, #F3BE66 100%);
+  color: #1a1b3d;
+  font-weight: 600;
+  color:#380C00
 }
 
-/* 地址输入区域 */
+/* 地图容器 */
+.map-wrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 地址输入区域 - 覆盖在地图底部 */
 .address-input-area {
-  margin: 20rpx;
-  background: #1a1b3d;
-  border-radius: 16rpx;
-  padding: 30rpx;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1E1F34;
+  border-radius: 30rpx 30rpx 0 0;
+  padding: 40rpx 30rpx 30rpx;
+  z-index: 5;
+  height: 700rpx;
 }
 
 .origin-input,
 .destination-input {
   display: flex;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
+  padding: 8rpx 0;
+}
+.destination-input{
+  background-color: #353548;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-left: 10rpx;
+}
+.origin-input{
+  margin-left: 30rpx;
 }
 
 .input-dot {
-  width: 20rpx;
-  height: 20rpx;
+  width: 15rpx;
+  height: 15rpx;
   border-radius: 50%;
   margin-right: 20rpx;
+  flex-shrink: 0;
 }
 
 .input-dot.green {
-  background: #4caf50;
+  background: #04FF00;
 }
 
 .input-dot.orange {
-  background: #ff6b35;
+  background: #FFBA48;
 }
 
 .input-content {
   flex: 1;
-  margin-left: 20rpx;
 }
 
 .input-text {
   color: #fff;
-  font-size: 28rpx;
+  font-size: 30rpx;
   line-height: 1.5;
 }
 
 .input-placeholder {
-  color: #999;
-  font-size: 28rpx;
+  color: #fff;
+  font-size: 30rpx;
 }
 
 /* 安全中心 */
 .safety-center {
   display: flex;
   align-items: center;
-  margin-top: 20rpx;
-  padding-top: 20rpx;
+  justify-content: center;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
   border-top: 1rpx solid #2a2b4d;
 }
 
 .safety-icon {
-  width: 32rpx;
-  height: 32rpx;
+  width: 36rpx;
+  height: 36rpx;
   border-radius: 50%;
-  background: #4caf50;
-  color: #fff;
+  background: transparent;
+  color: #8a8a9e;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20rpx;
+  font-size: 28rpx;
   margin-right: 12rpx;
 }
 
 .safety-text {
-  color: #fff;
-  font-size: 26rpx;
+  color: #8a8a9e;
+  font-size: 28rpx;
 }
 
 .map-container {
   position: relative;
   width: 100%;
-  height: 40vh;
-  margin-top: 20rpx;
+  height: 100%;
 }
 
 .map {
@@ -964,20 +1730,17 @@ export default {
 
 .map-control {
   position: absolute;
-  bottom: 30rpx;
-  left: 20rpx;
-  width: 80rpx;
-  height: 80rpx;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10rpx;
+  bottom: 720rpx;
+  left:680rpx;
+  width: 40rpx;
+  height: 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .control-icon {
-  font-size: 40rpx;
-  color: #fff;
+  font-size: 20rpx;
 }
 
 .city-panel {
@@ -1020,6 +1783,193 @@ export default {
   color: #fff;
   border-radius: 10rpx;
   font-size: 24rpx;
+}
+
+.pickup-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.pickup-modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.pickup-modal-content {
+  width: 100%;
+  background: #1E1F34;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 100rpx 30rpx 26rpx;
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1000;
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
+  margin-top: 80rpx;
+}
+
+.pickup-modal-header {
+  margin-bottom: 20rpx;
+}
+
+.pickup-title {
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 600;
+  display: block;
+}
+
+.pickup-subtitle {
+  margin-top: 10rpx;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24rpx;
+  display: block;
+}
+
+.pickup-scroll-list {
+  margin-top: 18rpx;
+  height: 180rpx;
+  flex: 1;
+  overflow: hidden;
+}
+
+.pickup-item {
+  background: #353548;
+  border: 2rpx solid #B9BABE;
+  border-radius: 16rpx;
+  padding: 22rpx 20rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 18rpx;
+}
+
+.pickup-item.active {
+  border-color: rgba(244, 189, 99, 0.9);
+}
+
+.pickup-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #04FF00;
+  margin-right: 18rpx;
+  flex-shrink: 0;
+}
+
+.pickup-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6rpx;
+}
+
+.pickup-name {
+  color: #fff;
+  font-size: 28rpx;
+  line-height: 1.2;
+}
+
+.pickup-distance {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24rpx;
+  line-height: 1.2;
+}
+
+.pickup-empty {
+  padding: 30rpx 0;
+  text-align: center;
+}
+
+.pickup-empty-text {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 26rpx;
+}
+
+.pickup-loading {
+  padding: 30rpx 0;
+  text-align: center;
+}
+
+.pickup-loading-text {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 26rpx;
+}
+
+.pickup-search-box {
+  position: absolute;
+  top: 320rpx;
+  left: 20rpx;
+  right: 20rpx;
+  z-index: 1000;
+  padding: 0 4rpx;
+}
+
+.pickup-search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 25rpx;
+  padding: 40rpx 20rpx;
+  height: 50rpx;
+}
+
+.pickup-search-icon {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #04FF00;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.pickup-search-input {
+  flex: 1;
+  color: #333;
+  font-size: 26rpx;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.pickup-search-placeholder {
+  color: #666;
+}
+
+.pickup-search-clear {
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 28rpx;
+  margin-left: 10rpx;
+  flex-shrink: 0;
+}
+
+.pickup-confirm-btn {
+  margin-top: 22rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  background: linear-gradient(90deg, #F4BD67 0%, #FEE2AE 49.04%, #F4BE6A 99.89%);
+  color: #380C00;
+  font-size: 30rpx;
+  font-weight: 600;
 }
 
 .city-loading {
@@ -1100,23 +2050,24 @@ export default {
 .price-panel {
   position: fixed;
   bottom: 0;
-  left: 10rpx;
-  right: 10rpx;
-  background: #1a1b3d;
-  border-radius: 30rpx 30rpx 0 0;
-  max-height: 70vh;
+  left: 20rpx;
+  right: 20rpx;
+  background: #1E1F34;
+  border-radius: 24rpx 24rpx 0 0;
+  max-height: 65vh;
   z-index: 200;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 -8rpx 20rpx rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.3);
 }
 
 .price-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 30rpx;
-  border-bottom: 1rpx solid #2a2b4d;
+  padding: 30rpx 30rpx 20rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .price-header-left {
@@ -1150,14 +2101,16 @@ export default {
 
 .price-list {
   flex: 1;
-  padding: 20rpx 12rpx 36rpx;
+  padding: 20rpx 30rpx 36rpx;
   overflow-y: auto;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 .price-vehicle-item {
   margin-bottom: 24rpx;
-  padding: 16rpx 0 20rpx;
-  border-bottom: 1rpx solid #1f2142;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
 }
 
 .price-vehicle-item:last-child {
@@ -1170,7 +2123,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16rpx;
+  margin-bottom: 18rpx;
+  padding: 0 4rpx;
 }
 
 .vehicle-name {
@@ -1187,71 +2141,75 @@ export default {
 .supplier-list {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: 10rpx;
 }
 
 .supplier-item {
   display: flex;
   align-items: center;
-  padding: 12rpx 14rpx;
-  background: #1b1d3a;
-  border-radius: 10rpx;
+  padding: 18rpx 20rpx;
+  background: #353548;
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  border-radius: 12rpx;
   overflow: hidden;
   min-width: 0;
-  width: 100%;
   box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.supplier-item:active {
+  background: #404155;
+  transform: scale(0.98);
 }
 
 .supplier-logo-wrapper {
-  width: 50rpx;
-  height: 50rpx;
+  width: 44rpx;
+  height: 44rpx;
   margin-right: 16rpx;
   flex-shrink: 0;
 }
 
 .supplier-logo {
-  width: 50rpx;
-  height: 50rpx;
+  width: 44rpx;
+  height: 44rpx;
   border-radius: 8rpx;
   background: #2a2b4d;
 }
 
 .supplier-logo-placeholder {
-  width: 50rpx;
-  height: 50rpx;
+  width: 44rpx;
+  height: 44rpx;
   border-radius: 8rpx;
-  background: #2a2b4d;
+  background: #F4BD63;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .logo-text {
-  font-size: 20rpx;
-  color: #ffb84d;
-  font-weight: 500;
+  font-size: 18rpx;
+  color: #380C00;
+  font-weight: 600;
 }
 
 .supplier-name {
   flex: 1;
-  font-size: 24rpx;
-  color: #f5f6fa;
+  font-size: 26rpx;
+  color: #fff;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 12rpx;
+  margin-right: 16rpx;
   min-width: 0;
+  font-weight: 400;
 }
 
 .supplier-price {
-  font-size: 26rpx;
-  color: #ffb84d;
-  font-weight: 500;
+  font-size: 28rpx;
+  color: #F4BD63;
+  font-weight: 600;
   flex-shrink: 0;
-  max-width: 140rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 100rpx;
   text-align: right;
 }
 
@@ -1271,9 +2229,10 @@ export default {
 
 .modal-content {
   width: 600rpx;
-  background: #1a1b3d;
+  background: #0d1034;
   border-radius: 20rpx;
   overflow: hidden;
+  border: 1rpx solid #FCDDA6;
 }
 
 .modal-header {
@@ -1287,7 +2246,7 @@ export default {
 .modal-title {
   font-size: 32rpx;
   font-weight: 500;
-  color: #fff;
+  color: #F4C06E;
 }
 
 .modal-close {
@@ -1323,12 +2282,13 @@ export default {
 .input-field {
   width: 100%;
   height: 80rpx;
-  background: #2a2b4d;
+  background: #353548;
   border-radius: 10rpx;
   padding: 0 20rpx;
   font-size: 28rpx;
   color: #fff;
   box-sizing: border-box;
+  border: 1rpx solid #B9BABE;
 }
 
 .modal-footer {
@@ -1352,7 +2312,7 @@ export default {
 }
 
 .modal-btn.confirm {
-  color: #ffb84d;
+  color: #f4C06E;
   font-weight: 500;
 }
 </style>

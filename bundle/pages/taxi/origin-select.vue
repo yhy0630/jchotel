@@ -1,17 +1,6 @@
 <template>
 	<view class="origin-select">
-		<!-- 导航栏 -->
-		<view class="navbar">
-			<view class="nav-left" @click="goBack">
-				<text class="nav-icon">‹</text>
-			</view>
-			<view class="nav-title">打车</view>
-			<view class="nav-right">
-				<text class="nav-icon">⋯</text>
-				<text class="nav-icon">◎</text>
-			</view>
-		</view>
-
+		<custom-navbar title="打车"></custom-navbar>
 		<!-- 搜索输入框 -->
 		<view class="search-input">
 			<view class="input-dot green"></view>
@@ -282,6 +271,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	padding-bottom: 20rpx;
+	padding-top: calc(130rpx + var(--status-bar-height));
 }
 
 .navbar {
