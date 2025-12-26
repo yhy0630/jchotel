@@ -845,6 +845,13 @@
 				"style": {
 					"navigationBarTitleText": "会员升级"
 				}
+			},
+			{
+				"path": "pages/hotel/invoice-apply",
+				"style": {
+					"navigationBarTitleText": "申请开票",
+					"navigationStyle": "custom"
+				}
 			}
 		]
 	}],

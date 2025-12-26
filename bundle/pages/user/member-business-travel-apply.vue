@@ -1,88 +1,44 @@
 <template>
-  <view class="page">
-    <custom-navbar title="完善信息"></custom-navbar>
-    <view class="nav-title">完善信息（商旅会员）</view>
-    <scroll-view scroll-y class="form-wrap">
-      <view class="form-item" v-for="item in fields" :key="item.key">
-        <view class="label">
-          <text class="required" v-if="item.required">*</text>
-          <text>{{ item.label }}</text>
-        </view>
-        <view class="control">
-          <input
-            v-if="item.type === 'input'"
-            v-model="form[item.key]"
-            :type="item.inputType || 'text'"
-            :placeholder="item.placeholder"
-            placeholder-class="ph"
-          />
-          <view
-            v-else-if="item.type === 'select'"
-            class="select"
-            @tap="handleSelect(item)"
-          >
-            <text :class="{'ph': !form[item.key]}">{{ form[item.key] || item.placeholder }}</text>
-            <text class="arrow">›</text>
-          </view>
-          <textarea
-            v-else-if="item.type === 'textarea'"
-            v-model="form[item.key]"
-            :placeholder="item.placeholder"
-            placeholder-class="ph"
-            class="textarea"
-            auto-height
-          />
-        </view>
-      </view>
-      <!-- 身份优惠选择 -->
-      <view class="form-item">
+  <member-form
+    ref="memberForm"
+    title="完善信息（商旅会员）"
+    :fields="fields"
+    :show-image-upload="form.identity_discount_id > 0"
+    @submit="handleSubmit"
+  >
+    <!-- 身份优惠选择插槽 -->
+    <template #identity-discount>
+      <view class="form-item form-item-row">
         <view class="label">
           <text>身份优惠</text>
         </view>
         <view class="control">
           <view class="select" @tap="selectIdentityDiscount">
-            <text :class="{'ph': !selectedIdentityDiscount}">{{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}</text>
-            <text class="arrow">›</text>
+            <text :class="['select-text', { 'ph': !selectedIdentityDiscount }]">{{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}</text>
           </view>
         </view>
       </view>
-      <!-- 身份优惠证明图片上传 -->
-      <view class="form-item upload-item-wrap" v-if="form.identity_discount_id">
-        <view class="label">
-          <text>身份优惠证明图片</text>
-        </view>
-        <view class="control upload-control">
-          <view class="upload-wrap">
-            <view class="upload-item" v-for="(img, index) in identityProofImages" :key="index">
-              <image :src="img" mode="aspectFill" class="upload-img"></image>
-              <view class="delete-btn" @tap="deleteImage(index)">×</view>
-            </view>
-            <view class="upload-btn" @tap="chooseImages" v-if="identityProofImages.length < 9">
-              <text class="upload-icon">+</text>
-              <text class="upload-text">上传图片</text>
-            </view>
-          </view>
-          <view class="upload-tip">最多上传9张图片</view>
-        </view>
-      </view>
-    </scroll-view>
-    <view class="submit-bar" @tap="submitApply">提交审核</view>
-  </view>
+    </template>
+  </member-form>
 </template>
 
 <script>
 import { applyMember, getIdentityDiscountList } from '@/api/user'
-import { baseURL } from '@/config/app'
+import MemberForm from '@/components/member-form/member-form.vue'
 
 export default {
+  components: {
+    MemberForm
+  },
   data() {
     return {
       memberType: 'business_travel',
       submitting: false,
-      form: {},
+      form: {
+        identity_discount_id: 0
+      },
       identityDiscountList: [],
       selectedIdentityDiscount: '',
-      identityProofImages: [],
       fields: [
         { key: 'level', label: '会员级别', required: true, type: 'input', placeholder: '例如：铂金卡' },
         { key: 'account', label: '会员账号', required: true, type: 'input', placeholder: '请输入会员账号' },
@@ -101,20 +57,9 @@ export default {
     }
   },
   created() {
-    this.resetForm()
     this.loadIdentityDiscountList()
   },
   methods: {
-    resetForm() {
-      const nextForm = {}
-      this.fields.forEach(field => {
-        nextForm[field.key] = field.default || ''
-      })
-      this.form = nextForm
-      this.form.identity_discount_id = 0
-      this.selectedIdentityDiscount = ''
-      this.identityProofImages = []
-    },
     async loadIdentityDiscountList() {
       try {
         const res = await getIdentityDiscountList()
@@ -138,7 +83,10 @@ export default {
           if (tapIndex === 0) {
             this.form.identity_discount_id = 0
             this.selectedIdentityDiscount = ''
-            this.identityProofImages = []
+            // 清空组件中的图片
+            if (this.$refs.memberForm) {
+              this.$refs.memberForm.clearImages()
+            }
           } else {
             const selected = this.identityDiscountList[tapIndex - 1]
             this.form.identity_discount_id = selected.id
@@ -147,81 +95,15 @@ export default {
         }
       })
     },
-    chooseImages() {
-      const maxCount = 9 - this.identityProofImages.length
-      uni.chooseImage({
-        count: maxCount,
-        sizeType: ['compressed'],
-        sourceType: ['album', 'camera'],
-        success: async (res) => {
-          uni.showLoading({ title: '上传中...' })
-          try {
-            const uploadPromises = res.tempFilePaths.map(path => this.uploadImage(path))
-            const uploadResults = await Promise.all(uploadPromises)
-            this.identityProofImages = [...this.identityProofImages, ...uploadResults]
-            uni.hideLoading()
-          } catch (e) {
-            uni.hideLoading()
-            uni.showToast({ title: '图片上传失败', icon: 'none' })
-          }
-        }
-      })
-    },
-    async uploadImage(filePath) {
-      return new Promise((resolve, reject) => {
-        uni.uploadFile({
-          url: baseURL + '/api/file/formImage',
-          filePath: filePath,
-          name: 'file',
-          header: {
-            'token': uni.getStorageSync('token') || ''
-          },
-          success: (res) => {
-            try {
-              const data = JSON.parse(res.data)
-              if (data.code === 1 && data.data && data.data.url) {
-                resolve(data.data.url)
-              } else {
-                reject(new Error(data.msg || '上传失败'))
-              }
-            } catch (e) {
-              reject(e)
-            }
-          },
-          fail: reject
-        })
-      })
-    },
-    deleteImage(index) {
-      this.identityProofImages.splice(index, 1)
-    },
-    handleSelect(item) {
-      if (!item.options || !item.options.length) {
-        uni.showToast({ title: '暂无可选项', icon: 'none' })
-        return
-      }
-      uni.showActionSheet({
-        itemList: item.options,
-        success: ({ tapIndex }) => {
-          this.$set(this.form, item.key, item.options[tapIndex])
-        }
-      })
-    },
-    async submitApply() {
+    async handleSubmit(data) {
       if (this.submitting) return
-      for (const item of this.fields) {
-        if (item.required && !this.form[item.key]) {
-          uni.showToast({ title: `请填写${item.label}`, icon: 'none' })
-          return
-        }
-      }
       this.submitting = true
       try {
         const submitData = {
           type: this.memberType,
-          form: this.form,
+          form: { ...data.form, identity_discount_id: this.form.identity_discount_id },
           identity_discount_id: this.form.identity_discount_id || 0,
-          identity_proof_images: this.identityProofImages.length > 0 ? JSON.stringify(this.identityProofImages) : ''
+          identity_proof_images: data.identityProofImages.length > 0 ? JSON.stringify(data.identityProofImages) : ''
         }
         const res = await applyMember(submitData)
         if (res.code === 1) {
@@ -244,165 +126,56 @@ export default {
 </script>
 
 <style scoped>
-.page {
-  min-height: 100vh;
-  background: #0D1034;
-  display: flex;
-  flex-direction: column;
-  padding-top: calc(130rpx + var(--status-bar-height));
-}
-.nav-title {
-  padding: 32rpx;
-  padding-top: 80rpx;
-  font-size: 32rpx;
-  color: #ffffff;
-  display: none;
-}
-.form-wrap {
-  flex: 1;
-  padding: 0;
-  background: #1E1F1F;
-  box-sizing: border-box;
-  border-radius: 30rpx;
-  padding: 30rpx 30rpx;
-  margin: 30rpx 0;
-}
+/* 身份优惠选择样式 */
 .form-item {
-  display: flex;
-  align-items: center;
-  padding: 32rpx 32rpx;
-  border-bottom: 1rpx solid #E6E6E8;
+  padding: 15rpx 20rpx;
 }
-.label {
-  font-size: 28rpx;
-  color: #ffffff;
-  min-width: 160rpx;
-  flex-shrink: 0;
-}
-.required {
-  color: #ff5b5b;
-  margin-right: 4rpx;
-}
-.control {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-.control input {
-  flex: 1;
-  height: 60rpx;
-  background: transparent;
-  color: #B9B9BD;
-  font-size: 28rpx;
-  text-align: left;
-}
-.textarea {
-  flex: 1;
-  min-height: 100rpx;
-  background: transparent;
-  color: #999999;
-  font-size: 28rpx;
-  padding: 12rpx 0;
-  line-height: 40rpx;
-  text-align: left;
-}
-.ph {
-  color: #666666;
-}
-.select {
-  flex: 1;
+.form-item-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #999999;
-  font-size: 28rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
 }
-.arrow {
-  color: #B9B9BD;
-  font-size: 45rpx;
-  margin-left: 12rpx;
-  font-weight: 300;
+.label {
+  font-size: 26rpx;
+  color: #ffffff;
   flex-shrink: 0;
+  width: 220rpx;
 }
-.upload-item-wrap {
-  flex-direction: column;
-  align-items: flex-start;
+.control {
+  flex: 1;
+  padding-left: 16rpx;
+  padding-right: 16rpx;
+  box-sizing: border-box;
 }
-.upload-item-wrap .label {
-  margin-bottom: 20rpx;
-}
-.upload-control {
-  width: 100%;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.upload-wrap {
+.select {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  width: 100%;
+  align-items: center;
+  height: 72rpx;
 }
-.upload-item {
+.form-item-row .select {
   position: relative;
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 8rpx;
-  overflow: hidden;
+  justify-content: space-between;
+  padding-right: 34rpx;
 }
-.upload-img {
-  width: 100%;
-  height: 100%;
-}
-.delete-btn {
+.form-item-row .select::after {
+  content: '>';
   position: absolute;
-  top: -8rpx;
-  right: -8rpx;
-  width: 40rpx;
-  height: 40rpx;
-  background: #ff5b5b;
-  border-radius: 50%;
-  color: #fff;
-  font-size: 32rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c8cbd9;
+  font-size: 30rpx;
 }
-.upload-btn {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 8rpx;
-  background: #0c1224;
-  border: 2rpx dashed #666d8f;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.select-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ffffff;
+  font-size: 26rpx;
 }
-.upload-icon {
-  font-size: 48rpx;
+.ph {
   color: #666d8f;
-  line-height: 1;
-  margin-bottom: 8rpx;
-}
-.upload-text {
-  font-size: 22rpx;
-  color: #666d8f;
-}
-.upload-tip {
-  font-size: 22rpx;
-  color: #666d8f;
-  margin-top: 12rpx;
-}
-.submit-bar {
-  height: 96rpx;
-  margin: 0 40rpx 40rpx;
-  border-radius: 48rpx;
-  background: linear-gradient(90deg, #ffb84d 0%, #ff8a34 100%);
-  text-align: center;
-  line-height: 96rpx;
-  color: #fff;
-  font-size: 32rpx;
-  font-weight: 600;
 }
 </style>

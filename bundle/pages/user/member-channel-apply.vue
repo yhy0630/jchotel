@@ -1,107 +1,70 @@
 <template>
-  <view class="page">
-    <view class="nav-title">完善信息（渠道会员）</view>
-    <scroll-view scroll-y class="form-wrap">
-      <view class="form-item" v-for="item in fields" :key="item.key">
-        <view class="label">
-          <text class="required" v-if="item.required">*</text>
-          <text>{{ item.label }}</text>
-        </view>
-        <view class="control">
-          <input
-            v-if="item.type === 'input'"
-            v-model="form[item.key]"
-            :type="item.inputType || 'text'"
-            :placeholder="item.placeholder"
-            placeholder-class="ph"
-          />
-          <view
-            v-else
-            class="select"
-            @tap="handleSelect(item)"
-          >
-            <text :class="{'ph': !form[item.key]}">{{ form[item.key] || item.placeholder }}</text>
-          </view>
-        </view>
-      </view>
-      <!-- 身份优惠选择 -->
+  <member-form
+    ref="memberForm"
+    title="完善信息（渠道会员）"
+    :fields="fields"
+    :show-image-upload="form.identity_discount_id > 0"
+    @submit="handleSubmit"
+  >
+    <!-- 营业执照上传插槽 -->
+    <template #identity-discount>
       <view class="form-item">
         <view class="label">
-          <text>身份优惠</text>
+          <text>营业执照</text>
         </view>
         <view class="control">
-          <view class="select" @tap="selectIdentityDiscount">
-            <text :class="{'ph': !selectedIdentityDiscount}">{{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}</text>
-          </view>
-        </view>
-      </view>
-      <!-- 身份优惠证明图片上传 -->
-      <view class="form-item" v-if="form.identity_discount_id">
-        <view class="label">
-          <text>身份优惠证明图片</text>
-        </view>
-        <view class="control">
-          <view class="upload-wrap">
-            <view class="upload-item" v-for="(img, index) in identityProofImages" :key="index">
+          <view class="license-tip">上传营业执照，最多5张</view>
+          <!-- <view class="upload-wrap">
+            <view class="upload-item" v-for="(img, index) in businessLicenseImages" :key="index">
               <image :src="img" mode="aspectFill" class="upload-img"></image>
-              <view class="delete-btn" @tap="deleteImage(index)">×</view>
+              <view class="delete-btn" @tap="deleteLicenseImage(index)">×</view>
+              <view class="replace-btn" @tap="replaceLicenseImage(index)">替换</view>
             </view>
-            <view class="upload-btn" @tap="chooseImages" v-if="identityProofImages.length < 9">
+            <view class="upload-btn" @tap="chooseLicenseImages" v-if="businessLicenseImages.length < 5">
               <text class="upload-icon">+</text>
-              <text class="upload-text">上传图片</text>
             </view>
-          </view>
-          <view class="upload-tip">最多上传9张图片</view>
+          </view> -->
         </view>
       </view>
-    </scroll-view>
-    <view class="submit-bar" @tap="submitApply">提交审核</view>
-  </view>
-</template>
+    </template>
+  </member-form>
+</template> 
 
 <script>
 import { applyMember, getIdentityDiscountList } from '@/api/user'
+import MemberForm from '@/components/member-form/member-form.vue'
 import { baseURL } from '@/config/app'
 
 export default {
+  components: {
+    MemberForm
+  },
   data() {
     return {
       memberType: 'channel',
       submitting: false,
-      form: {},
+      form: {
+        identity_discount_id: 0
+      },
       identityDiscountList: [],
       selectedIdentityDiscount: '',
-      identityProofImages: [],
+      businessLicenseImages: [],
       fields: [
-        { key: 'level', label: '会员级别', required: true, type: 'input', placeholder: '例如：合作渠道A类' },
-        { key: 'account', label: '会员账号', required: true, type: 'input', placeholder: '请输入渠道账号' },
-        { key: 'manager_name', label: '管理员姓名', required: true, type: 'input', placeholder: '请输入管理员姓名' },
-        { key: 'manager_gender', label: '管理员性别', required: true, type: 'select', placeholder: '请选择性别', options: ['男', '女'] },
-        { key: 'manager_age', label: '管理员年龄', required: true, type: 'select', placeholder: '请选择年龄段', options: ['18-25岁', '26-35岁', '36-45岁', '46岁以上'] },
-        { key: 'manager_mobile', label: '管理员电话', required: true, type: 'input', inputType: 'number', placeholder: '请输入手机号码' },
-        { key: 'legal_name', label: '法人姓名', required: true, type: 'input', placeholder: '请输入法人姓名' },
-        { key: 'legal_gender', label: '法人性别', required: true, type: 'select', placeholder: '请选择', options: ['男', '女'] },
-        { key: 'legal_age', label: '法人年龄', required: true, type: 'select', placeholder: '请选择年龄段', options: ['18-25岁', '26-35岁', '36-45岁', '46岁以上'] },
-        { key: 'finance_name', label: '财务姓名', required: true, type: 'input', placeholder: '请输入财务联系人' },
-        { key: 'finance_mobile', label: '财务电话', required: true, type: 'input', inputType: 'number', placeholder: '请输入联系电话' }
+        { key: 'level', label: '会员级别', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'account', label: '会员账号', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'hotel_name', label: '酒店名称', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'hotel_address', label: '酒店地址', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'manager_name', label: '负责人姓名', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'hotel_phone', label: '酒店电话', required: true, type: 'input', inputType: 'number', placeholder: '请输入' },
+        { key: 'store_manager_name', label: '店长姓名', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'store_manager_phone', label: '店长电话', required: true, type: 'input', inputType: 'number', placeholder: '请输入' }
       ]
     }
   },
   created() {
-    this.resetForm()
     this.loadIdentityDiscountList()
   },
   methods: {
-    resetForm() {
-      const nextForm = {}
-      this.fields.forEach(field => {
-        nextForm[field.key] = field.default || ''
-      })
-      this.form = nextForm
-      this.form.identity_discount_id = 0
-      this.selectedIdentityDiscount = ''
-      this.identityProofImages = []
-    },
     async loadIdentityDiscountList() {
       try {
         const res = await getIdentityDiscountList()
@@ -125,7 +88,10 @@ export default {
           if (tapIndex === 0) {
             this.form.identity_discount_id = 0
             this.selectedIdentityDiscount = ''
-            this.identityProofImages = []
+            // 清空组件中的图片
+            if (this.$refs.memberForm) {
+              this.$refs.memberForm.clearImages()
+            }
           } else {
             const selected = this.identityDiscountList[tapIndex - 1]
             this.form.identity_discount_id = selected.id
@@ -134,8 +100,8 @@ export default {
         }
       })
     },
-    chooseImages() {
-      const maxCount = 9 - this.identityProofImages.length
+    chooseLicenseImages() {
+      const maxCount = 5 - this.businessLicenseImages.length
       uni.chooseImage({
         count: maxCount,
         sizeType: ['compressed'],
@@ -143,9 +109,9 @@ export default {
         success: async (res) => {
           uni.showLoading({ title: '上传中...' })
           try {
-            const uploadPromises = res.tempFilePaths.map(path => this.uploadImage(path))
+            const uploadPromises = res.tempFilePaths.map(path => this.uploadLicenseImage(path))
             const uploadResults = await Promise.all(uploadPromises)
-            this.identityProofImages = [...this.identityProofImages, ...uploadResults]
+            this.businessLicenseImages = [...this.businessLicenseImages, ...uploadResults]
             uni.hideLoading()
           } catch (e) {
             uni.hideLoading()
@@ -154,7 +120,7 @@ export default {
         }
       })
     },
-    async uploadImage(filePath) {
+    async uploadLicenseImage(filePath) {
       return new Promise((resolve, reject) => {
         uni.uploadFile({
           url: baseURL + '/api/file/formImage',
@@ -179,36 +145,37 @@ export default {
         })
       })
     },
-    deleteImage(index) {
-      this.identityProofImages.splice(index, 1)
+    deleteLicenseImage(index) {
+      this.businessLicenseImages.splice(index, 1)
     },
-    handleSelect(item) {
-      if (!item.options || !item.options.length) {
-        uni.showToast({ title: '暂无可选项', icon: 'none' })
-        return
-      }
-      uni.showActionSheet({
-        itemList: item.options,
-        success: ({ tapIndex }) => {
-          this.$set(this.form, item.key, item.options[tapIndex])
+    replaceLicenseImage(index) {
+      uni.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: async (res) => {
+          uni.showLoading({ title: '上传中...' })
+          try {
+            const uploadResult = await this.uploadLicenseImage(res.tempFilePaths[0])
+            this.businessLicenseImages.splice(index, 1, uploadResult)
+            uni.hideLoading()
+          } catch (e) {
+            uni.hideLoading()
+            uni.showToast({ title: '图片上传失败', icon: 'none' })
+          }
         }
       })
     },
-    async submitApply() {
+    async handleSubmit(data) {
       if (this.submitting) return
-      for (const item of this.fields) {
-        if (item.required && !this.form[item.key]) {
-          uni.showToast({ title: `请填写${item.label}`, icon: 'none' })
-          return
-        }
-      }
       this.submitting = true
       try {
         const submitData = {
           type: this.memberType,
-          form: this.form,
+          form: { ...data.form, identity_discount_id: this.form.identity_discount_id },
           identity_discount_id: this.form.identity_discount_id || 0,
-          identity_proof_images: this.identityProofImages.length > 0 ? JSON.stringify(this.identityProofImages) : ''
+          identity_proof_images: data.identityProofImages.length > 0 ? JSON.stringify(data.identityProofImages) : '',
+          business_license_images: this.businessLicenseImages.length > 0 ? JSON.stringify(this.businessLicenseImages) : ''
         }
         const res = await applyMember(submitData)
         if (res.code === 1) {
@@ -231,119 +198,134 @@ export default {
 </script>
 
 <style scoped>
-.page {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #1a2548 0%, #050814 100%);
-  display: flex;
-  flex-direction: column;
-}
-.nav-title {
-  padding: 32rpx;
-  padding-top: 80rpx;
-  font-size: 32rpx;
-  color: #ffffff;
-}
-.form-wrap {
-  flex: 1;
-  padding: 0 24rpx 24rpx;
-}
+/* 身份优惠选择样式 */
 .form-item {
-  background: #151c35;
-  border-radius: 12rpx;
-  padding: 22rpx 24rpx;
-  margin-bottom: 16rpx;
+  padding: 15rpx 20rpx;
+}
+.form-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
 }
 .label {
   font-size: 26rpx;
   color: #ffffff;
-  margin-bottom: 10rpx;
+  flex-shrink: 0;
+  width: 220rpx;
 }
-.required {
-  color: #ff5b5b;
-  margin-right: 6rpx;
+.control {
+  flex: 1;
+  padding-left: 16rpx;
+  padding-right: 16rpx;
+  box-sizing: border-box;
 }
-.control input,
 .select {
+  display: flex;
+  align-items: center;
   height: 72rpx;
-  border-radius: 8rpx;
-  background: #0c1224;
-  padding: 0 20rpx;
+}
+.form-item-row .select {
+  position: relative;
+  justify-content: space-between;
+  padding-right: 34rpx;
+}
+.form-item-row .select::after {
+  content: '>';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c8cbd9;
+  font-size: 30rpx;
+}
+.form-item-row .select.no-arrow::after {
+  display: none;
+}
+.select-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #ffffff;
   font-size: 26rpx;
 }
 .ph {
   color: #666d8f;
 }
-.select {
-  display: flex;
-  align-items: center;
+
+/* 营业执照上传样式 */
+.license-tip {
+  font-size: 24rpx;
+  color: #B9B9BD;
+  margin-bottom: 16rpx;
+  margin-left: 220rpx;
+  margin-top: -30rpx;
 }
+
 .upload-wrap {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
 }
+
 .upload-item {
   position: relative;
-  width: 160rpx;
-  height: 160rpx;
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 8rpx;
   overflow: hidden;
 }
+
 .upload-img {
   width: 100%;
   height: 100%;
 }
+
 .delete-btn {
   position: absolute;
-  top: -8rpx;
+  top: 0rpx;
   right: -8rpx;
   width: 40rpx;
   height: 40rpx;
   background: #ff5b5b;
-  border-radius: 50%;
+  border-radius: 20%;
   color: #fff;
   font-size: 32rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  z-index: 2;
 }
+
+.replace-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 24rpx;
+  text-align: center;
+  padding: 8rpx 0;
+  z-index: 1;
+}
+
 .upload-btn {
   width: 160rpx;
   height: 160rpx;
-  border-radius: 8rpx;
+  border-radius: 50%;
   background: #0c1224;
   border: 2rpx dashed #666d8f;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
+
 .upload-icon {
   font-size: 48rpx;
   color: #666d8f;
   line-height: 1;
-  margin-bottom: 8rpx;
-}
-.upload-text {
-  font-size: 22rpx;
-  color: #666d8f;
-}
-.upload-tip {
-  font-size: 22rpx;
-  color: #666d8f;
-  margin-top: 12rpx;
-}
-.submit-bar {
-  height: 96rpx;
-  margin: 0 40rpx 40rpx;
-  border-radius: 48rpx;
-  background: linear-gradient(90deg, #ffb84d 0%, #ff8a34 100%);
-  text-align: center;
-  line-height: 96rpx;
-  color: #fff;
-  font-size: 32rpx;
-  font-weight: 600;
 }
 </style>
