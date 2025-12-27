@@ -5,7 +5,7 @@
     :fields="fields"
     :show-image-upload="form.identity_discount_id > 0"
     @submit="handleSubmit"
-  >
+          >
     <!-- 身份优惠选择插槽 -->
     <template #identity-discount>
       <view class="form-item form-item-row">
@@ -13,9 +13,19 @@
           <text>身份优惠</text>
         </view>
         <view class="control">
-          <view class="select" @tap="selectIdentityDiscount">
-            <text :class="['select-text', { 'ph': !selectedIdentityDiscount }]">{{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}</text>
+          <view class="upload-trigger" @tap="selectIdentityDiscount">
+            <text :class="['upload-text', { 'ph': !selectedIdentityDiscount }]">
+              {{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}
+            </text>
+            <text class="upload-icon" @tap.stop="openImageUpload">+</text>
           </view>
+        </view>
+      </view>
+      <!-- 图片预览区域 -->
+      <view class="image-preview" v-if="identityDiscountImages.length > 0">
+        <view class="upload-item" v-for="(img, index) in identityDiscountImages" :key="index">
+          <image :src="img" mode="aspectFill" class="upload-img"></image>
+          <view class="delete-btn" @tap="deleteImage(index)">×</view>
         </view>
       </view>
     </template>
@@ -24,6 +34,7 @@
 
 <script>
 import { applyMember, getIdentityDiscountList } from '@/api/user'
+import { baseURL } from '@/config/app'
 import MemberForm from '@/components/member-form/member-form.vue'
 
 export default {
@@ -39,6 +50,7 @@ export default {
       },
       identityDiscountList: [],
       selectedIdentityDiscount: '',
+      identityDiscountImages: [], // 身份优惠图片数组
       fields: [
         { key: 'level', label: '会员级别', required: true, type: 'input', placeholder: '例如：铂金卡' },
         { key: 'account', label: '会员账号', required: true, type: 'input', placeholder: '请输入会员账号' },
@@ -83,6 +95,7 @@ export default {
           if (tapIndex === 0) {
             this.form.identity_discount_id = 0
             this.selectedIdentityDiscount = ''
+            this.identityDiscountImages = []
             // 清空组件中的图片
             if (this.$refs.memberForm) {
               this.$refs.memberForm.clearImages()
@@ -95,6 +108,66 @@ export default {
         }
       })
     },
+    // 打开图片上传
+    openImageUpload() {
+      const maxCount = 5
+      const currentCount = this.identityDiscountImages.length
+      
+      if (currentCount >= maxCount) {
+        uni.showToast({ title: '最多上传5张图片', icon: 'none' })
+        return
+      }
+      
+      const remainCount = maxCount - currentCount
+      uni.chooseImage({
+        count: remainCount,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: async (res) => {
+          uni.showLoading({ title: '上传中...' })
+          try {
+            const uploadPromises = res.tempFilePaths.map(path => this.uploadImage(path))
+            const uploadResults = await Promise.all(uploadPromises)
+            this.identityDiscountImages = [...this.identityDiscountImages, ...uploadResults]
+            uni.hideLoading()
+            uni.showToast({ title: '上传成功', icon: 'success' })
+          } catch (e) {
+            uni.hideLoading()
+            uni.showToast({ title: '图片上传失败', icon: 'none' })
+          }
+        }
+      })
+    },
+    // 上传单张图片
+    async uploadImage(filePath) {
+      return new Promise((resolve, reject) => {
+        uni.uploadFile({
+          url: baseURL + '/api/file/formImage',
+          filePath: filePath,
+          name: 'file',
+          header: {
+            'token': uni.getStorageSync('token') || ''
+          },
+          success: (res) => {
+            try {
+              const data = JSON.parse(res.data)
+              if (data.code === 1 && data.data && data.data.url) {
+                resolve(data.data.url)
+              } else {
+                reject(new Error(data.msg || '上传失败'))
+              }
+            } catch (e) {
+              reject(e)
+            }
+          },
+          fail: reject
+        })
+      })
+    },
+    // 删除图片
+    deleteImage(index) {
+      this.identityDiscountImages.splice(index, 1)
+    },
     async handleSubmit(data) {
       if (this.submitting) return
       this.submitting = true
@@ -103,7 +176,7 @@ export default {
           type: this.memberType,
           form: { ...data.form, identity_discount_id: this.form.identity_discount_id },
           identity_discount_id: this.form.identity_discount_id || 0,
-          identity_proof_images: data.identityProofImages.length > 0 ? JSON.stringify(data.identityProofImages) : ''
+          identity_proof_images: this.identityDiscountImages.length > 0 ? JSON.stringify(this.identityDiscountImages) : ''
         }
         const res = await applyMember(submitData)
         if (res.code === 1) {
@@ -148,34 +221,69 @@ export default {
   padding-right: 16rpx;
   box-sizing: border-box;
 }
-.select {
+
+/* 上传触发器样式 - 与管理员身份证上传相同 */
+.upload-trigger {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   height: 72rpx;
 }
-.form-item-row .select {
-  position: relative;
-  justify-content: space-between;
-  padding-right: 34rpx;
-}
-.form-item-row .select::after {
-  content: '>';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #c8cbd9;
-  font-size: 30rpx;
-}
-.select-text {
+
+.upload-text {
   flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: #ffffff;
   font-size: 26rpx;
 }
+
+.upload-icon {
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 300;
+  background-color: #353548;
+  border-radius: 50%;
+  padding: 5rpx 15rpx;
+}
+
 .ph {
   color: #666d8f;
+}
+
+/* 图片预览区域 */
+.image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 20rpx;
+  background: #1e1F34;
+}
+
+.upload-item {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.upload-img {
+  width: 100%;
+  height: 100%;
+}
+
+.delete-btn {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: #ff5b5b;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 </style>

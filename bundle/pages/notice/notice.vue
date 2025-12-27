@@ -1,6 +1,7 @@
 <template>
 <!--pages/notice/notice.wxml-->
 <view class="notice-container">
+  <custom-navbar title="通知"></custom-navbar>
   <view v-for="(item, index) in lists" :key="index" class="notice-item mb20">
     <view class="row-between item-header">
       <view class="header-title md">{{item.title}}</view>
@@ -122,6 +123,7 @@ export default {
 <style lang="scss">
 /* pages/notice/notice.wxss */
 .notice-container {
+  padding-top: calc(130rpx + var(--status-bar-height));
   padding: 0 20rpx;
   margin-top: 8rpx;
   .notice-item {

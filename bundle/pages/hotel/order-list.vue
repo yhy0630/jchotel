@@ -34,12 +34,9 @@
         
         
         <view class="actions" @click.stop>
-          <!-- 待支付状态：所有订单类型通用 -->
           <button v-if="item.status === 0 && !isPaid(item)" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
           <button v-if="item.status === 0 && !isPaid(item)" class="btn pay" @click.stop="goPay(item)">去支付</button>
-          <!-- 待出行/待接单/已支付状态：所有订单类型通用（如果未支付可以取消） -->
           <button v-if="item.status === 1 && !isPaid(item)" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
-          <!-- 已完成/已出票状态：所有订单类型通用 -->
           <button v-if="item.status === 2 || item.status === 3" class="btn invoice" @click.stop="applyInvoice(item)">申请开票</button>
           <button v-if="item.status === 2 || item.status === 3" class="btn review" @click.stop="goReview(item)">去评价</button>
         </view>

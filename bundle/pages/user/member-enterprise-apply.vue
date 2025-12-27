@@ -1,68 +1,243 @@
 <template>
   <view class="page">
-    <view class="nav-title">完善信息（企业会员）</view>
+    <custom-navbar title="完善信息（企业会员）"></custom-navbar>
     <scroll-view scroll-y class="form-wrap">
-      <view class="form-item" v-for="item in fields" :key="item.key">
+      <!-- 1. 会员等级 -->
+      <view class="form-item form-item-row">
         <view class="label">
-          <text class="required" v-if="item.required">*</text>
-          <text>{{ item.label }}</text>
+          <text class="required">*</text>
+          <text>会员等级</text>
         </view>
         <view class="control">
-          <input
-            v-if="item.type === 'input'"
-            v-model="form[item.key]"
-            :type="item.inputType || 'text'"
-            :placeholder="item.placeholder"
-            placeholder-class="ph"
-          />
-          <textarea
-            v-else-if="item.type === 'textarea'"
-            v-model="form[item.key]"
-            :placeholder="item.placeholder"
-            placeholder-class="ph"
-            class="textarea"
-            auto-height
-          />
-          <view
-            v-else-if="item.type === 'select'"
-            class="select"
-            @tap="handleSelect(item)"
-          >
-            <text :class="{'ph': !form[item.key]}">{{ form[item.key] || item.placeholder }}</text>
+          <input v-model="form.level" type="text" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 2. 会员账号 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>会员账号</text>
+        </view>
+        <view class="control">
+          <input v-model="form.account" type="text" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 3. 管理员姓名 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>管理员姓名</text>
+        </view>
+        <view class="control">
+          <input v-model="form.admin_name" type="text" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 4. 管理员性别 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>管理员性别</text>
+        </view>
+        <view class="control">
+          <view class="select" @tap="selectGender('admin_gender')">
+            <text :class="['select-text', { 'ph': !form.admin_gender }]">{{ form.admin_gender || '请选择' }}</text>
           </view>
         </view>
       </view>
-      <!-- 身份优惠选择 -->
-      <view class="form-item">
+      
+      <!-- 5. 管理员年龄 -->
+      <view class="form-item form-item-row">
         <view class="label">
-          <text>身份优惠</text>
+          <text class="required">*</text>
+          <text>管理员年龄</text>
         </view>
         <view class="control">
-          <view class="select" @tap="selectIdentityDiscount">
-            <text :class="{'ph': !selectedIdentityDiscount}">{{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}</text>
+          <input v-model="form.admin_age" type="number" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 6. 管理员电话 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>管理员电话</text>
+        </view>
+        <view class="control">
+          <input v-model="form.admin_phone" type="number" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 7. 管理员身份证上传 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>管理员身份证</text>
+        </view>
+        <view class="control">
+          <view class="upload-trigger" @tap="openImageUpload('admin_id_card')">
+            <text :class="['upload-text', { 'ph': adminIdCardImages.length === 0 }]">
+              {{ adminIdCardImages.length > 0 ? `已上传${adminIdCardImages.length}张，最多3张` : '上传身份证，最多3张' }}
+            </text>
+            <text class="upload-icon">+</text>
           </view>
         </view>
       </view>
-      <!-- 身份优惠证明图片上传 -->
-      <view class="form-item" v-if="form.identity_discount_id">
+      <view class="image-preview" v-if="adminIdCardImages.length > 0">
+        <view class="upload-item" v-for="(img, index) in adminIdCardImages" :key="index">
+          <image :src="img" mode="aspectFill" class="upload-img"></image>
+          <view class="delete-btn" @tap="deleteImage('admin_id_card', index)">×</view>
+        </view>
+      </view>
+      
+      <!-- 8. 法人姓名 -->
+      <view class="form-item form-item-row">
         <view class="label">
-          <text>身份优惠证明图片</text>
+          <text class="required">*</text>
+          <text>法人姓名</text>
         </view>
         <view class="control">
-          <view class="upload-wrap">
-            <view class="upload-item" v-for="(img, index) in identityProofImages" :key="index">
-              <image :src="img" mode="aspectFill" class="upload-img"></image>
-              <view class="delete-btn" @tap="deleteImage(index)">×</view>
-            </view>
-            <view class="upload-btn" @tap="chooseImages" v-if="identityProofImages.length < 9">
-              <text class="upload-icon">+</text>
-              <text class="upload-text">上传图片</text>
-            </view>
+          <input v-model="form.legal_name" type="text" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 9. 法人年龄 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>法人年龄</text>
+        </view>
+        <view class="control">
+          <input v-model="form.legal_age" type="number" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 10. 法人电话 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>法人电话</text>
+        </view>
+        <view class="control">
+          <input v-model="form.legal_phone" type="number" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 11. 法人身份证上传 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>法人身份证</text>
+        </view>
+        <view class="control">
+          <view class="upload-trigger" @tap="openImageUpload('legal_id_card')">
+            <text :class="['upload-text', { 'ph': legalIdCardImages.length === 0 }]">
+              {{ legalIdCardImages.length > 0 ? `已上传${legalIdCardImages.length}张，最多3张` : '上传身份证，最多3张' }}
+            </text>
+            <text class="upload-icon">+</text>
           </view>
-          <view class="upload-tip">最多上传9张图片</view>
+        </view>
+      </view>
+      <view class="image-preview" v-if="legalIdCardImages.length > 0">
+        <view class="upload-item" v-for="(img, index) in legalIdCardImages" :key="index">
+          <image :src="img" mode="aspectFill" class="upload-img"></image>
+          <view class="delete-btn" @tap="deleteImage('legal_id_card', index)">×</view>
+        </view>
+      </view>
+      
+      <!-- 12. 财务姓名 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>财务姓名</text>
+        </view>
+        <view class="control">
+          <input v-model="form.finance_name" type="text" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 13. 财务性别 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>财务性别</text>
+        </view>
+        <view class="control">
+          <view class="select" @tap="selectGender('finance_gender')">
+            <text :class="['select-text', { 'ph': !form.finance_gender }]">{{ form.finance_gender || '请选择' }}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 14. 财务年龄 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>财务年龄</text>
+        </view>
+        <view class="control">
+          <input v-model="form.finance_age" type="number" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 15. 财务电话 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>财务电话</text>
+        </view>
+        <view class="control">
+          <input v-model="form.finance_phone" type="number" placeholder="请输入" placeholder-class="ph" />
+        </view>
+      </view>
+      
+      <!-- 16. 财务身份证上传 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>财务身份证</text>
+        </view>
+        <view class="control">
+          <view class="upload-trigger" @tap="openImageUpload('finance_id_card')">
+            <text :class="['upload-text', { 'ph': financeIdCardImages.length === 0 }]">
+              {{ financeIdCardImages.length > 0 ? `已上传${financeIdCardImages.length}张，最多3张` : '上传身份证，最多3张' }}
+            </text>
+            <text class="upload-icon">+</text>
+          </view>
+        </view>
+      </view>
+      <view class="image-preview" v-if="financeIdCardImages.length > 0">
+        <view class="upload-item" v-for="(img, index) in financeIdCardImages" :key="index">
+          <image :src="img" mode="aspectFill" class="upload-img"></image>
+          <view class="delete-btn" @tap="deleteImage('finance_id_card', index)">×</view>
+        </view>
+      </view>
+      
+      <!-- 17. 营业执照上传 -->
+      <view class="form-item form-item-row">
+        <view class="label">
+          <text class="required">*</text>
+          <text>营业执照</text>
+        </view>
+        <view class="control">
+          <view class="upload-trigger" @tap="openImageUpload('business_license')">
+            <text :class="['upload-text', { 'ph': businessLicenseImages.length === 0 }]">
+              {{ businessLicenseImages.length > 0 ? `已上传${businessLicenseImages.length}张，最多5张` : '上传营业执照，最多5张' }}
+            </text>
+            <text class="upload-icon">+</text>
+          </view>
+        </view>
+      </view>
+      <view class="image-preview" v-if="businessLicenseImages.length > 0">
+        <view class="upload-item" v-for="(img, index) in businessLicenseImages" :key="index">
+          <image :src="img" mode="aspectFill" class="upload-img"></image>
+          <view class="delete-btn" @tap="deleteImage('business_license', index)">×</view>
         </view>
       </view>
     </scroll-view>
+    
     <view class="submit-bar" @tap="submitApply">提交审核</view>
   </view>
 </template>
@@ -76,39 +251,46 @@ export default {
     return {
       memberType: 'enterprise',
       submitting: false,
-      hasPendingApply: false, // 是否已有待审核的申请
-      form: {},
-      identityDiscountList: [], // 身份优惠列表
-      selectedIdentityDiscount: '', // 选中的身份优惠名称
-      identityProofImages: [], // 身份证明图片列表
-      fields: [
-        { key: 'level', label: '会员级别', required: true, type: 'input', placeholder: '例如：旗舰企业' },
-        { key: 'account', label: '会员账号', required: true, type: 'input', placeholder: '请输入企业账号' },
-        { key: 'hotel_name', label: '公司/酒店名称', required: true, type: 'input', placeholder: '请输入主体名称' },
-        { key: 'hotel_address', label: '详细地址', required: true, type: 'input', placeholder: '请输入办公地址' },
-        { key: 'principal', label: '负责人姓名', required: true, type: 'input', placeholder: '请输入负责人姓名' },
-        { key: 'principal_mobile', label: '负责人电话', required: true, type: 'input', inputType: 'number', placeholder: '请输入联系电话' },
-        { key: 'manager_name', label: '运营联系人', required: false, type: 'input', placeholder: '如有请填写' },
-        { key: 'manager_mobile', label: '联系人电话', required: false, type: 'input', inputType: 'number', placeholder: '请输入联系电话' },
-        { key: 'license', label: '营业执照信息', required: true, type: 'textarea', placeholder: '请输入营业执照编号、统一社会信用代码及主要经营范围' }
-      ]
+      hasPendingApply: false,
+      form: {
+        level: '',
+        account: '',
+        admin_name: '',
+        admin_gender: '',
+        admin_age: '',
+        admin_phone: '',
+        legal_name: '',
+        legal_age: '',
+        legal_phone: '',
+        finance_name: '',
+        finance_gender: '',
+        finance_age: '',
+        finance_phone: '',
+        identity_discount_id: 0
+      },
+      identityDiscountList: [],
+      selectedIdentityDiscount: '',
+      // 各类图片数组
+      adminIdCardImages: [],      // 管理员身份证
+      legalIdCardImages: [],       // 法人身份证
+      financeIdCardImages: [],     // 财务身份证
+      businessLicenseImages: [],   // 营业执照
+      identityProofImages: []      // 身份优惠证明
     }
   },
   created() {
-    this.resetForm()
     this.checkPendingApply()
     this.loadIdentityDiscountList()
   },
   methods: {
-    resetForm() {
-      const nextForm = {}
-      this.fields.forEach(field => {
-        nextForm[field.key] = field.default || ''
+    // 选择性别
+    selectGender(field) {
+      uni.showActionSheet({
+        itemList: ['男', '女'],
+        success: ({ tapIndex }) => {
+          this.$set(this.form, field, ['男', '女'][tapIndex])
+        }
       })
-      this.form = nextForm
-      this.form.identity_discount_id = 0
-      this.selectedIdentityDiscount = ''
-      this.identityProofImages = []
     },
     // 加载身份优惠列表
     async loadIdentityDiscountList() {
@@ -144,11 +326,42 @@ export default {
         }
       })
     },
-    // 选择图片
-    chooseImages() {
-      const maxCount = 9 - this.identityProofImages.length
+    // 打开图片上传
+    openImageUpload(type) {
+      let currentImages = []
+      let maxCount = 3
+      
+      switch(type) {
+        case 'admin_id_card':
+          currentImages = this.adminIdCardImages
+          maxCount = 3
+          break
+        case 'legal_id_card':
+          currentImages = this.legalIdCardImages
+          maxCount = 3
+          break
+        case 'finance_id_card':
+          currentImages = this.financeIdCardImages
+          maxCount = 3
+          break
+        case 'business_license':
+          currentImages = this.businessLicenseImages
+          maxCount = 5
+          break
+        case 'identity_proof':
+          currentImages = this.identityProofImages
+          maxCount = 5
+          break
+      }
+      
+      if (currentImages.length >= maxCount) {
+        uni.showToast({ title: `最多上传${maxCount}张图片`, icon: 'none' })
+        return
+      }
+      
+      const remainCount = maxCount - currentImages.length
       uni.chooseImage({
-        count: maxCount,
+        count: remainCount,
         sizeType: ['compressed'],
         sourceType: ['album', 'camera'],
         success: async (res) => {
@@ -156,8 +369,27 @@ export default {
           try {
             const uploadPromises = res.tempFilePaths.map(path => this.uploadImage(path))
             const uploadResults = await Promise.all(uploadPromises)
-            this.identityProofImages = [...this.identityProofImages, ...uploadResults]
+            
+            switch(type) {
+              case 'admin_id_card':
+                this.adminIdCardImages = [...this.adminIdCardImages, ...uploadResults]
+                break
+              case 'legal_id_card':
+                this.legalIdCardImages = [...this.legalIdCardImages, ...uploadResults]
+                break
+              case 'finance_id_card':
+                this.financeIdCardImages = [...this.financeIdCardImages, ...uploadResults]
+                break
+              case 'business_license':
+                this.businessLicenseImages = [...this.businessLicenseImages, ...uploadResults]
+                break
+              case 'identity_proof':
+                this.identityProofImages = [...this.identityProofImages, ...uploadResults]
+                break
+            }
+            
             uni.hideLoading()
+            uni.showToast({ title: '上传成功', icon: 'success' })
           } catch (e) {
             uni.hideLoading()
             uni.showToast({ title: '图片上传失败', icon: 'none' })
@@ -192,28 +424,30 @@ export default {
       })
     },
     // 删除图片
-    deleteImage(index) {
-      this.identityProofImages.splice(index, 1)
-    },
-    // 处理下拉选择
-    handleSelect(item) {
-      if (!item.options || !item.options.length) {
-        uni.showToast({ title: '暂无可选项', icon: 'none' })
-        return
+    deleteImage(type, index) {
+      switch(type) {
+        case 'admin_id_card':
+          this.adminIdCardImages.splice(index, 1)
+          break
+        case 'legal_id_card':
+          this.legalIdCardImages.splice(index, 1)
+          break
+        case 'finance_id_card':
+          this.financeIdCardImages.splice(index, 1)
+          break
+        case 'business_license':
+          this.businessLicenseImages.splice(index, 1)
+          break
+        case 'identity_proof':
+          this.identityProofImages.splice(index, 1)
+          break
       }
-      uni.showActionSheet({
-        itemList: item.options,
-        success: ({ tapIndex }) => {
-          this.$set(this.form, item.key, item.options[tapIndex])
-        }
-      })
     },
     // 检查是否有待审核的申请
     async checkPendingApply() {
       try {
         const res = await getMemberApplyRecords()
         if (res.code === 1 && res.data && res.data.list) {
-          // 检查是否有企业会员类型且状态为待审核(0)的申请
           const pendingApply = res.data.list.find(item => 
             item.type === 'enterprise' && item.status === 0
           )
@@ -223,6 +457,7 @@ export default {
         console.error('检查待审核申请失败:', e)
       }
     },
+    // 提交申请
     async submitApply() {
       // 防止重复提交
       if (this.submitting) {
@@ -239,12 +474,46 @@ export default {
         return
       }
       
-      // 表单验证
-      for (const item of this.fields) {
-        if (item.required && !this.form[item.key]) {
-          uni.showToast({ title: `请填写${item.label}`, icon: 'none' })
+      // 表单验证 - 必填字段
+      const requiredFields = [
+        { key: 'level', label: '会员等级' },
+        { key: 'account', label: '会员账号' },
+        { key: 'admin_name', label: '管理员姓名' },
+        { key: 'admin_gender', label: '管理员性别' },
+        { key: 'admin_age', label: '管理员年龄' },
+        { key: 'admin_phone', label: '管理员电话' },
+        { key: 'legal_name', label: '法人姓名' },
+        { key: 'legal_age', label: '法人年龄' },
+        { key: 'legal_phone', label: '法人电话' },
+        { key: 'finance_name', label: '财务姓名' },
+        { key: 'finance_gender', label: '财务性别' },
+        { key: 'finance_age', label: '财务年龄' },
+        { key: 'finance_phone', label: '财务电话' }
+      ]
+      
+      for (const field of requiredFields) {
+        if (!this.form[field.key]) {
+          uni.showToast({ title: `请填写${field.label}`, icon: 'none' })
           return
         }
+      }
+      
+      // 验证必传图片
+      if (this.adminIdCardImages.length === 0) {
+        uni.showToast({ title: '请上传管理员身份证', icon: 'none' })
+        return
+      }
+      if (this.legalIdCardImages.length === 0) {
+        uni.showToast({ title: '请上传法人身份证', icon: 'none' })
+        return
+      }
+      if (this.financeIdCardImages.length === 0) {
+        uni.showToast({ title: '请上传财务身份证', icon: 'none' })
+        return
+      }
+      if (this.businessLicenseImages.length === 0) {
+        uni.showToast({ title: '请上传营业执照', icon: 'none' })
+        return
       }
       
       this.submitting = true
@@ -252,7 +521,13 @@ export default {
         // 准备提交数据
         const submitData = {
           type: this.memberType,
-          form: this.form,
+          form: {
+            ...this.form,
+            admin_id_card: JSON.stringify(this.adminIdCardImages),
+            legal_id_card: JSON.stringify(this.legalIdCardImages),
+            finance_id_card: JSON.stringify(this.financeIdCardImages),
+            business_license: JSON.stringify(this.businessLicenseImages)
+          },
           identity_discount_id: this.form.identity_discount_id || 0,
           identity_proof_images: this.identityProofImages.length > 0 ? JSON.stringify(this.identityProofImages) : ''
         }
@@ -261,7 +536,6 @@ export default {
         if (res.code === 1) {
           uni.showToast({ title: '提交成功，等待审核', icon: 'success' })
           setTimeout(() => {
-            // 返回到上一个页面
             uni.navigateBack()
           }, 1500)
         } else {
@@ -281,67 +555,119 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #1a2548 0%, #050814 100%);
+  background: #0D1034;
   display: flex;
   flex-direction: column;
+  padding-top: calc(130rpx + var(--status-bar-height));
 }
-.nav-title {
-  padding: 32rpx;
-  padding-top: 80rpx;
-  font-size: 32rpx;
-  color: #ffffff;
-}
+
 .form-wrap {
   flex: 1;
-  padding: 0 24rpx 24rpx;
+  margin: 20rpx 0rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  border-radius: 30rpx;
+  background: #1e1F34;
 }
-.form-item {
-  background: #151c35;
-  border-radius: 12rpx;
-  padding: 22rpx 24rpx;
-  margin-bottom: 16rpx;
+
+.form-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
+  padding: 15rpx 20rpx;
 }
+
 .label {
   font-size: 26rpx;
   color: #ffffff;
-  margin-bottom: 10rpx;
+  flex-shrink: 0;
+  width: 220rpx;
 }
+
 .required {
   color: #ff5b5b;
   margin-right: 6rpx;
 }
-.control input,
-.textarea {
-  border-radius: 8rpx;
-  background: #0c1224;
-  padding: 0 20rpx;
+
+.control {
+  flex: 1;
+  padding-left: 16rpx;
+  padding-right: 16rpx;
+  box-sizing: border-box;
+}
+
+.control input {
+  height: 72rpx;
+  background: transparent;
+  padding: 0;
   color: #ffffff;
   font-size: 26rpx;
 }
-.control input {
-  height: 72rpx;
-}
-.textarea {
-  min-height: 160rpx;
-  padding-top: 12rpx;
-  line-height: 40rpx;
-}
+
 .ph {
   color: #666d8f;
 }
+
 .select {
-  height: 72rpx;
   display: flex;
   align-items: center;
-  border-radius: 8rpx;
-  background: #0c1224;
-  padding: 0 20rpx;
+  position: relative;
+  justify-content: space-between;
+  padding-right: 34rpx;
+  height: 72rpx;
+  background: transparent;
 }
-.upload-wrap {
+
+.select::after {
+  content: '>';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c8cbd9;
+  font-size: 30rpx;
+}
+
+.select-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ffffff;
+  font-size: 26rpx;
+}
+
+.upload-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72rpx;
+}
+
+.upload-text {
+  flex: 1;
+  color: #ffffff;
+  font-size: 26rpx;
+}
+
+.upload-icon {
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 300;
+  background-color: #353548;
+  border-radius: 50%;
+  padding: 5rpx 15rpx;
+}
+
+.image-preview {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
+  padding: 20rpx;
+  background: #1e1F34;
 }
+
 .upload-item {
   position: relative;
   width: 160rpx;
@@ -349,10 +675,12 @@ export default {
   border-radius: 8rpx;
   overflow: hidden;
 }
+
 .upload-img {
   width: 100%;
   height: 100%;
 }
+
 .delete-btn {
   position: absolute;
   top: -8rpx;
@@ -368,40 +696,15 @@ export default {
   justify-content: center;
   line-height: 1;
 }
-.upload-btn {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 8rpx;
-  background: #0c1224;
-  border: 2rpx dashed #666d8f;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.upload-icon {
-  font-size: 48rpx;
-  color: #666d8f;
-  line-height: 1;
-  margin-bottom: 8rpx;
-}
-.upload-text {
-  font-size: 22rpx;
-  color: #666d8f;
-}
-.upload-tip {
-  font-size: 22rpx;
-  color: #666d8f;
-  margin-top: 12rpx;
-}
+
 .submit-bar {
   height: 96rpx;
   margin: 0 40rpx 40rpx;
   border-radius: 48rpx;
-  background: linear-gradient(90deg, #ffb84d 0%, #ff8a34 100%);
+  background: linear-gradient(90deg, #F4BD66 0%, #FEE2AF 49.58%, #F3BD65 100%);
   text-align: center;
   line-height: 96rpx;
-  color: #fff;
+  color: #380C00;
   font-size: 32rpx;
   font-weight: 600;
 }

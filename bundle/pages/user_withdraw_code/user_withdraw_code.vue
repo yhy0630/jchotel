@@ -1,5 +1,6 @@
 <template>
 <view class="user-withdraw-code">
+  <custom-navbar title="提现记录"></custom-navbar>
     <view class="withdraw-code-container mt10">
         <view class="withdraw-code-contain">
             <navigator v-for="(item, index) in withdrawRecords" :key="index" class="withdraw-code-item bg-white" hover-class="none"
@@ -77,6 +78,7 @@ export default {
 .user-withdraw-code {
    background-color: #0D1038;
 	min-height: 100vh;
+	padding-top: calc(130rpx + var(--status-bar-height));
     .withdraw-code-container {
         .withdraw-code-item {
             padding: 24rpx 30rpx;

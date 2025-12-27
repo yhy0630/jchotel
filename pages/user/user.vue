@@ -285,10 +285,23 @@
 			</view>
 		</view> -->
         <recommend/>
+        
+        <!-- 自定义切换身份弹窗 -->
+        <custom-modal
+            :show.sync="showSwitchModal"
+            :title="switchModalTitle"
+            :content="switchModalContent"
+            :confirm-text="switchModalType === 'complete' ? '去完善' : '确认'"
+            cancel-text="取消"
+            @confirm="handleSwitchConfirm"
+            @cancel="handleSwitchCancel"
+        />
 	</view>
 </template>
 
 <script>
+	import CustomModal from '@/components/custom-modal/custom-modal.vue'
+	import recommend from '@/components/recommend/recommend.vue'
 	import {
 		mapGetters,
 		mapActions
@@ -315,7 +328,12 @@
 				navBg: 0,
 				menuList: [],
 				statusBarH: "",
-                isMerchant: false, // 是否商家，根据后台权限设置
+                isMerchant: false,
+                // 自定义弹窗相关
+                showSwitchModal: false,
+                switchModalTitle: '',
+                switchModalContent: '',
+                switchModalType: '', // 'confirm' 或 'complete'
                 // 会员身份相关
                 activeMemberType: '',
                 memberTabs: [
@@ -389,7 +407,10 @@
 			};
 		},
 
-		components: {},
+		components: {
+			CustomModal,
+			recommend
+		},
 		props: {},
 		watch: {
 			'userInfo.member_category_code'(val) {
@@ -552,7 +573,7 @@
                     this.checkMerchantPermission();
                 }
             },
-            // 切换身份：如果未开通该身份，则跳转入驻表单；如果已开通，提示已切换
+            // 切换身份：先弹出确认框，确认后判断是否已开通
             switchIdentity() {
                 if (!this.isLogin) {
                     return toLogin()
@@ -563,28 +584,66 @@
                     this.activeMemberType = this.memberTabs[0].key;
                 }
 
-                let url = ''
                 const targetType = this.activeMemberType;
+                const memberLabel = this.getMemberLabel(targetType);
 
+                // 第一步：弹出确认切换身份的提示框
+                this.switchModalType = 'confirm';
+                this.switchModalTitle = '切换身份';
+                this.switchModalContent = `确认切换为${memberLabel}吗`;
+                this.showSwitchModal = true;
+            },
+            
+            // 处理切换身份确认弹窗的确认按钮
+            handleSwitchConfirm() {
+                if (this.switchModalType === 'confirm') {
+                    // 第一个弹窗确认后，进行判断
+                    const targetType = this.activeMemberType;
+                    const memberLabel = this.getMemberLabel(targetType);
+                    this.performIdentitySwitch(targetType, memberLabel);
+                } else if (this.switchModalType === 'complete') {
+                    // 第二个弹窗确认后，跳转到入驻表单
+                    this.navigateToApplyForm();
+                }
+            },
+            
+            // 处理切换身份弹窗的取消按钮
+            handleSwitchCancel() {
+                // 弹窗关闭由组件的.sync自动处理
+            },
+            
+            // 执行身份切换的实际逻辑
+            performIdentitySwitch(targetType, memberLabel) {
                 // 已经是该身份会员，提示已切换
                 if (this.ownedMemberTypes.includes(targetType)) {
-                    uni.showToast({ title: `您已是${this.getMemberLabel(targetType)}，可在个人中心查看数据`, icon: 'success' });
+                    uni.showToast({ title: `您已是${memberLabel}，可在个人中心查看数据`, icon: 'success' });
                     return;
                 }
 
-                // 未开通，跳转入驻表单
+                // 未开通，弹出温馨提示
+                this.switchModalType = 'complete';
+                this.switchModalTitle = '温馨提示';
+                this.switchModalContent = '升级之前，需要完善您的个人信息';
+                this.showSwitchModal = true;
+            },
+            
+            // 跳转到入驻表单
+            navigateToApplyForm() {
+                const targetType = this.activeMemberType;
+                let applyUrl = '';
+                
                 if (targetType === 'business_travel') {
-                    url = '/bundle/pages/user/member-business-travel-apply'
+                    applyUrl = '/bundle/pages/user/member-business-travel-apply'
                 } else if (targetType === 'channel') {
-                    url = '/bundle/pages/user/member-channel-apply'
+                    applyUrl = '/bundle/pages/user/member-channel-apply'
                 } else if (targetType === 'enterprise') {
-                    url = '/bundle/pages/user/member-enterprise-apply'
+                    applyUrl = '/bundle/pages/user/member-enterprise-apply'
                 } else if (targetType === 'business') {
-                    url = '/bundle/pages/user/member-business-apply'
+                    applyUrl = '/bundle/pages/user/member-business-apply'
                 }
                 
-                if (url) {
-                    uni.navigateTo({ url })
+                if (applyUrl) {
+                    uni.navigateTo({ url: applyUrl });
                 } else {
                     uni.showToast({ title: '该会员类型暂不支持入驻', icon: 'none' });
                 }

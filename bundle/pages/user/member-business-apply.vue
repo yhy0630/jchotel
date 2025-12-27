@@ -1,93 +1,55 @@
 <template>
-  <view class="page">
-    <view class="nav-title">完善信息（商务会员）</view>
-    <scroll-view scroll-y class="form-wrap">
-      <view class="form-item" v-for="item in fields" :key="item.key">
-        <view class="label">
-          <text class="required" v-if="item.required">*</text>
-          <text>{{ item.label }}</text>
-        </view>
-        <view class="control">
-          <input
-            v-model="form[item.key]"
-            :placeholder="item.placeholder"
-            placeholder-class="ph"
-          />
-        </view>
-      </view>
-      <!-- 身份优惠选择 -->
-      <view class="form-item">
-        <view class="label">
-          <text>身份优惠</text>
-        </view>
-        <view class="control">
-          <view class="select" @tap="selectIdentityDiscount">
-            <text :class="{'ph': !selectedIdentityDiscount}">{{ selectedIdentityDiscount || '请选择身份优惠（可选）' }}</text>
-          </view>
-        </view>
-      </view>
-      <!-- 身份优惠证明图片上传 -->
-      <view class="form-item" v-if="form.identity_discount_id">
-        <view class="label">
-          <text>身份优惠证明图片</text>
-        </view>
-        <view class="control">
-          <view class="upload-wrap">
-            <view class="upload-item" v-for="(img, index) in identityProofImages" :key="index">
-              <image :src="img" mode="aspectFill" class="upload-img"></image>
-              <view class="delete-btn" @tap="deleteImage(index)">×</view>
-            </view>
-            <view class="upload-btn" @tap="chooseImages" v-if="identityProofImages.length < 9">
-              <text class="upload-icon">+</text>
-              <text class="upload-text">上传图片</text>
-            </view>
-          </view>
-          <view class="upload-tip">最多上传9张图片</view>
-        </view>
-      </view>
-    </scroll-view>
-    <view class="submit-bar" @tap="submitApply">提交审核</view>
-  </view>
+  <member-form
+    ref="memberForm"
+    title="完善信息（商务会员）"
+    :fields="fields"
+    :show-image-upload="form.identity_discount_id > 0"
+    @submit="handleSubmit"
+  >
+  </member-form>
 </template>
 
 <script>
 import { applyMember, getIdentityDiscountList } from '@/api/user'
 import { baseURL } from '@/config/app'
+import MemberForm from '@/components/member-form/member-form.vue'
 
 export default {
+  components: {
+    MemberForm
+  },
   data() {
     return {
       memberType: 'business',
       submitting: false,
-      form: {},
+      form: {
+        identity_discount_id: 0
+      },
       identityDiscountList: [],
       selectedIdentityDiscount: '',
-      identityProofImages: [],
+      identityDiscountImages: [], // 身份优惠图片数组
       fields: [
         { key: 'level', label: '会员级别', required: true, type: 'input', placeholder: '请输入' },
         { key: 'account', label: '会员账号', required: true, type: 'input', placeholder: '请输入' },
-        { key: 'company', label: '公司名称', required: true, type: 'input', placeholder: '请输入' },
-        { key: 'department', label: '部门名称', required: true, type: 'input', placeholder: '请输入' },
-        { key: 'position', label: '职位名称', required: true, type: 'input', placeholder: '请输入' },
-        { key: 'mobile', label: '联系电话', required: true, type: 'input', placeholder: '请输入' }
+        { key: 'business_area', label: '业务区域', required: true, type: 'select', placeholder: '请选择', options: ['华北地区', '华东地区', '华南地区', '华中地区', '西南地区', '西北地区', '东北地区'] },
+        { key: 'hotel', label: '就职酒店', required: true, type: 'input', placeholder: '请输入工作单位名称' },
+        { key: 'position', label: '岗位名称', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'name', label: '姓名', required: true, type: 'input', placeholder: '请输入' },
+        { key: 'gender', label: '性别', required: true, type: 'select', placeholder: '请选择', options: ['男', '女'] },
+        { key: 'age', label: '年龄', required: true, type: 'select', placeholder: '请选择', options: ['18-25岁', '26-35岁', '36-45岁', '46-60岁', '60岁以上'] },
+        { key: 'nation', label: '民族', required: true, type: 'select', placeholder: '请选择', options: ['汉族', '满族', '蒙古族', '回族', '藏族', '维吾尔族', '其他'] },
+        { key: 'education', label: '学历', required: true, type: 'select', placeholder: '请选择', options: ['高中及以下', '大专', '本科', '硕士及以上'] },
+        { key: 'political', label: '政治面貌', required: true, type: 'select', placeholder: '请选择', options: ['群众', '共青团员', '共产党员', '民主党派'] },
+        { key: 'social_group', label: '社会群体', required: true, type: 'select', placeholder: '请选择', options: ['商协会', '高校校友', '公益组织', '行业社群', '其他'] },
+        { key: 'hobbies', label: '业余爱好', required: false, type: 'input', placeholder: '如：旅行、摄影、阅读' },
+        { key: 'remark', label: '备注', required: false, type: 'input', placeholder: '请输入备注信息' }
       ]
     }
   },
   created() {
-    this.resetForm()
     this.loadIdentityDiscountList()
   },
   methods: {
-    resetForm() {
-      const nextForm = {}
-      this.fields.forEach(field => {
-        nextForm[field.key] = field.default || ''
-      })
-      this.form = nextForm
-      this.form.identity_discount_id = 0
-      this.selectedIdentityDiscount = ''
-      this.identityProofImages = []
-    },
     async loadIdentityDiscountList() {
       try {
         const res = await getIdentityDiscountList()
@@ -111,7 +73,7 @@ export default {
           if (tapIndex === 0) {
             this.form.identity_discount_id = 0
             this.selectedIdentityDiscount = ''
-            this.identityProofImages = []
+            this.identityDiscountImages = []
           } else {
             const selected = this.identityDiscountList[tapIndex - 1]
             this.form.identity_discount_id = selected.id
@@ -120,10 +82,19 @@ export default {
         }
       })
     },
-    chooseImages() {
-      const maxCount = 9 - this.identityProofImages.length
+    // 打开图片上传
+    openImageUpload() {
+      const maxCount = 5
+      const currentCount = this.identityDiscountImages.length
+      
+      if (currentCount >= maxCount) {
+        uni.showToast({ title: '最多上传5张图片', icon: 'none' })
+        return
+      }
+      
+      const remainCount = maxCount - currentCount
       uni.chooseImage({
-        count: maxCount,
+        count: remainCount,
         sizeType: ['compressed'],
         sourceType: ['album', 'camera'],
         success: async (res) => {
@@ -131,8 +102,9 @@ export default {
           try {
             const uploadPromises = res.tempFilePaths.map(path => this.uploadImage(path))
             const uploadResults = await Promise.all(uploadPromises)
-            this.identityProofImages = [...this.identityProofImages, ...uploadResults]
+            this.identityDiscountImages = [...this.identityDiscountImages, ...uploadResults]
             uni.hideLoading()
+            uni.showToast({ title: '上传成功', icon: 'success' })
           } catch (e) {
             uni.hideLoading()
             uni.showToast({ title: '图片上传失败', icon: 'none' })
@@ -140,6 +112,7 @@ export default {
         }
       })
     },
+    // 上传单张图片
     async uploadImage(filePath) {
       return new Promise((resolve, reject) => {
         uni.uploadFile({
@@ -165,24 +138,19 @@ export default {
         })
       })
     },
+    // 删除图片
     deleteImage(index) {
-      this.identityProofImages.splice(index, 1)
+      this.identityDiscountImages.splice(index, 1)
     },
-    async submitApply() {
+    async handleSubmit(data) {
       if (this.submitting) return
-      for (const item of this.fields) {
-        if (item.required && !this.form[item.key]) {
-          uni.showToast({ title: `请填写${item.label}`, icon: 'none' })
-          return
-        }
-      }
       this.submitting = true
       try {
         const submitData = {
           type: this.memberType,
-          form: this.form,
+          form: { ...data.form, identity_discount_id: this.form.identity_discount_id },
           identity_discount_id: this.form.identity_discount_id || 0,
-          identity_proof_images: this.identityProofImages.length > 0 ? JSON.stringify(this.identityProofImages) : ''
+          identity_proof_images: this.identityDiscountImages.length > 0 ? JSON.stringify(this.identityDiscountImages) : ''
         }
         const res = await applyMember(submitData)
         if (res.code === 1) {
@@ -205,58 +173,62 @@ export default {
 </script>
 
 <style scoped>
-.page {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #1a2548 0%, #050814 100%);
-  display: flex;
-  flex-direction: column;
-}
-.nav-title {
-  padding: 32rpx;
-  padding-top: 80rpx;
-  font-size: 32rpx;
-  color: #ffffff;
-}
-.form-wrap {
-  flex: 1;
-  padding: 0 24rpx 24rpx;
-}
+/* 身份优惠选择样式 */
 .form-item {
-  background: #151c35;
-  border-radius: 12rpx;
-  padding: 22rpx 24rpx;
-  margin-bottom: 16rpx;
+  padding: 15rpx 20rpx;
+}
+.form-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
 }
 .label {
   font-size: 26rpx;
   color: #ffffff;
-  margin-bottom: 10rpx;
+  flex-shrink: 0;
+  width: 220rpx;
 }
-.required {
-  color: #ff5b5b;
-  margin-right: 6rpx;
+.control {
+  flex: 1;
+  padding-left: 16rpx;
+  padding-right: 16rpx;
+  box-sizing: border-box;
 }
-.control input,
-.select {
+
+/* 上传触发器样式 */
+.upload-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   height: 72rpx;
-  border-radius: 8rpx;
-  background: #0c1224;
-  padding: 0 20rpx;
+}
+
+.upload-text {
+  flex: 1;
   color: #ffffff;
   font-size: 26rpx;
 }
+
+.upload-icon {
+  color: #c8cbd9;
+  font-size: 32rpx;
+  font-weight: 300;
+}
+
 .ph {
   color: #666d8f;
 }
-.select {
-  display: flex;
-  align-items: center;
-}
-.upload-wrap {
+
+/* 图片预览区域 */
+.image-preview {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
+  padding: 20rpx;
+  background: #1e1F34;
 }
+
 .upload-item {
   position: relative;
   width: 160rpx;
@@ -264,10 +236,12 @@ export default {
   border-radius: 8rpx;
   overflow: hidden;
 }
+
 .upload-img {
   width: 100%;
   height: 100%;
 }
+
 .delete-btn {
   position: absolute;
   top: -8rpx;
@@ -282,43 +256,6 @@ export default {
   align-items: center;
   justify-content: center;
   line-height: 1;
-}
-.upload-btn {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 8rpx;
-  background: #0c1224;
-  border: 2rpx dashed #666d8f;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.upload-icon {
-  font-size: 48rpx;
-  color: #666d8f;
-  line-height: 1;
-  margin-bottom: 8rpx;
-}
-.upload-text {
-  font-size: 22rpx;
-  color: #666d8f;
-}
-.upload-tip {
-  font-size: 22rpx;
-  color: #666d8f;
-  margin-top: 12rpx;
-}
-.submit-bar {
-  height: 96rpx;
-  margin: 0 40rpx 40rpx;
-  border-radius: 48rpx;
-  background: linear-gradient(90deg, #ffb84d 0%, #ff8a34 100%);
-  text-align: center;
-  line-height: 96rpx;
-  color: #fff;
-  font-size: 32rpx;
-  font-weight: 600;
 }
 </style>
 

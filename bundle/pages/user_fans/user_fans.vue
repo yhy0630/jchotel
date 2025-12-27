@@ -1,5 +1,6 @@
 <template>
 <view class="user-fans-box">
+    <custom-navbar title="粉丝列表"></custom-navbar>
     <view class="header">
         <view class="top-bar row bg-white md">
             <view :class="'bar-item row-center ' + (active == 'all' ? 'item-active' : '')" @tap="changeTab" data-active="all">全部粉丝</view>
@@ -232,6 +233,7 @@ export default {
 .user-fans-box {
     background-color: #0D1038;
 	min-height: 100vh;
+    padding-top: calc(130rpx + var(--status-bar-height));
     .header {
         color: #FFFFFF;
         ::v-deep .u-search {
@@ -308,6 +310,7 @@ export default {
     .data-null {
         padding-top: 200rpx;
         line-height: 40rpx;
+
     }
     .card-box {
         margin-top: 20rpx;

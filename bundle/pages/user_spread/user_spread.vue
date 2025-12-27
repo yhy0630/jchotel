@@ -20,8 +20,8 @@
                     <!-- <view class="xs fans-type">铁粉</view> -->
                 </view>
                 <view class="row">
-                    <view class="member-tag">会员类别</view>
-                    <view class="member-tag ml10">会员等级</view>
+                    <view class="member-tag">{{ member_category_name || '会员类别' }}</view>
+                    <view class="member-tag ml10">{{ member_grade_name || '会员等级' }}</view>
                 </view>
                 <!-- <view class="xs row" style="line-height: 30rpx;text-align: left;">
                     上级分销商：{{!inviteStatus ? '无' : userInfo.leader.nickname}} <view v-if="!inviteStatus" class="br60 white write-btn row-center" @tap="showInvitePop">填写</view>
@@ -156,7 +156,7 @@
                 </view>
                 <!-- <view class="row-center my-promote-banner bg-primary white">我的推广海报</view> -->
             </view>
-            <view class="usual-tools-box bg-white mt20">
+            <!-- <view class="usual-tools-box bg-white mt20">
                 <view class="usual-tools-header row lg bold">
                     常用工具
                 </view>
@@ -170,7 +170,7 @@
                     <view class="nr normal mt20" style="line-height: 40rpx">月度账单</view>
                 </navigator>
                 </view>
-            </view>
+            </view> -->
         </view>
     </view>
     <u-popup v-model="showPop" @close="onClose" closeable mode="center" border-radius="30">
@@ -205,7 +205,7 @@
 // +----------------------------------------------------------------------
 // | author: likeshop.cn.team
 // +----------------------------------------------------------------------
-import { inputInviteCode, applyVip, applyVipDetail, getInviteInfo, getPromoteHome, veryfiyDistribute } from "@/api/user";
+import { inputInviteCode, applyVip, applyVipDetail, getInviteInfo, getPromoteHome, veryfiyDistribute, getUser } from "@/api/user";
 import area from '@/utils/area'
 import {copy} from '@/utils/tools'
 export default {
@@ -240,7 +240,9 @@ export default {
       history_earnings: 0,
       month_earnings: 0,
       today_earnings: 0,
-	  userFans: 0
+	  userFans: 0,
+      member_category_name: '',
+      member_grade_name: ''
     };
   },
 
@@ -253,11 +255,23 @@ export default {
    */
   onLoad: function (options) {
     this.showLoading = true
+    this.getUserCenterInfo()
     this.veryfiyDistributeFun()
   },
 
  
   methods: {
+    // 获取用户中心信息
+    getUserCenterInfo() {
+      getUser().then(res => {
+        if (res.code == 1 && res.data) {
+          this.member_category_name = res.data.member_category_name || ''
+          this.member_grade_name = res.data.member_grade_name || ''
+        }
+      }).catch(e => {
+        console.error('获取用户中心信息失败:', e)
+      })
+    },
     onInput(e) {
         this.inviteCode = e.detail.value
     },
