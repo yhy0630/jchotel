@@ -246,8 +246,30 @@ export default {
       })
     },
     bookRoom(roomCode) {
+      // 根据 roomCode 找到当前房型的完整信息
+      const room = this.rooms.find(r => r.roomCode === roomCode) || {}
+      const roomInfo = encodeURIComponent(JSON.stringify(room))
+
+      // 组装部分酒店信息，避免订单页再次请求详情
+      const hotelInfo = encodeURIComponent(JSON.stringify({
+        shoppingId: this.detail.shoppingId || '',
+        hotelName: this.detail.hotelName || '',
+        cityCode: this.cityCode || '',
+        cityName: this.detail.city || this.detail.district || '',
+        arriveEarlyTime: this.detail.arriveEarlyTime || '',
+        arriveLastTime: this.detail.arriveLastTime || ''
+      }))
+
       uni.navigateTo({
-        url: `/bundle/pages/hotel/order-create?hotelCode=${this.hotelCode}&roomCode=${roomCode}&checkInDate=${this.checkInDate}&checkOutDate=${this.checkOutDate}&adultCount=${this.adultCount}&childCount=${this.childCount}`
+        url: `/bundle/pages/hotel/order-create`
+          + `?hotelCode=${this.hotelCode}`
+          + `&roomCode=${roomCode}`
+          + `&checkInDate=${this.checkInDate}`
+          + `&checkOutDate=${this.checkOutDate}`
+          + `&adultCount=${this.adultCount}`
+          + `&childCount=${this.childCount}`
+          + `&roomInfo=${roomInfo}`
+          + `&hotelInfo=${hotelInfo}`
       })
     },
     loadMore() {

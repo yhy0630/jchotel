@@ -119,17 +119,17 @@
             </view>
           </view>
           <view class="flight-prices">
-            <view class="price-line">
+            <view class="price-line" :class="{ highlight: getPriceType(item) === 'list' }">
               <text class="price-label">挂牌价</text>
               <text class="price-value">¥{{ formatPrice(item.list_price || item.price || item.display_price) }}</text>
               <text class="price-unit">起</text>
             </view>
-            <view class="price-line vip">
+            <view class="price-line vip" :class="{ highlight: getPriceType(item) === 'vip' }">
               <text class="price-label">尊享价</text>
-              <text class="price-value">¥{{ formatPrice(item.display_price || item.price) }}</text>
+              <text class="price-value">¥{{ formatPrice(item.vip_price || item.display_price || item.price) }}</text>
               <text class="price-unit">起</text>
             </view>
-            <view class="price-line share">
+            <view class="price-line share" :class="{ highlight: getPriceType(item) === 'share' }">
               <text class="price-label">股东价</text>
               <text class="price-value">¥{{ formatPrice(item.share_price || item.display_price || item.price) }}</text>
               <text class="price-unit">起</text>
@@ -521,6 +521,15 @@ export default {
       const numPrice = typeof price === 'number' ? price : parseFloat(price)
       return numPrice.toFixed(2)
     },
+
+    // 获取当前用户对应的价格类型（用于高亮），优先使用后端返回的 user_price_type
+    getPriceType(item) {
+      if (!item) return ''
+      if (item.user_price_type) return item.user_price_type
+      if (item.price_type === 4) return 'share'
+      if (item.price_type === 2) return 'vip'
+      return 'list'
+    },
     
     goDetail(item) {
       // 优先使用routeId（新接口参数）
@@ -559,6 +568,12 @@ export default {
         price_type: item.price_type || 2,
         price_type_text: encodeURIComponent(item.price_type_text || '尊享价'),
         original_price: item.original_price || item.price || 0,
+        // 传递所有三种价格，用于动态显示和高亮
+        list_price: item.list_price || item.price || 0,
+        vip_price: item.vip_price || item.price || 0,
+        share_price: item.share_price || item.price || 0,
+        user_price_type: item.user_price_type || 'list',
+        user_final_price: item.user_final_price || item.display_price || item.price || 0,
         dep_city: encodeURIComponent(item.departureCityName || item.departureCity || ''),
         arr_city: encodeURIComponent(item.arrivalCityName || item.arrivalCity || ''),
         // 使用机场三字码传递，避免名称过长写入数据库
@@ -946,8 +961,20 @@ export default {
         font-size: 16rpx;
       }
 
-      &.vip {
-        color: #e3af53;
+      // 去掉硬编码的尊享价样式，只根据用户等级动态高亮
+      &.highlight {
+        color: #F3BC63;
+        .price-label {
+          color: #F3BC63;
+          font-weight: 700;
+        }
+        .price-value {
+          background: linear-gradient(90deg, #F3BC63 0%, #FDE3B1 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 700;
+        }
       }
     }
   }

@@ -3,15 +3,15 @@
     <custom-navbar title="会员升级"></custom-navbar>
     <view class="member-selector-wrap">
       <view class="member-selector">
-        <view 
-          class="selector-item" 
+        <view
+          class="selector-item"
           :class="{'active': memberType === 'personal'}"
           @click="switchMemberType('personal')"
         >
           <text>个人会员</text>
         </view>
-        <view 
-          class="selector-item" 
+        <view
+          class="selector-item"
           :class="{'active': memberType === 'enterprise'}"
           @click="switchMemberType('enterprise')"
         >

@@ -85,14 +85,14 @@
     <!-- 底部价格栏 -->
     <view class="bottom-bar">
       <view class="bottom-price">
-        <view class="price-row-bottom">
-          <text class="price-label-small">挂牌价 ¥{{ formatPrice(totalAmount) }}</text>
+        <view class="price-row-bottom" :class="{ highlight: userPriceType === 'list' }">
+          <text class="price-label-small" :class="{ highlight: userPriceType === 'list' }">挂牌价 ¥{{ formatPrice(listPriceWithInsurance) }}</text>
         </view>
-        <view class="price-row-bottom">
-          <text class="price-label-small">尊享价 ¥{{ formatPrice(finalAmount) }}</text>
+        <view class="price-row-bottom" :class="{ highlight: userPriceType === 'vip' }">
+          <text class="price-label-small" :class="{ highlight: userPriceType === 'vip' }">尊享价 ¥{{ formatPrice(vipPriceWithInsurance) }}</text>
         </view>
-        <view class="price-row-bottom">
-          <text class="price-label-small">股东价 ¥{{ formatPrice(originalPrice || totalAmount) }}</text>
+        <view class="price-row-bottom" :class="{ highlight: userPriceType === 'share' }">
+          <text class="price-label-small" :class="{ highlight: userPriceType === 'share' }">股东价 ¥{{ formatPrice(sharePriceWithInsurance) }}</text>
         </view>
       </view>
       <button class="submit-btn" :disabled="submitting" @click="goToPayment">
@@ -123,6 +123,12 @@ export default {
       originalPrice: 0,
       priceType: 2,
       priceTypeText: '尊享价',
+      // 三种价格（用于动态显示和高亮）
+      listPrice: 0,        // 挂牌价
+      vipPrice: 0,         // 尊享价
+      sharePrice: 0,       // 股东价
+      userPriceType: 'list', // 用户当前的价格类型（list/vip/share）
+      userFinalPrice: 0,   // 用户最终价格
       seatCode: '',
       seatName: '',
       priceId: '',
@@ -147,12 +153,38 @@ export default {
     }
   },
   computed: {
-    finalAmount() {
-      // 最终金额 = 订单总额 + 保险费用
-      const insurancePrice = this.selectedInsurance >= 0 
+    insurancePrice() {
+      // 保险费用
+      return this.selectedInsurance >= 0 && this.insuranceOptions[this.selectedInsurance]
         ? this.insuranceOptions[this.selectedInsurance].price 
         : 0
-      return this.totalAmount + insurancePrice
+    },
+    finalAmount() {
+      // 最终金额 = 用户等级对应的价格 + 保险费用
+      // 使用用户等级对应的价格
+      let basePrice = this.totalAmount
+      if (this.userPriceType === 'vip') {
+        basePrice = this.vipPrice
+      } else if (this.userPriceType === 'share') {
+        basePrice = this.sharePrice
+      } else {
+        basePrice = this.listPrice
+      }
+      // 如果传递了 user_final_price，优先使用
+      if (this.userFinalPrice > 0) {
+        basePrice = this.userFinalPrice
+      }
+      return basePrice + this.insurancePrice
+    },
+    // 计算三种价格（含保险）
+    listPriceWithInsurance() {
+      return this.listPrice + this.insurancePrice
+    },
+    vipPriceWithInsurance() {
+      return this.vipPrice + this.insurancePrice
+    },
+    sharePriceWithInsurance() {
+      return this.sharePrice + this.insurancePrice
     }
   },
   onLoad(options) {
@@ -172,6 +204,37 @@ export default {
     this.originalPrice = parseFloat(options.original_price || 0)
     this.priceType = parseInt(options.price_type || 2)
     this.priceTypeText = decodeURIComponent(options.price_type_text || '尊享价')
+    
+    // 接收三种价格和用户价格类型
+    this.listPrice = parseFloat(options.list_price || options.total_amount || 0)
+    this.vipPrice = parseFloat(options.vip_price || options.total_amount || 0)
+    this.sharePrice = parseFloat(options.share_price || options.total_amount || 0)
+    this.userPriceType = options.user_price_type || 'list'
+    this.userFinalPrice = parseFloat(options.user_final_price || options.display_price || options.total_amount || 0)
+    
+    // 根据用户价格类型设置显示价格
+    if (this.userPriceType === 'vip') {
+      this.displayPrice = this.vipPrice
+      this.totalAmount = this.vipPrice
+      this.priceTypeText = '尊享价'
+      this.priceType = 2
+    } else if (this.userPriceType === 'share') {
+      this.displayPrice = this.sharePrice
+      this.totalAmount = this.sharePrice
+      this.priceTypeText = '股东价'
+      this.priceType = 4
+    } else {
+      this.displayPrice = this.listPrice
+      this.totalAmount = this.listPrice
+      this.priceTypeText = '挂牌价'
+      this.priceType = 1
+    }
+    
+    // 如果传递了 user_final_price，优先使用（因为可能包含身份优惠等额外计算）
+    if (this.userFinalPrice > 0) {
+      this.displayPrice = this.userFinalPrice
+      this.totalAmount = this.userFinalPrice
+    }
     this.seatCode = options.seat_code || ''
     this.seatName = decodeURIComponent(options.seat_name || '')
     this.priceId = options.price_id || ''
@@ -294,9 +357,15 @@ export default {
           fuel_tax: this.ticketType === 'flight' ? this.fuelTax : 0,
           display_price: this.displayPrice,
           total_amount: this.totalAmount,
-          insurance_price: this.selectedInsurance >= 0 ? this.insuranceOptions[this.selectedInsurance].price : 0,
+          insurance_price: this.insurancePrice,
           final_amount: this.finalAmount,
           price_type: this.priceType,
+          // 传递所有价格信息，确保订单创建使用正确的价格
+          list_price: this.listPrice,
+          vip_price: this.vipPrice,
+          share_price: this.sharePrice,
+          user_price_type: this.userPriceType,
+          user_final_price: this.userFinalPrice || this.displayPrice,
           seat_code: this.seatCode,
           seat_name: this.seatName,
           price_id: this.priceId,
@@ -315,11 +384,15 @@ export default {
         const res = await createOrder(orderData)
         
         if (res.code === 1 && res.data && res.data.order_id) {
-          // 跳转到支付页面，使用正确的参数
+          // 跳转到支付页面，使用用户等级对应的价格
           const params = {
             from: 'flight', // 机票订单类型
             order_id: res.data.order_id,
-            amount: this.finalAmount
+            amount: this.finalAmount, // 用户等级对应的最终价格（含保险）
+            // 传递价格信息，确保支付流程使用正确的价格
+            price_type: this.priceType,
+            user_price_type: this.userPriceType,
+            user_final_price: this.userFinalPrice || this.displayPrice
           }
           
           const queryString = Object.keys(params)
@@ -580,6 +653,19 @@ export default {
       .price-label-small {
         font-size: 22rpx;
         color: #B9BABE;
+        
+        &.highlight {
+          color: #F3BC63;
+          font-weight: 600;
+        }
+      }
+      
+      // 整行高亮时，标签也高亮
+      &.highlight {
+        .price-label-small {
+          color: #F3BC63;
+          font-weight: 600;
+        }
       }
     }
   }

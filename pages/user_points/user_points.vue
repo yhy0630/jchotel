@@ -24,6 +24,7 @@
 <script>
 import DataListCard from '@/components/DataListCard.vue'
 import config from '@/config/app.js'
+import { getIntegralList, getUser } from '@/api/user.js'
 
 export default {
 	components: {
@@ -80,57 +81,80 @@ export default {
 	},
 	methods: {
 		// 获取总积分
-		getTotalPoints() {
-			// TODO: 调用API获取总积分
-			// 示例数据
-			this.totalPoints = 49185
+		async getTotalPoints() {
+			try {
+				const res = await getIntegralList({
+					page_no: 1,
+					page_size: 1
+				})
+				if (res.code === 1) {
+					this.totalPoints = res.data.total_integral || 0
+				}
+			} catch (e) {
+				console.error('获取总积分失败:', e)
+				// 如果接口失败，尝试从用户信息获取
+				try {
+					const userRes = await getUser()
+					if (userRes.code === 1 && userRes.data) {
+						this.totalPoints = userRes.data.user_integral || 0
+					}
+				} catch (err) {
+					console.error('获取用户信息失败:', err)
+				}
+			}
 		},
 		// 获取积分明细列表
-		getPointsList() {
-			return new Promise((resolve) => {
-				// TODO: 调用API获取积分明细
-				// 示例数据
-				const mockData = [
-					{
-						title: '积分来源名称',
-						create_time: '2022-12-04 03:59:25',
-						points: 24
-					},
-					{
-						title: '积分来源名称',
-						create_time: '2022-12-04 03:59:25',
-						points: 0.1
-					},
-					{
-						title: '积分来源名称',
-						create_time: '2022-12-04 03:59:25',
-						points: -0.1
-					},
-					{
-						title: '积分来源名称',
-						create_time: '2022-12-04 03:59:25',
-						points: -0.1
-					},
-					{
-						title: '积分来源名称',
-						create_time: '2022-12-04 03:59:25',
-						points: -0.1
+		async getPointsList() {
+			try {
+				const res = await getIntegralList({
+					page_no: this.page,
+					page_size: this.pageSize,
+					type: 0 // 0:全部, 1:增加, 2:减少
+				})
+				
+				if (res.code === 1 && res.data) {
+					const list = res.data.list || []
+					
+					// 格式化数据
+					const formattedList = list.map(item => ({
+						title: item.source_type_desc || '积分变动',
+						create_time: item.create_time || '',
+						points: item.change_amount || 0,
+						change_type: item.change_type || 1, // 1:增加, 2:减少
+						order_sn: item.order_sn || '',
+						remark: item.remark || ''
+					}))
+					
+					if (this.page === 1) {
+						this.pointsList = formattedList
+					} else {
+						this.pointsList = [...this.pointsList, ...formattedList]
 					}
-				]
-				
-				if (this.page === 1) {
-					this.pointsList = mockData
+					
+					// 更新总积分
+					if (res.data.total_integral !== undefined) {
+						this.totalPoints = res.data.total_integral
+					}
+					
+					// 判断是否还有更多数据
+					this.hasMore = res.data.more || false
+					
+					return Promise.resolve()
 				} else {
-					this.pointsList = [...this.pointsList, ...mockData]
+					uni.showToast({
+						title: res.msg || '获取积分列表失败',
+						icon: 'none'
+					})
+					return Promise.reject(res.msg || '获取积分列表失败')
 				}
-				
-				// 判断是否还有更多数据
-				if (mockData.length < this.pageSize) {
-					this.hasMore = false
-				}
-				
-				resolve()
-			})
+			} catch (e) {
+				console.error('获取积分列表失败:', e)
+				uni.showToast({
+					title: '获取积分列表失败',
+					icon: 'none'
+				})
+				return Promise.reject(e)
+			}
 		}
 	}
 }

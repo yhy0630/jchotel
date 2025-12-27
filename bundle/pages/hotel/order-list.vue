@@ -31,8 +31,8 @@
         <view class="location">{{ getOrderLocation(item) }}</view>
         <view class="dates">{{ getOrderDates(item) }}</view>
         <view class="price">¥ {{ item.amount_payable || item.amount_paid || item.total_price || 0 }}</view>
-        
-        
+
+
         <view class="actions" @click.stop>
           <button v-if="item.status === 0 && !isPaid(item)" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
           <button v-if="item.status === 0 && !isPaid(item)" class="btn pay" @click.stop="goPay(item)">去支付</button>
@@ -115,7 +115,7 @@ export default {
   computed: {
     typeLabel() {
       // 查找当前选中的订单类型
-      const selected = this.allOrderTypes.find(item => 
+      const selected = this.allOrderTypes.find(item =>
         item.orderType === this.orderType && item.activeType === this.activeType
       )
       return selected ? selected.label : '全部订单'
@@ -185,7 +185,7 @@ export default {
         this.toggleTypePicker(false)
         return
       }
-      
+
       // 更新订单类型和子类型
       this.orderType = item.orderType
       this.activeType = item.activeType
@@ -198,7 +198,7 @@ export default {
 
       // 关闭弹窗
       this.toggleTypePicker(false)
-      
+
       // 重置分页并重新加载列表
       this.page = 1
       this.noMore = false
@@ -215,7 +215,7 @@ export default {
       this.loading = true
       try {
         let res
-        
+
         // 如果是"全部订单"，需要加载所有类型的订单并合并
         if (this.orderType === 'all') {
           res = await this.loadAllOrderTypes()
@@ -257,14 +257,14 @@ export default {
           }
           res = await orderList(params)
         }
-        
+
         if (res.code === 1) {
           if (this.page === 1) {
             this.list = res.data.list || []
           } else {
             this.list = this.list.concat(res.data.list || [])
           }
-          
+
           // 对于"全部订单"，使用 hasMore 字段判断
           if (this.orderType === 'all') {
             if (res.data.hasMore === false || (res.data.list || []).length < this.limit) {
@@ -301,13 +301,13 @@ export default {
         this.allOrdersPage = { hotel: 1, flight: 1, train: 1, taxi: 1 }
         this.allOrdersNoMore = { hotel: false, flight: false, train: false, taxi: false }
       }
-      
+
       // 如果缓存中的数据不够当前页显示，需要加载更多
       const needCount = this.page * this.limit
       while (this.allOrdersCache.length < needCount && !this.isAllTypesNoMore()) {
         // 并行加载所有类型的订单（每个类型加载一页）
         const promises = []
-        
+
         // 1. 酒店订单
         if (!this.allOrdersNoMore.hotel) {
           const hotelParams = {
@@ -322,7 +322,7 @@ export default {
               .catch(e => ({ type: 'hotel', res: { code: 0, data: { list: [] } } }))
           )
         }
-        
+
         // 2. 飞机票订单
         if (!this.allOrdersNoMore.flight) {
           const flightParams = {
@@ -336,7 +336,7 @@ export default {
               .catch(e => ({ type: 'flight', res: { code: 0, data: { list: [] } } }))
           )
         }
-        
+
         // 3. 火车票订单
         if (!this.allOrdersNoMore.train) {
           const trainParams = {
@@ -350,7 +350,7 @@ export default {
               .catch(e => ({ type: 'train', res: { code: 0, data: { list: [] } } }))
           )
         }
-        
+
         // 4. 打车订单
         if (!this.allOrdersNoMore.taxi) {
           const taxiParams = {
@@ -369,10 +369,10 @@ export default {
         if (promises.length === 0) {
           break
         }
-        
+
         // 等待所有请求完成
         const results = await Promise.all(promises)
-        
+
         // 处理每个类型的结果
         results.forEach(({ type, res }) => {
           if (res.code === 1 && res.data && res.data.list && res.data.list.length > 0) {
@@ -382,10 +382,10 @@ export default {
               _orderType: type
             }))
             this.allOrdersCache = this.allOrdersCache.concat(orders)
-            
+
             // 更新该类型的页码
             this.allOrdersPage[type]++
-            
+
             // 如果返回的数据少于 limit，说明该类型没有更多了
             if (res.data.list.length < this.limit) {
               this.allOrdersNoMore[type] = true
@@ -396,22 +396,22 @@ export default {
           }
         })
       }
-      
+
       // 按创建时间倒序排序（最新的在前）
       this.allOrdersCache.sort((a, b) => {
         const timeA = parseInt(a.create_time || a.add_time || 0)
         const timeB = parseInt(b.create_time || b.add_time || 0)
         return timeB - timeA
       })
-      
+
       // 分页处理：返回当前页的数据
       const start = (this.page - 1) * this.limit
       const end = start + this.limit
       const paginatedList = this.allOrdersCache.slice(start, end)
-      
+
       // 判断是否还有更多数据
       const hasMore = this.allOrdersCache.length > end || !this.isAllTypesNoMore()
-      
+
       return {
         code: 1,
         data: {
@@ -434,7 +434,7 @@ export default {
     getStatusText(status, item) {
       // 如果订单有 _orderType 标识（来自"全部订单"），使用该标识；否则使用 this.orderType
       const orderType = item?._orderType || this.orderType
-      
+
       // 打车订单状态
       if (orderType === 'taxi') {
         const map = { 0: '待支付', 1: '待接单', 2: '进行中', 3: '已完成', 4: '已取消' }
@@ -479,7 +479,7 @@ export default {
       // 根据订单类型跳转到对应的详情页面
       // 如果订单有 _orderType 标识（来自"全部订单"），使用该标识；否则使用 this.orderType
       const orderType = item._orderType || this.orderType
-      
+
       const detailPages = {
         'flight': '/bundle/pages/ticket/flight-order-detail',
         'train': '/bundle/pages/ticket/train-order-detail',
@@ -487,9 +487,9 @@ export default {
         'taxi': '/bundle/pages/taxi/order-detail',
         'hotel': '/bundle/pages/hotel/order-detail'
       }
-      
+
       const detailPage = detailPages[orderType] || '/bundle/pages/hotel/order-detail'
-      
+
       // 根据订单类型传递不同的参数
       let url = `${detailPage}?order_id=${item.id}`
       if (orderType === 'flight' || orderType === 'train') {
@@ -498,7 +498,7 @@ export default {
       if (item.order_sn) {
         url += `&order_sn=${item.order_sn}`
       }
-      
+
       uni.navigateTo({
         url
       })

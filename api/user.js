@@ -427,3 +427,8 @@ export function getMemberGradeOptions() {
 export function getIdentityDiscountList() {
     return request.get('identity_discount/lists')
 }
+
+// 获取积分列表
+export function getIntegralList(params) {
+    return request.get('user/integralList', {params})
+}

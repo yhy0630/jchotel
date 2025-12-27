@@ -166,13 +166,43 @@ export default {
     this.checkInDate = options.checkInDate || ''
     this.checkOutDate = options.checkOutDate || ''
 
+    // 接收从酒店详情页传递的房型和酒店信息，避免再次请求 hotelDetail 接口
+    if (options.roomInfo) {
+      try {
+        this.roomInfo = JSON.parse(decodeURIComponent(options.roomInfo))
+        // 优先使用 roomInfo 中的完整 roomCode（包含 ==~# 后缀），避免 URL 参数中的 roomCode 被截取
+        if (this.roomInfo.roomCode) {
+          this.roomCode = this.roomInfo.roomCode
+        }
+        // 使用后端在详情接口中计算好的价格
+        this.prices = {
+          list_price: this.roomInfo.list_price || 0,
+          vip_price: this.roomInfo.vip_price || 0,
+          share_price: this.roomInfo.share_price || 0,
+          user_final_price: this.roomInfo.user_final_price || this.roomInfo.list_price || 0
+        }
+        this.userPriceType = this.roomInfo.user_price_type || 'list'
+      } catch (e) {
+        console.error('解析 roomInfo 失败:', e)
+      }
+    }
+
+    if (options.hotelInfo) {
+      try {
+        const hotelInfo = JSON.parse(decodeURIComponent(options.hotelInfo))
+        this.hotelInfo = hotelInfo || {}
+      } catch (e) {
+        console.error('解析 hotelInfo 失败:', e)
+      }
+    }
+
     if (this.checkInDate && this.checkOutDate) {
       const checkIn = new Date(this.checkInDate)
       const checkOut = new Date(this.checkOutDate)
       this.nightNum = Math.max(1, Math.ceil((checkOut - checkIn) / 86400000))
     }
 
-    this.loadHotelDetail()
+    // 这里不再调用 hotelDetail，避免重复请求，所需信息从上一个页面传递
   },
   methods: {
     formatPrice(price) {
@@ -200,9 +230,20 @@ export default {
         if (res.code === 1) {
           this.hotelInfo = res.data || {}
           const rooms = this.hotelInfo.rooms || []
-          const room = rooms.find(r => r.roomCode === this.roomCode) || rooms[0]
+          // 先尝试精确匹配，如果找不到则尝试部分匹配（兼容roomCode可能不完整的情况）
+          let room = rooms.find(r => r.roomCode === this.roomCode)
+          if (!room) {
+            // 如果精确匹配失败，尝试部分匹配（roomCode可能缺少后缀）
+            room = rooms.find(r => r.roomCode && r.roomCode.indexOf(this.roomCode) === 0)
+          }
+          if (!room) {
+            // 如果还是找不到，使用第一个房间
+            room = rooms[0]
+          }
           if (room) {
             this.roomInfo = room
+            // 使用后端返回的完整 roomCode（包含 ==~# 后缀）
+            this.roomCode = room.roomCode || this.roomCode
             // 直接使用后端计算好的价格（后端已经基于 settAmount 计算好了）
             this.prices = {
               list_price: room.list_price || 0,
@@ -254,11 +295,12 @@ export default {
         return // 用户取消
       }
 
-      // 先进行预检查，调用第三方接口验证是否能下单
+      // 先调用第三方酒店预订接口创建订单
       this.checking = true
       try {
-        uni.showLoading({ title: '正在验证...', mask: true })
-        
+        uni.showLoading({ title: '正在预订...', mask: true })
+
+        // 传递完整的预订参数，包括从酒店详情获取的信息
         const checkRes = await checkBooking({
           hotel_code: this.hotelCode,
           room_code: this.roomCode,
@@ -268,17 +310,31 @@ export default {
           child_count: 0,
           guest_name: this.guestName,
           mobile: this.mobile,
-          room_num: this.roomNum
+          room_num: this.roomNum,
+          // 从酒店详情获取的必要参数（避免后端再次调用 hotelDetail 接口）
+          shopping_id: this.hotelInfo.shoppingId || '',
+          room_name: this.roomInfo.roomName || '',
+          plan_code: this.roomInfo.planCode || '',
+          // 基础价格（后端需要这个来判断是否需要调用接口）
+          sett_amount: this.roomInfo.settAmount || 0,
+          amount_price: this.roomInfo.amountPrice || 0,
+          base_price: this.roomInfo.settAmount || this.roomInfo.amountPrice || 0,
+          // 城市代码（用于价格计算）
+          city_code: this.hotelInfo.cityCode || '',
+          // 用户最终价格
+          user_final_price: this.prices.user_final_price || 0,
+          arrive_early_time: this.hotelInfo.arriveEarlyTime || '',
+          arrive_last_time: this.hotelInfo.arriveLastTime || ''
         })
 
         uni.hideLoading()
 
         if (checkRes.code !== 1) {
-          uni.showToast({ title: checkRes.msg || '预订验证失败', icon: 'none' })
+          uni.showToast({ title: checkRes.msg || '预订失败', icon: 'none' })
           return
         }
 
-        // 预检查通过，创建本地订单
+        // 第三方预订成功，创建本地订单
         this.submitting = true
         uni.showLoading({ title: '正在创建订单...', mask: true })
 
@@ -291,7 +347,20 @@ export default {
           child_count: 0,
           guest_name: this.guestName,
           mobile: this.mobile,
-          room_num: this.roomNum
+          room_num: this.roomNum,
+          // 传递订单号和第三方订单信息（如果返回了）
+          order_sn: checkRes.data?.order_sn || null,
+          third_party_order: checkRes.data?.third_party_order || null,
+          // 传递价格信息（从 checkBooking 返回的数据中获取，确保使用加价后的价格）
+          user_final_price: checkRes.data?.user_final_price || this.prices.user_final_price || 0,
+          base_price: checkRes.data?.base_price || this.roomInfo.settAmount || this.roomInfo.amountPrice || 0,
+          sett_amount: checkRes.data?.sett_amount || this.roomInfo.settAmount || 0,
+          amount_price: checkRes.data?.amount_price || this.roomInfo.amountPrice || 0,
+          room_name: checkRes.data?.room_name || this.roomInfo.roomName || '',
+          plan_code: checkRes.data?.plan_code || this.roomInfo.planCode || '',
+          city_code: checkRes.data?.city_code || this.hotelInfo.cityCode || '',
+          arrive_early_time: checkRes.data?.arrive_early_time || this.hotelInfo.arriveEarlyTime || '',
+          arrive_last_time: checkRes.data?.arrive_last_time || this.hotelInfo.arriveLastTime || ''
         })
 
         uni.hideLoading()
@@ -320,7 +389,7 @@ export default {
   background: #0D1034;
   color: #fff;
   padding-bottom: 140rpx;
-  padding-top: calc(120rpx + var(--status-bar-height)); 
+  padding-top: calc(120rpx + var(--status-bar-height));
 }
 
 .content {

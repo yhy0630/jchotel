@@ -50,7 +50,7 @@
         <view class="user-stats" v-if="isLogin">
             <view class="stat-item">
                 <text class="stat-label">在网时长：</text>
-                <text class="stat-value">333天</text>
+                <text class="stat-value">{{ onlineDuration }}</text>
             </view>
             <view class="stat-item">
                 <text class="stat-label">能量分：</text>
@@ -58,7 +58,7 @@
             </view>
             <view class="stat-item">
                 <text class="stat-label">消费积分：</text>
-                <text class="stat-value">69898</text>
+                <text class="stat-value">{{ userInfo.user_integral || 0 }}</text>
             </view>
         </view>
         <!-- <view class="member-identity-card" v-if="isLogin">
@@ -473,6 +473,31 @@
 		},
 		methods: {
 			...mapActions(['getCartNum', 'getUser']),
+			// 计算在网时长
+			calculateOnlineDuration() {
+				if (!this.isLogin || !this.userInfo || !this.userInfo.create_time) {
+					return '0天';
+				}
+				
+				const createTime = new Date(this.userInfo.create_time).getTime();
+				const now = Date.now();
+				const diffMs = now - createTime;
+				const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+				
+				if (diffDays < 30) {
+					return diffDays + '天';
+				} else if (diffDays < 365) {
+					const months = Math.floor(diffDays / 30);
+					return months + '个月';
+				} else {
+					const years = Math.floor(diffDays / 365);
+					const remainMonths = Math.floor((diffDays % 365) / 30);
+					if (remainMonths > 0) {
+						return years + '年' + remainMonths + '个月';
+					}
+					return years + '年';
+				}
+			},
 			goLogin() {
 				let {
 					isLogin
@@ -726,6 +751,10 @@
 		},
 		computed: {
 			...mapGetters(["cartNum", "userInfo", "inviteCode", "appConfig", "isLogin"]),
+			// 在网时长
+			onlineDuration() {
+				return this.calculateOnlineDuration();
+			},
 		background() {
 			const {
 				center_setting

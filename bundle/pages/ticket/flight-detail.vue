@@ -353,6 +353,13 @@ export default {
       const totalPrice = memberBasePrice + airportTax + fuelTax      // 含税总价（展示给用户）
       const policyId = adultPrice.policyInfo?.policyId || ''
       
+      // 获取三种价格和用户价格类型（后端已计算好）
+      const listPrice = Number(adultPrice.list_price || ticketPrice)
+      const vipPrice = Number(adultPrice.vip_price || ticketPrice)
+      const sharePrice = Number(adultPrice.share_price || ticketPrice)
+      const userPriceType = adultPrice.user_price_type || 'list'
+      const userFinalPrice = Number(adultPrice.user_final_price || memberBasePrice)
+      
       // 跳转到乘客信息页面
       const params = {
         type: 'flight',
@@ -366,6 +373,12 @@ export default {
         display_price: memberBasePrice,                     // 会员价（不含税）
         total_amount: totalPrice,                           // 本单应付总额（不含保险）
         original_price: ticketPrice + airportTax + fuelTax, // 原始总价 = 票面 + 税费
+        // 传递所有三种价格，用于动态显示和高亮
+        list_price: listPrice,
+        vip_price: vipPrice,
+        share_price: sharePrice,
+        user_price_type: userPriceType,
+        user_final_price: userFinalPrice,
         price_type: 2,
         price_type_text: '尊享价',
         seat_code: seat.seatCode || '',

@@ -78,6 +78,14 @@
             <text class="form-label">联系手机*</text>
             <text class="form-tip">用于接收订单/航变信息</text>
           </view>
+          <input
+            class="form-input"
+            v-model="contactMobile"
+            type="number"
+            placeholder="请输入联系手机号"
+            placeholder-class="input-placeholder"
+            maxlength="11"
+          />
         </view>
       </view>
 
@@ -106,9 +114,18 @@
           <text class="label">燃油费</text>
           <text class="value">¥{{ formatPrice(fuelTax) }}</text>
         </view>
-        <view class="price-row">
-          <text class="label sub">{{ priceTypeText }}</text>
-          <text class="value highlight">¥{{ formatPrice(displayPrice) }}</text>
+        <!-- 显示所有三种价格，根据用户等级动态高亮 -->
+        <view class="price-row" :class="{ highlight: userPriceType === 'list' }">
+          <text class="label sub">挂牌价</text>
+          <text class="value" :class="{ highlight: userPriceType === 'list' }">¥{{ formatPrice(listPrice) }}</text>
+        </view>
+        <view class="price-row" :class="{ highlight: userPriceType === 'vip' }">
+          <text class="label sub">尊享价</text>
+          <text class="value" :class="{ highlight: userPriceType === 'vip' }">¥{{ formatPrice(vipPrice) }}</text>
+        </view>
+        <view class="price-row" :class="{ highlight: userPriceType === 'share' }">
+          <text class="label sub">股东价</text>
+          <text class="value" :class="{ highlight: userPriceType === 'share' }">¥{{ formatPrice(sharePrice) }}</text>
         </view>
         <view class="price-row total">
           <text class="label">本单您需支付</text>
@@ -158,6 +175,12 @@ export default {
       originalPrice: 0,    // 原价（票面价+机建+燃油）
       priceType: 2,
       priceTypeText: '尊享价',
+      // 三种价格（用于动态显示和高亮）
+      listPrice: 0,        // 挂牌价
+      vipPrice: 0,         // 尊享价
+      sharePrice: 0,       // 股东价
+      userPriceType: 'list', // 用户当前的价格类型（list/vip/share）
+      userFinalPrice: 0,   // 用户最终价格
       seatCode: '',
       seatName: '',
       priceId: '',
@@ -195,6 +218,7 @@ export default {
       passengerName: '',
       idCard: '',
       mobile: '',
+      contactMobile: '',  // 联系手机号
       cabinClass: 'Y',
       seatType: 'second',
       
@@ -222,8 +246,8 @@ export default {
       return map[this.seatType] || '二等座'
     },
     canSubmit() {
-      return this.passengerName && this.idCard && this.mobile && 
-             this.idCard.length >= 15 && this.mobile.length === 11
+      return this.passengerName && this.idCard && this.mobile && this.contactMobile &&
+             this.idCard.length >= 15 && this.mobile.length === 11 && this.contactMobile.length === 11
     }
   },
   onLoad(options) {
@@ -261,6 +285,33 @@ export default {
     
     this.priceType = parseInt(options.price_type || 2)
     this.priceTypeText = decodeURIComponent(options.price_type_text || '尊享价')
+    
+    // 接收三种价格和用户价格类型
+    this.listPrice = parseFloat(options.list_price || options.price || 0)
+    this.vipPrice = parseFloat(options.vip_price || options.price || 0)
+    this.sharePrice = parseFloat(options.share_price || options.price || 0)
+    this.userPriceType = options.user_price_type || 'list'
+    this.userFinalPrice = parseFloat(options.user_final_price || options.display_price || options.price || 0)
+    
+    // 根据用户价格类型设置显示价格和价格类型文本
+    if (this.userPriceType === 'vip') {
+      this.displayPrice = this.vipPrice
+      this.priceTypeText = '尊享价'
+      this.priceType = 2
+    } else if (this.userPriceType === 'share') {
+      this.displayPrice = this.sharePrice
+      this.priceTypeText = '股东价'
+      this.priceType = 4
+    } else {
+      this.displayPrice = this.listPrice
+      this.priceTypeText = '挂牌价'
+      this.priceType = 1
+    }
+    
+    // 如果传递了 user_final_price，优先使用（因为可能包含身份优惠等额外计算）
+    if (this.userFinalPrice > 0) {
+      this.displayPrice = this.userFinalPrice
+    }
     
     // 航班相关信息
     this.flightNo = options.flight_no || ''
@@ -366,6 +417,14 @@ export default {
         uni.showToast({ title: '手机号码格式不正确', icon: 'none' })
         return
       }
+      if (!this.contactMobile) {
+        uni.showToast({ title: '请输入联系手机号', icon: 'none' })
+        return
+      }
+      if (!this.validateMobile(this.contactMobile)) {
+        uni.showToast({ title: '联系手机号格式不正确', icon: 'none' })
+        return
+      }
       
       // 跳转到订单确认页面
       const params = {
@@ -376,6 +435,7 @@ export default {
         passenger_name: this.passengerName,
         id_card: this.idCard,
         mobile: this.mobile,
+        contact_mobile: this.contactMobile,  // 添加联系手机号
         ticket_price: this.ticketPrice,
         airport_tax: this.airportTax,
         fuel_tax: this.fuelTax,
@@ -384,6 +444,12 @@ export default {
         original_price: this.originalPrice,
         price_type: this.priceType,
         price_type_text: this.priceTypeText,
+        // 传递所有价格信息，确保订单创建和支付流程使用正确的价格
+        list_price: this.listPrice,
+        vip_price: this.vipPrice,
+        share_price: this.sharePrice,
+        user_price_type: this.userPriceType,
+        user_final_price: this.userFinalPrice || this.displayPrice,
         seat_code: this.seatCode,
         seat_name: this.seatName,
         price_id: this.priceId,
@@ -699,6 +765,21 @@ export default {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+        }
+      }
+      
+      // 整行高亮时，标签和值都高亮
+      &.highlight {
+        .label {
+          color: #F3BC63;
+          font-weight: 600;
+        }
+        .value {
+          background: linear-gradient(90deg, #F3BC63 0%, #FFE6B6 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 600;
         }
       }
       
