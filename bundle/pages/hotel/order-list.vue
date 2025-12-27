@@ -31,18 +31,17 @@
         <view class="location">{{ getOrderLocation(item) }}</view>
         <view class="dates">{{ getOrderDates(item) }}</view>
         <view class="price">¥ {{ item.amount_payable || item.amount_paid || item.total_price || 0 }}</view>
-        <!-- 支付状态显示 -->
-        <view v-if="(item._orderType || orderType) === 'hotel' && item.status === 0" class="pay-status">
-          <text class="pay-status-label">支付状态：</text>
-          <text :class="['pay-status-value', getPayStatusClass(item)]">
-            {{ getPayStatusText(item) }}
-          </text>
-        </view>
+        
+        
         <view class="actions" @click.stop>
+          <!-- 待支付状态：所有订单类型通用 -->
           <button v-if="item.status === 0 && !isPaid(item)" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
           <button v-if="item.status === 0 && !isPaid(item)" class="btn pay" @click.stop="goPay(item)">去支付</button>
-          <button v-if="item.status === 1 && (item._orderType || orderType) === 'hotel'" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
-          <button v-if="item.status === 2 && (item._orderType || orderType) === 'hotel'" class="btn invoice" @click.stop="applyInvoice(item)">申请开票</button>
+          <!-- 待出行/待接单/已支付状态：所有订单类型通用（如果未支付可以取消） -->
+          <button v-if="item.status === 1 && !isPaid(item)" class="btn cancel" @click.stop="cancelOrder(item)">取消订单</button>
+          <!-- 已完成/已出票状态：所有订单类型通用 -->
+          <button v-if="item.status === 2 || item.status === 3" class="btn invoice" @click.stop="applyInvoice(item)">申请开票</button>
+          <button v-if="item.status === 2 || item.status === 3" class="btn review" @click.stop="goReview(item)">去评价</button>
         </view>
       </view>
       <view v-if="loading" class="loading">加载中...</view>
@@ -561,6 +560,12 @@ export default {
         url: `/bundle/pages/hotel/invoice-apply?order_id=${item.id}&order_sn=${item.order_sn || ''}`
       })
     },
+    goReview(item) {
+      // 跳转到商品评价页面，传递订单ID
+      uni.navigateTo({
+        url: `/bundle/pages/goods_reviews/goods_reviews?id=${item.id}`
+      })
+    },
     getOrderIcon(item) {
       const orderType = item?._orderType || this.orderType
       const iconMap = {
@@ -832,13 +837,13 @@ export default {
   border: 2rpx solid #FCDDA6;
 }
 
-.btn.pay, .btn.invoice {
+.btn.pay, .btn.invoice, .btn.review {
   background: transparent;
   color: #FCDDA6;
   border: 2rpx solid #FCDDA6;
 }
 
-.btn.pay:active, .btn.invoice:active {
+.btn.pay:active, .btn.invoice:active, .btn.review:active {
   background: linear-gradient(90deg, #F4C06B 0%, #FDE0AB 49.59%, #F3BF6C 100%);
   color: #380C00;
   border-color: transparent;

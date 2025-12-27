@@ -1,14 +1,16 @@
 <template>
 <view class="goods-reviews">
-    <order-goods :list="goods"></order-goods>
-    <view class="goods-evaluate row">
-        <view class="lable">商品评价</view>
-        <u-rate name="goodsRate" :count="5" :size="42" active-color="#FF2C3C" v-model="goodsRate" @change="goodsRateChange" />
+  <custom-navbar title="商品评价"></custom-navbar>
+  <scroll-view scroll-y class="content-wrap">
+    <order-goods :list="goods" style="background-color:#1E1F34"></order-goods>
+    <view class="goods-evaluate row" style="margin-top: 20rpx;background-color:#1E1F34;color:white">
+        <view class="lable">服务星级</view>
+        <u-rate name="goodsRate" :count="5" :size="42" active-color="#F4BE67" v-model="goodsRate" @change="goodsRateChange" />
         <view :class="'desc ' + ((goodsRate<=2)? 'muted': 'primary') + ' '" v-show="!(goodsRate == 0)">
             {{goodsRateDesc}}
         </view>
     </view>
-        <view class="rate bg-white">
+        <!-- <view class="rate bg-white">
             <view class="item row mb20">
                 <view class="lable">描述相符</view>
                 <u-rate name="descRate" :size="42" active-color="#FF2C3C" v-model="descRate" />
@@ -21,37 +23,22 @@
                 <view class="lable">配送服务</view>
                 <u-rate name="deliveryRate" :size="42" active-color="#FF2C3C" v-model="deliveryRate" />
             </view>
-        </view>
-        <view class="goods-dec bg-white mt20">
-            <view class="title mb20 md bold">商品描述</view>
-            <view class="textarea mb20" style="background-color: #F5F5F5;">
-               <u-input v-model="comment"  placeholder="宝贝收到还满意吗，说说你的使用心得。分享给想买的他们吧！！" type="textarea" :clearable="false">
+        </view> -->
+        <view class="goods-dec bg-white mt20" style="background-color:#1E1F34;color:white">
+            <view class="textarea mb20" >
+               <u-input v-model="comment"  placeholder=" (*^▽^*)  感觉怎么样，跟大家分享一下吧~" type="textarea" :clearable="false">
                </u-input>
             </view>
-            <uploader preview-size="180rpx" :mutiple="true" :maxUpload="5" :file-list="fileList" @after-read="afterRead" :deletable="true" @delete="onDelete" />
+            <!-- <uploader preview-size="180rpx" :mutiple="true" :maxUpload="5" :file-list="fileList" @after-read="afterRead" :deletable="true" @delete="onDelete" /> -->
         </view>
-        <button form-type="submit" class="btn br60" type="primary" size="lg" @tap="onSubmit">立即评价</button>
+  </scroll-view>
+  <view class="btn-wrapper">
+    <button form-type="submit" class="btn br60" size="lg" @tap="onSubmit">立即评价</button>
+  </view>
 </view>
 </template>
 
 <script>
-// +----------------------------------------------------------------------
-// | likeshop开源商城系统
-// +----------------------------------------------------------------------
-// | 欢迎阅读学习系统程序代码，建议反馈是我们前进的动力
-// | gitee下载：https://gitee.com/likeshop_gitee
-// | github下载：https://github.com/likeshop-github
-// | 访问官网：https://www.likeshop.cn
-// | 访问社区：https://home.likeshop.cn
-// | 访问手册：http://doc.likeshop.cn
-// | 微信公众号：likeshop技术社区
-// | likeshop系列产品在gitee、github等公开渠道开源版本可免费商用，未经许可不能去除前后端官方版权标识
-// |  likeshop系列产品收费版本务必购买商业授权，购买去版权授权后，方可去除前后端官方版权标识
-// | 禁止对系统程序代码以任何目的，任何形式的再发布
-// | likeshop团队版权所有并拥有最终解释权
-// +----------------------------------------------------------------------
-// | author: likeshop.cn.team
-// +----------------------------------------------------------------------
 import { baseURL } from '@/config/app.js';
 import { goodsComment, getCommentInfo } from '@/api/user';
 import { uploadFile } from '@/utils/tools.js';
@@ -183,8 +170,19 @@ export default {
 </script>
 <style>
 .goods-reviews {
-    padding: 20rpx 0 40rpx;
+    min-height: 100vh;
+    background: #0D1034;
+    display: flex;
+    flex-direction: column;
+    padding-top: calc(130rpx + var(--status-bar-height));
 }
+
+.content-wrap {
+    flex: 1;
+    padding: 20rpx 0;
+    padding-bottom: 140rpx;
+}
+
 .goods-reviews .rate {
     padding:  20rpx 30rpx;
 }
@@ -204,9 +202,28 @@ export default {
     padding: 20rpx;
     box-sizing: border-box;
 }
+
+.btn-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20rpx 26rpx;
+    padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+    background: #0D1034;
+    z-index: 100;
+}
+
 .goods-reviews .btn {
-    width: 698rpx;
-    margin: 30rpx 26rpx 0;
+    width: 100%;
+    margin: 0;
+    background: linear-gradient(90deg, #F4BD66 0%, #FEE2AF 49.58%, #F3BD65 100%);
+    color: #380C00;
+    border: none;
+}
+
+.goods-reviews .btn::after {
+    border: none;
 }
 
 .rate .item .desc {
@@ -215,8 +232,6 @@ export default {
 
 .goods-reviews .goods-evaluate {
     padding: 20rpx 30rpx;
-    background-color: white;
-    border: 1rpx solid #F2F2F2;
 }
 
 .goods-reviews .goods-evaluate .desc {
